@@ -1,0 +1,148 @@
+# From Summary Functions To A t-Statistic
+
+## One More Function
+
+So far, we have built small functions for the mean, variance, standard deviation, and standard error.
+
+Those pieces can also be used to build a t-statistic. We will calculate it first, then see how a test uses it.
+
+The basic question is:
+
+<div class="summary-box">
+How far is my sample mean from a comparison value, relative to the noise in the sample?
+</div>
+
+## A Score Example
+
+Imagine we have a short set of scores:
+
+```{r score-data}
+scores <- score_values
+comparison_value <- 50
+
+scores
+comparison_value
+```
+
+The comparison value is just the value we want to compare the sample against. It could be a scale midpoint, a known benchmark, or a value from a previous study.
+
+## The Equation
+
+The t-statistic can be written as:
+
+$$
+t = \frac{\bar{x} - \mu_0}{s / \sqrt{n}}
+$$
+
+Read this as:
+
+1. calculate the sample mean;
+2. subtract the comparison value;
+3. calculate the standard error;
+4. divide the difference by the standard error.
+
+## Build The Pieces
+
+```{r t-pieces}
+my_mean <- function(x) {
+  return(sum(x) / length(x))
+}
+
+my_var <- function(x) {
+  return(sum((x - my_mean(x))^2) / (length(x) - 1))
+}
+
+my_sd <- function(x) {
+  return(sqrt(my_var(x)))
+}
+
+my_se <- function(x) {
+  return(my_sd(x) / sqrt(length(x)))
+}
+
+mean_score <- my_mean(scores)
+sd_score <- my_sd(scores)
+n <- length(scores)
+se_score <- my_se(scores)
+
+mean_score
+sd_score
+n
+se_score
+```
+
+Now we can put those pieces into the equation.
+
+```{r t-by-hand}
+t_value <- (mean_score - comparison_value) / se_score
+t_value
+```
+
+The absolute t-value is larger when the mean is further from the comparison value, holding the standard error fixed. Its sign tells us which side of the comparison value the mean falls on.
+
+## Put It In A Function
+
+```{r t-function}
+my_t_value <- function(x, comparison_value) {
+  mean_x <- my_mean(x)
+  se_x <- my_se(x)
+
+  output <- (mean_x - comparison_value) / se_x
+  return(output)
+}
+
+my_t_value(scores, comparison_value = 50)
+```
+
+This function returns one number. That number is not the whole test. It is the statistic that the test uses.
+
+The denominator of the t-statistic is the `r fitb("standard error")`.
+
+Check the hand-built statistic against `t.test()`:
+
+```{r compare-ttest}
+t.test(scores, mu = comparison_value)
+```
+
+The `t` in this output should match our function. The test also reports degrees of freedom (`df`), a p-value, and a confidence interval. For this one-sample test, `df` is the sample size minus one.
+
+The two-sided p-value is the probability, under the null model, of getting a t-value at least as far from zero as ours in either direction. It is not the probability that the null hypothesis is true. Here the null model says that the population mean equals the comparison value. The usual exact t-test assumes independent observations drawn from a normal population with nonzero variance.
+
+```{r t-interpretation, echo=FALSE}
+t_result <- t.test(scores, mu = comparison_value)
+```
+
+Our sample mean is `r round(my_mean(scores), 2)` and the comparison value is `r comparison_value`. The difference is `r round(my_t_value(scores, comparison_value), 2)` estimated standard errors above zero. The two-sided p-value is `r round(t_result$p.value, 3)`. At an alpha of .05, we would not reject this null hypothesis. That does not establish that the population mean is exactly `r comparison_value`.
+
+Try changing the comparison value to 55. Before running the function, predict the sign of t.
+
+`r hide("Show one solution")`
+```{r t-sign-exercise}
+my_t_value(scores, comparison_value = 55)
+t.test(scores, mu = 55)
+```
+The t-value is negative because our sample mean is below 55.
+`r unhide()`
+
+## Why Simulate It?
+
+One t-value tells us what happened in one sample.
+
+The next question is what t-values tend to look like if we took lots of samples. This is where simulation helps.
+
+The NHST app lets you draw one sample, see the summary pieces that produced its t-value, then watch that t-value join the growing distribution of t-values.
+
+Try this sequence:
+
+1. Click **Sample null once**.
+2. Look at the current sample and its mean, variance, SD, SE, and t-value.
+3. Look at where that single t-value lands on the t-axis.
+4. Repeat a few times before running a null batch.
+5. Click **Sample true population once** and compare the new t-value with the null values already on the axis.
+6. Run a true-population batch and look at how much the generated distribution overlaps with the null t distribution.
+
+The important link is:
+
+<div class="summary-box">
+sample values -> summary pieces -> one t-value -> long-run t distribution
+</div>

@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mean And Variance Widget</title>
+  <style>
+    :root {
+      --blue: #467AAC;
+      --orange: #D55E00;
+      --ink: #243447;
+      --panel: #eef5fb;
+      --line: #d8e4ef;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 16px;
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    .controls {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px;
+    }
+
+    .control {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      font: inherit;
+    }
+
+    .value {
+      font-variant-numeric: tabular-nums;
+      font-size: 0.95rem;
+    }
+
+    .checks label {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-weight: 500;
+      margin: 6px 0;
+    }
+
+    button {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--blue);
+      color: white;
+      border: 0;
+      border-radius: 4px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .plot-wrap {
+      min-width: 0;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 430px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .summary div {
+      background: #f8fbfd;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 0.95rem;
+    }
+
+    .summary strong {
+      display: block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #53677a;
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      canvas {
+        height: 360px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="controls">
+      <div class="control">
+        <label for="mean">Mean</label>
+        <input id="mean" type="range" min="-5" max="5" value="0" step="0.1">
+        <div class="value" id="mean-value"></div>
+      </div>
+
+      <div class="control">
+        <label for="variance">Variance</label>
+        <input id="variance" type="range" min="0.25" max="9" value="1" step="0.25">
+        <div class="value" id="variance-value"></div>
+      </div>
+
+      <div class="control">
+        <label for="sample-size">Sample size</label>
+        <input id="sample-size" type="range" min="10" max="300" value="80" step="10">
+        <div class="value" id="sample-size-value"></div>
+      </div>
+
+      <div class="control">
+        <label for="seed">Seed</label>
+        <input id="seed" type="number" min="1" step="1" value="123">
+      </div>
+
+      <div class="control checks">
+        <label><input id="show-dots" type="checkbox" checked> Sample dots</label>
+        <label><input id="show-lines" type="checkbox" checked> Lines to the mean</label>
+        <label><input id="show-curve" type="checkbox" checked> Bell curve</label>
+      </div>
+
+      <button id="new-sample" type="button">Draw new sample</button>
+    </aside>
+
+    <main class="plot-wrap">
+      <canvas id="plot" width="1000" height="520" aria-label="Interactive normal distribution plot"></canvas>
+      <div class="summary">
+        <div><strong>Mean</strong><span id="summary-mean"></span></div>
+        <div><strong>Variance</strong><span id="summary-variance"></span></div>
+        <div><strong>SD</strong><span id="summary-sd"></span></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const blue = "#467AAC";
+    const orange = "#D55E00";
+    const ink = "#243447";
+    const grid = "#d8e4ef";
+    const xLimits = [-15, 15];
+    const yLimits = [-0.35, 0.9];
+
+    const els = {
+      mean: document.getElementById("mean"),
+      variance: document.getElementById("variance"),
+      sampleSize: document.getElementById("sample-size"),
+      seed: document.getElementById("seed"),
+      showDots: document.getElementById("show-dots"),
+      showLines: document.getElementById("show-lines"),
+      showCurve: document.getElementById("show-curve"),
+      newSample: document.getElementById("new-sample"),
+      meanValue: document.getElementById("mean-value"),
+      varianceValue: document.getElementById("variance-value"),
+      sampleSizeValue: document.getElementById("sample-size-value"),
+      summaryMean: document.getElementById("summary-mean"),
+      summaryVariance: document.getElementById("summary-variance"),
+      summarySd: document.getElementById("summary-sd"),
+      canvas: document.getElementById("plot")
+    };
+
+    let sampleIndex = 0;
+    let dots = [];
+
+    function makeRng(seed) {
+      let state = Math.floor(seed) % 2147483647;
+      if (state <= 0) state += 2147483646;
+      return function() {
+        state = state * 16807 % 2147483647;
+        return (state - 1) / 2147483646;
+      };
+    }
+
+    function normalSample(rng, mean, sd) {
+      const u1 = Math.max(rng(), 1e-12);
+      const u2 = rng();
+      const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+      return mean + sd * z;
+    }
+
+    function normalDensity(x, mean, sd) {
+      return Math.exp(-0.5 * Math.pow((x - mean) / sd, 2)) / (sd * Math.sqrt(2 * Math.PI));
+    }
+
+    function inputs() {
+      const mean = Number(els.mean.value);
+      const variance = Number(els.variance.value);
+      return {
+        mean,
+        variance,
+        sd: Math.sqrt(variance),
+        n: Number(els.sampleSize.value),
+        seed: Number(els.seed.value),
+        showDots: els.showDots.checked,
+        showLines: els.showLines.checked,
+        showCurve: els.showCurve.checked
+      };
+    }
+
+    function generateSample() {
+      const opts = inputs();
+      const rng = makeRng(opts.seed + sampleIndex * 9973);
+      dots = Array.from({ length: opts.n }, () => ({
+        x: normalSample(rng, opts.mean, opts.sd),
+        jitter: rng()
+      }));
+    }
+
+    function draw() {
+      const opts = inputs();
+      const canvas = els.canvas;
+      const ctx = canvas.getContext("2d");
+      const width = canvas.width;
+      const height = canvas.height;
+      const pad = { left: 58, right: 22, top: 28, bottom: 58 };
+      const plotWidth = width - pad.left - pad.right;
+      const plotHeight = height - pad.top - pad.bottom;
+
+      const xMin = xLimits[0];
+      const xMax = xLimits[1];
+      const maxDensity = normalDensity(opts.mean, opts.mean, opts.sd);
+      const yMin = (opts.showDots || opts.showLines) ? yLimits[0] : 0;
+      const yMax = yLimits[1];
+
+      const xScale = x => pad.left + ((x - xMin) / (xMax - xMin)) * plotWidth;
+      const yScale = y => pad.top + (1 - ((y - yMin) / (yMax - yMin))) * plotHeight;
+
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.strokeStyle = grid;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, yScale(0));
+      ctx.lineTo(width - pad.right, yScale(0));
+      ctx.stroke();
+
+      ctx.fillStyle = ink;
+      ctx.font = "18px system-ui, sans-serif";
+      ctx.fillText("Mean and variance as layers", pad.left, 20);
+
+      const tickStep = niceTickStep(xMax - xMin);
+      ctx.font = "13px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#53677a";
+      ctx.strokeStyle = grid;
+      for (let tick = Math.ceil(xMin / tickStep) * tickStep; tick <= xMax; tick += tickStep) {
+        const px = xScale(tick);
+        ctx.beginPath();
+        ctx.moveTo(px, yScale(0) - 5);
+        ctx.lineTo(px, yScale(0) + 5);
+        ctx.stroke();
+        ctx.fillText(roundForAxis(tick), px, height - 24);
+      }
+      ctx.fillText("Value", pad.left + plotWidth / 2, height - 6);
+
+      if (opts.showCurve) {
+        ctx.beginPath();
+        for (let i = 0; i <= 320; i++) {
+          const x = xMin + (i / 320) * (xMax - xMin);
+          const y = normalDensity(x, opts.mean, opts.sd);
+          const px = xScale(x);
+          const py = yScale(y);
+          if (i === 0) ctx.moveTo(px, yScale(0));
+          ctx.lineTo(px, py);
+        }
+        ctx.lineTo(xScale(xMax), yScale(0));
+        ctx.closePath();
+        ctx.fillStyle = "rgba(70, 122, 172, 0.20)";
+        ctx.fill();
+
+        ctx.beginPath();
+        for (let i = 0; i <= 320; i++) {
+          const x = xMin + (i / 320) * (xMax - xMin);
+          const y = normalDensity(x, opts.mean, opts.sd);
+          const px = xScale(x);
+          const py = yScale(y);
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.strokeStyle = blue;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+
+      const meanX = xScale(opts.mean);
+      ctx.strokeStyle = orange;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(meanX, pad.top);
+      ctx.lineTo(meanX, height - pad.bottom);
+      ctx.stroke();
+
+      if (opts.showLines) {
+        ctx.strokeStyle = "rgba(213, 94, 0, 0.35)";
+        ctx.lineWidth = 1.5;
+        dots.forEach(dot => {
+          const y = -(0.05 + dot.jitter * 0.25);
+          ctx.beginPath();
+          ctx.moveTo(meanX, yScale(y));
+          ctx.lineTo(xScale(dot.x), yScale(y));
+          ctx.stroke();
+        });
+      }
+
+      if (opts.showDots) {
+        ctx.fillStyle = blue;
+        dots.forEach(dot => {
+          const y = -(0.05 + dot.jitter * 0.25);
+          ctx.beginPath();
+          ctx.arc(xScale(dot.x), yScale(y), 4, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      els.meanValue.textContent = opts.mean.toFixed(1);
+      els.varianceValue.textContent = `${opts.variance.toFixed(2)}; SD = ${opts.sd.toFixed(3)}`;
+      els.sampleSizeValue.textContent = opts.n;
+      els.summaryMean.textContent = opts.mean.toFixed(2);
+      els.summaryVariance.textContent = opts.variance.toFixed(2);
+      els.summarySd.textContent = opts.sd.toFixed(3);
+    }
+
+    function niceTickStep(range) {
+      if (range <= 4) return 1;
+      if (range <= 10) return 2;
+      if (range <= 20) return 5;
+      return 10;
+    }
+
+    function roundForAxis(value) {
+      return Math.abs(value) < 1e-10 ? "0" : String(Number(value.toFixed(2)));
+    }
+
+    function redrawWithNewSample() {
+      generateSample();
+      draw();
+    }
+
+    ["mean", "variance", "sample-size", "seed"].forEach(id => {
+      document.getElementById(id).addEventListener("input", redrawWithNewSample);
+    });
+
+    ["show-dots", "show-lines", "show-curve"].forEach(id => {
+      document.getElementById(id).addEventListener("change", draw);
+    });
+
+    els.newSample.addEventListener("click", () => {
+      sampleIndex += 1;
+      redrawWithNewSample();
+    });
+
+    redrawWithNewSample();
+  </script>
+</body>
+</html>

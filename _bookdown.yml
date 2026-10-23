@@ -1,0 +1,19 @@
+book_filename: "demyst"
+new_session: true
+output_dir: "docs"
+before_chapter_script: _common.R
+delete_merged_file: true
+rmd_files:
+  - "index.Rmd"
+  - "01-functions.Rmd"
+  - "02-equations.Rmd"
+  - "03-standard-error.Rmd"
+  - "04-t-statistic.Rmd"
+  - "05-correlation.Rmd"
+language:
+  ui:
+    chapter_name: "Chapter "
+  label:
+    fig: "Figure "
+    tab: "Table "
+    eq: "Equation "

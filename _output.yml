@@ -1,0 +1,26 @@
+bookdown::bs4_book:
+  default: yes
+  md_extensions: -smart
+  df_print: kable
+  includes:
+    in_header: include/header.html
+    after_body:
+    - include/webex.js
+    - include/script.js
+  css:
+  - include/psyteachr.css
+  - include/webex.css
+  - include/style.css
+  - demyst.css
+  theme:
+    primary: "#467AAC"
+bookdown::pdf_book:
+  includes:
+    in_header: include/preamble.tex
+  latex_engine: xelatex
+  citation_package: natbib
+  keep_tex: yes
+bookdown::epub_book:
+  stylesheet: include/epub.css
+  toc: yes
+  toc_depth: 2

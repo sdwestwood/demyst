@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Covariance and correlation</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; padding: 12px; font: 16px system-ui, sans-serif; color: #243447; background: white; }
+label { display: block; margin: 8px 0; }
+input[type=range] { width: 100%; }
+.controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+svg { width: 100%; height: auto; max-height: 390px; display: block; }
+output { font-variant-numeric: tabular-nums; }
+.numbers { padding: 10px; background: #eef5fb; line-height: 1.7; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 14px; }
+td, th { padding: 4px; text-align: right; border-bottom: 1px solid #d8e4ef; }
+caption { text-align: left; padding: 8px 0; }
+summary { cursor: pointer; padding: 10px 0; }
+@media (max-width: 420px) { .controls { grid-template-columns: 1fr; gap: 0; } }
+</style>
+</head>
+<body>
+<div class="controls">
+  <label for="relationship">Sample correlation: <output id="r-label"></output>
+    <input id="relationship" type="range" min="-1" max="1" step="0.05" value="0.6">
+  </label>
+  <label for="scale">Scale of y: <output id="scale-label"></output>
+    <input id="scale" type="range" min="0.5" max="3" step="0.5" value="1">
+  </label>
+</div>
+<label><input type="checkbox" id="distances" checked> Show distances to the means</label>
+<svg id="plot" viewBox="0 0 600 390" role="img" aria-labelledby="plot-title plot-description">
+  <title id="plot-title">Paired deviations</title>
+  <desc id="plot-description">Eight points on fixed axes, with horizontal and vertical lines showing deviations from the two means.</desc>
+  <g id="drawing"></g>
+</svg>
+<div class="numbers" aria-live="polite" id="numbers"></div>
+<details open><summary>Values for each pair</summary>
+<table><caption>Both means are zero in this example.</caption>
+<thead><tr><th scope="col">Pair</th><th scope="col">x</th><th scope="col">y</th><th scope="col">dx * dy</th></tr></thead>
+<tbody id="pairs"></tbody></table>
+</details>
+<script>
+const byId = id => document.getElementById(id);
+const sum = a => a.reduce((total, value) => total + value, 0);
+const x = [-3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5];
+const residual = [1, -1, -1, 1, -1, 1, 1, -1];
+const xx = sum(x.map(v => v * v));
+const projection = sum(x.map((v, i) => v * residual[i])) / xx;
+const orthogonal = residual.map((v, i) => v - projection * x[i]);
+const multiplier = Math.sqrt(xx / sum(orthogonal.map(v => v * v)));
+const z = orthogonal.map(v => v * multiplier);
+const px = v => 70 + (v + 5) * 48;
+const py = v => 340 - (v + 16) * (300 / 32);
+function line(x1, y1, x2, y2, colour, extra = '') {
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${colour}" ${extra}/>`;
+}
+function draw() {
+  const target = Number(byId('relationship').value);
+  const scale = Number(byId('scale').value);
+  const y = x.map((v, i) => scale * (target * v + Math.sqrt(Math.max(0, 1 - target * target)) * z[i]));
+  const products = x.map((v, i) => v * y[i]);
+  const covariance = sum(products) / 7;
+  const sx = Math.sqrt(xx / 7);
+  const sy = Math.sqrt(sum(y.map(v => v * v)) / 7);
+  const r = covariance / (sx * sy);
+  const t = Math.abs(target) === 1 ? 'undefined at perfect correlation' : (r * Math.sqrt(6 / (1 - r * r))).toFixed(2);
+  let svg = '';
+  for (let v = -4; v <= 4; v += 2) {
+    svg += line(px(v), 40, px(v), 340, '#e5ebf0');
+    svg += `<text x="${px(v)}" y="360" text-anchor="middle" font-size="14">${v}</text>`;
+  }
+  for (let v = -16; v <= 16; v += 4) {
+    svg += line(70, py(v), 550, py(v), '#e5ebf0');
+    svg += `<text x="60" y="${py(v) + 5}" text-anchor="end" font-size="14">${v}</text>`;
+  }
+  svg += line(px(0), 40, px(0), 340, '#687785', 'stroke-dasharray="5 4"');
+  svg += line(70, py(0), 550, py(0), '#687785', 'stroke-dasharray="5 4"');
+  x.forEach((v, i) => {
+    const colour = products[i] >= 0 ? '#467AAC' : '#D55E00';
+    if (byId('distances').checked) {
+      svg += line(px(0), py(y[i]), px(v), py(y[i]), colour, 'opacity="0.5"');
+      svg += line(px(v), py(0), px(v), py(y[i]), colour, 'opacity="0.5"');
+    }
+    svg += `<circle cx="${px(v)}" cy="${py(y[i])}" r="5" fill="${colour}"><title>Pair ${i + 1}: x ${v}, y ${y[i].toFixed(2)}, product ${products[i].toFixed(2)}</title></circle>`;
+  });
+  svg += '<text x="310" y="385" text-anchor="middle">x (mean = 0)</text><text transform="translate(18 190) rotate(-90)" text-anchor="middle">y (mean = 0)</text>';
+  byId('drawing').innerHTML = svg;
+  byId('r-label').textContent = target.toFixed(2);
+  byId('scale-label').textContent = scale.toFixed(1);
+  byId('numbers').textContent = `Covariance = ${covariance.toFixed(2)}; SD(x) = ${sx.toFixed(2)}; SD(y) = ${sy.toFixed(2)}. Correlation = covariance / (SD(x) * SD(y)) = ${r.toFixed(2)}. t = ${t}; df = 6.`;
+  byId('pairs').innerHTML = x.map((v, i) => `<tr><th scope="row">${i + 1}</th><td>${v.toFixed(2)}</td><td>${y[i].toFixed(2)}</td><td>${products[i].toFixed(2)}</td></tr>`).join('');
+}
+['relationship', 'scale', 'distances'].forEach(id => byId(id).addEventListener('input', draw));
+draw();
+</script>
+</body>
+</html>

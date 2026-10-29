@@ -9,6 +9,10 @@ _bookdown_files/
 demyst.rds
 figure/
 *_cache/
+demyst.tex
+render*.rds
+# knitr figure folders left at the top level (the copies in docs/ are kept)
+/*_files/
 
 # OS files
 .DS_Store

@@ -1,0 +1,859 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sampling Distribution Widget</title>
+  <style>
+    :root {
+      --blue: #467AAC;
+      --orange: #D55E00;
+      --ink: #243447;
+      --muted: #53677a;
+      --panel: #eef5fb;
+      --line: #d8e4ef;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 16px;
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    .controls {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px;
+    }
+
+    .control {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    .value {
+      font-variant-numeric: tabular-nums;
+      font-size: 0.95rem;
+    }
+
+    .checks label {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-weight: 500;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    button {
+      width: 100%;
+      padding: 8px 6px;
+      background: var(--blue);
+      color: white;
+      border: 0;
+      border-radius: 4px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #ffffff;
+      color: var(--blue);
+      border: 1px solid var(--blue);
+    }
+
+    .plot-wrap {
+      min-width: 0;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 440px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .summary div {
+      background: #f8fbfd;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 0.95rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .summary strong {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    body.steve canvas {
+      height: 560px;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 8px;
+      }
+
+      body.steve canvas {
+        height: 520px;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 16px;
+        row-gap: 2px;
+        padding: 10px 12px;
+      }
+
+      .control {
+        margin-bottom: 4px;
+      }
+
+      .buttons,
+      .reset-row {
+        grid-column: 1 / -1;
+      }
+
+      .reset-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        align-items: center;
+      }
+
+      canvas {
+        height: 380px;
+      }
+
+      .summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        margin-top: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="controls">
+      <div class="control">
+        <label for="sample-size">Sample size (n)</label>
+        <input id="sample-size" type="range" min="2" max="50" value="20" step="1">
+        <div class="value" id="sample-size-value"></div>
+      </div>
+
+      <div class="control">
+        <label for="pop-sd">Population SD</label>
+        <input id="pop-sd" type="range" min="5" max="15" value="10" step="1">
+        <div class="value" id="pop-sd-value"></div>
+      </div>
+
+      <div class="buttons">
+        <button id="draw-1" type="button">+1</button>
+        <button id="draw-10" type="button">+10</button>
+        <button id="draw-100" type="button">+100</button>
+      </div>
+
+      <div class="reset-row">
+        <div class="control checks">
+          <label><input id="show-expected" type="checkbox"> Expected shape</label>
+        </div>
+        <button id="reset" class="secondary" type="button">Reset</button>
+      </div>
+    </aside>
+
+    <main class="plot-wrap">
+      <canvas id="plot" aria-label="Top: a population and the latest sample drawn from it. Bottom: a histogram of every sample mean drawn so far."></canvas>
+      <div class="summary" aria-live="polite">
+        <div><strong>Samples drawn</strong><span id="summary-count">0</span></div>
+        <div><strong>Latest mean</strong><span id="summary-latest">&ndash;</span></div>
+        <div><strong>SD of the means</strong><span id="summary-sim-se">&ndash;</span></div>
+        <div><strong>Formula SE</strong><span id="summary-formula-se"></span></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const blue = "#467AAC";
+    const orange = "#D55E00";
+    const ink = "#243447";
+    const muted = "#53677a";
+    const grid = "#d8e4ef";
+
+    // Settings the book can pass in the address. Without any, the widget shows
+    // the 0 to 100 score scale (mean 50) used in Spread and Standard Error.
+    // style=steve gives the three-panel heights layout used in Null
+    // Distributions, e.g.
+    // ?style=steve&mean=175&sd=7&n=10&xmin=150&xmax=200&unit=cm&xlabel=Height%20(cm)
+    const params = new URLSearchParams(window.location.search);
+    const steveStyle = params.get("style") === "steve";
+    if (steveStyle) document.body.classList.add("steve");
+    const popMean = params.has("mean") ? Number(params.get("mean")) : 50;
+    const unit = params.has("unit") ? " " + params.get("unit") : "";
+    const xLabel = params.get("xlabel") || "";
+    const sdSlider = document.getElementById("pop-sd");
+    if (params.has("sd")) {
+      const sd = Number(params.get("sd"));
+      sdSlider.min = Math.max(1, Math.round(sd / 2));
+      sdSlider.max = Math.round(sd * 1.5);
+      sdSlider.value = sd;
+    }
+    if (params.has("n")) document.getElementById("sample-size").value = params.get("n");
+    const xLimits = params.has("xmin") && params.has("xmax")
+      ? [Number(params.get("xmin")), Number(params.get("xmax"))]
+      : params.has("mean") || params.has("sd")
+        ? [Math.floor((popMean - 5 * Number(sdSlider.value)) / 10) * 10,
+           Math.ceil((popMean + 5 * Number(sdSlider.value)) / 10) * 10]
+        : [0, 100];
+    // 1 on the default 0 to 100 scale; 1 cm on the 50 cm heights axis
+    const binWidth = (xLimits[1] - xLimits[0]) / (steveStyle ? 50 : 100);
+    // Fixed density scale for the population curve, so changing the SD
+    // visibly flattens or sharpens the curve instead of being rescaled away.
+    const popDensityMax = 1 / (Number(sdSlider.min) * Math.sqrt(2 * Math.PI)) * 1.05;
+
+    const reduceMotion = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const els = {
+      sampleSize: document.getElementById("sample-size"),
+      popSd: document.getElementById("pop-sd"),
+      sampleSizeValue: document.getElementById("sample-size-value"),
+      popSdValue: document.getElementById("pop-sd-value"),
+      draw1: document.getElementById("draw-1"),
+      draw10: document.getElementById("draw-10"),
+      draw100: document.getElementById("draw-100"),
+      reset: document.getElementById("reset"),
+      showExpected: document.getElementById("show-expected"),
+      count: document.getElementById("summary-count"),
+      latest: document.getElementById("summary-latest"),
+      simSe: document.getElementById("summary-sim-se"),
+      formulaSe: document.getElementById("summary-formula-se"),
+      canvas: document.getElementById("plot")
+    };
+
+    const state = {
+      means: [],
+      counts: new Map(),
+      currentSample: [],
+      currentMean: null,
+      queue: 0,
+      anim: null
+    };
+
+    function settings() {
+      const n = Number(els.sampleSize.value);
+      const sd = Number(els.popSd.value);
+      return { n, sd, se: sd / Math.sqrt(n) };
+    }
+
+    function randomNormal(mean, sd) {
+      const u1 = Math.max(Math.random(), 1e-12);
+      const u2 = Math.random();
+      return mean + sd * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    }
+
+    function normalDensity(x, mean, sd) {
+      return Math.exp(-0.5 * Math.pow((x - mean) / sd, 2)) / (sd * Math.sqrt(2 * Math.PI));
+    }
+
+    function newSample() {
+      const { n, sd } = settings();
+      const values = Array.from({ length: n }, () => randomNormal(popMean, sd));
+      const mean = values.reduce((a, b) => a + b, 0) / n;
+      return {
+        values: values.map(v => ({ x: v, jitter: Math.random() })),
+        mean
+      };
+    }
+
+    function binOf(x) {
+      return Math.floor(x / binWidth) * binWidth;
+    }
+
+    function addMean(mean) {
+      state.means.push(mean);
+      const bin = binOf(mean);
+      state.counts.set(bin, (state.counts.get(bin) || 0) + 1);
+    }
+
+    function sdOf(values) {
+      if (values.length < 2) return null;
+      const m = values.reduce((a, b) => a + b, 0) / values.length;
+      const ss = values.reduce((a, b) => a + (b - m) * (b - m), 0);
+      return Math.sqrt(ss / (values.length - 1));
+    }
+
+    // ---- Animation ---------------------------------------------------------
+
+    function durations() {
+      // Slow for a single sample, quicker when several are queued.
+      if (reduceMotion) return { dots: 0, mean: 0, drop: 0 };
+      if (state.queue > 0) return { dots: 140, mean: 60, drop: 160 };
+      return { dots: 900, mean: 350, drop: 550 };
+    }
+
+    function startNextSample() {
+      const sample = newSample();
+      state.currentSample = sample.values;
+      state.currentMean = sample.mean;
+      state.anim = { start: performance.now(), d: durations(), mean: sample.mean };
+      requestAnimationFrame(step);
+    }
+
+    function step(now) {
+      if (!state.anim) return;
+      const a = state.anim;
+      const t = now - a.start;
+      const total = a.d.dots + a.d.mean + a.d.drop;
+
+      if (t >= total) {
+        addMean(a.mean);
+        state.anim = null;
+        draw(null);
+        updateSummary();
+        if (state.queue > 0) {
+          state.queue -= 1;
+          startNextSample();
+        } else {
+          setButtons(true);
+        }
+        return;
+      }
+
+      draw({
+        dotsShown: a.d.dots === 0 ? 1 : Math.min(1, t / a.d.dots),
+        meanShown: t >= a.d.dots,
+        drop: t < a.d.dots + a.d.mean ? null : (t - a.d.dots - a.d.mean) / a.d.drop
+      });
+      requestAnimationFrame(step);
+    }
+
+    function requestSamples(k) {
+      if (state.anim) return;
+      setButtons(false);
+      state.queue = k - 1;
+      startNextSample();
+    }
+
+    function addInstantly(k) {
+      if (state.anim) return;
+      let sample = null;
+      for (let i = 0; i < k; i++) {
+        sample = newSample();
+        addMean(sample.mean);
+      }
+      state.currentSample = sample.values;
+      state.currentMean = sample.mean;
+      draw(null);
+      updateSummary();
+    }
+
+    function setButtons(enabled) {
+      [els.draw1, els.draw10, els.draw100, els.reset].forEach(b => { b.disabled = !enabled; });
+      [els.draw1, els.draw10, els.draw100].forEach(b => { b.style.opacity = enabled ? 1 : 0.55; });
+    }
+
+    function resetAll() {
+      state.means = [];
+      state.counts = new Map();
+      state.currentSample = [];
+      state.currentMean = null;
+      state.queue = 0;
+      state.anim = null;
+      setButtons(true);
+      draw(null);
+      updateSummary();
+    }
+
+    // ---- Drawing -----------------------------------------------------------
+
+    function draw(anim) {
+      if (steveStyle) {
+        drawSteve(anim);
+        return;
+      }
+      const { n, sd, se } = settings();
+      const canvas = els.canvas;
+      const dpr = window.devicePixelRatio || 1;
+      const cssW = canvas.clientWidth;
+      const cssH = canvas.clientHeight;
+      if (canvas.width !== Math.round(cssW * dpr) || canvas.height !== Math.round(cssH * dpr)) {
+        canvas.width = Math.round(cssW * dpr);
+        canvas.height = Math.round(cssH * dpr);
+      }
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, cssW, cssH);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, cssW, cssH);
+
+      const pad = { left: 14, right: 14 };
+      const plotW = cssW - pad.left - pad.right;
+      const xScale = x => pad.left + ((x - xLimits[0]) / (xLimits[1] - xLimits[0])) * plotW;
+
+      const small = cssW < 520;
+      const titleFont = small ? "13px system-ui, sans-serif" : "15px system-ui, sans-serif";
+      const tickFont = "11px system-ui, sans-serif";
+
+      // Panel geometry
+      const top = { y0: 22, curveH: cssH * 0.20, stripH: cssH * 0.13 };
+      top.base = top.y0 + top.curveH;
+      top.stripTop = top.base + 6;
+      top.stripBottom = top.stripTop + top.stripH;
+      top.axis = top.stripBottom + 4;
+
+      const bottom = { y0: top.axis + 48 };
+      bottom.axis = cssH - 22;
+      bottom.h = bottom.axis - bottom.y0 - 4;
+
+      // Top title
+      ctx.fillStyle = ink;
+      ctx.font = titleFont;
+      ctx.textAlign = "left";
+      ctx.fillText("Population (mean 50) and the latest sample of " + n, pad.left, 15);
+
+      // Population curve
+      ctx.beginPath();
+      for (let i = 0; i <= 300; i++) {
+        const x = xLimits[0] + (i / 300) * (xLimits[1] - xLimits[0]);
+        const y = top.base - Math.min(1, normalDensity(x, popMean, sd) / popDensityMax) * top.curveH;
+        if (i === 0) ctx.moveTo(xScale(x), top.base);
+        ctx.lineTo(xScale(x), y);
+      }
+      ctx.lineTo(xScale(xLimits[1]), top.base);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(70, 122, 172, 0.15)";
+      ctx.fill();
+      ctx.strokeStyle = blue;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i = 0; i <= 300; i++) {
+        const x = xLimits[0] + (i / 300) * (xLimits[1] - xLimits[0]);
+        const y = top.base - Math.min(1, normalDensity(x, popMean, sd) / popDensityMax) * top.curveH;
+        if (i === 0) ctx.moveTo(xScale(x), y); else ctx.lineTo(xScale(x), y);
+      }
+      ctx.stroke();
+
+      // Baseline and axis for top panel
+      drawAxis(ctx, xScale, top.axis, tickFont);
+
+      // Population mean marker
+      ctx.strokeStyle = "rgba(36, 52, 71, 0.35)";
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(xScale(popMean), top.y0);
+      ctx.lineTo(xScale(popMean), top.axis);
+      ctx.moveTo(xScale(popMean), bottom.y0 - 6);
+      ctx.lineTo(xScale(popMean), bottom.axis);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Current sample dots
+      const shownFrac = anim ? anim.dotsShown : 1;
+      const nShown = Math.ceil(shownFrac * state.currentSample.length);
+      const dotR = state.currentSample.length > 30 ? 3 : 4;
+      ctx.fillStyle = blue;
+      for (let i = 0; i < nShown; i++) {
+        const d = state.currentSample[i];
+        if (d.x < xLimits[0] || d.x > xLimits[1]) continue;
+        const y = top.stripTop + dotR + d.jitter * (top.stripH - 2 * dotR);
+        ctx.beginPath();
+        ctx.arc(xScale(d.x), y, dotR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Current sample mean
+      const showMean = state.currentMean !== null && (!anim || anim.meanShown);
+      if (showMean) {
+        const mx = xScale(state.currentMean);
+        ctx.strokeStyle = orange;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(mx, top.stripTop - 4);
+        ctx.lineTo(mx, top.stripBottom + 2);
+        ctx.stroke();
+        ctx.fillStyle = orange;
+        ctx.font = "bold 12px system-ui, sans-serif";
+        ctx.textAlign = mx > cssW - 90 ? "right" : "left";
+        const label = "sample mean " + state.currentMean.toFixed(1);
+        const lx = mx + (ctx.textAlign === "right" ? -6 : 6);
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 4;
+        ctx.lineJoin = "round";
+        ctx.strokeText(label, lx, top.stripTop + 8);
+        ctx.fillText(label, lx, top.stripTop + 8);
+      }
+
+      // Bottom title
+      ctx.fillStyle = ink;
+      ctx.font = titleFont;
+      ctx.textAlign = "left";
+      ctx.fillText("Every sample mean so far (" + state.means.length + ")", pad.left, bottom.y0 - 10);
+
+      // Histogram
+      let maxCount = 0;
+      state.counts.forEach(c => { if (c > maxCount) maxCount = c; });
+      const yMax = Math.max(5, maxCount) * 1.1;
+      const yScale = c => bottom.axis - (c / yMax) * bottom.h;
+      const latestBin = state.means.length ? binOf(state.means[state.means.length - 1]) : null;
+
+      state.counts.forEach((c, bin) => {
+        const x0 = xScale(bin);
+        const x1 = xScale(bin + binWidth);
+        ctx.fillStyle = (anim === null && bin === latestBin) ? orange : blue;
+        ctx.fillRect(x0 + 0.5, yScale(c), Math.max(1, x1 - x0 - 1), bottom.axis - yScale(c));
+      });
+
+      // Expected sampling distribution
+      if (els.showExpected.checked && state.means.length > 0) {
+        ctx.strokeStyle = ink;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        // Only draw within 4 standard errors of the mean, where the curve is visible.
+        const from = Math.max(xLimits[0], popMean - 4 * se);
+        const to = Math.min(xLimits[1], popMean + 4 * se);
+        for (let i = 0; i <= 300; i++) {
+          const x = from + (i / 300) * (to - from);
+          const expected = state.means.length * binWidth * normalDensity(x, popMean, se);
+          const y = Math.max(bottom.y0, yScale(expected));
+          if (i === 0) ctx.moveTo(xScale(x), y); else ctx.lineTo(xScale(x), y);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      drawAxis(ctx, xScale, bottom.axis, tickFont);
+
+      // Dropping mean
+      if (anim && anim.drop !== null && state.currentMean !== null) {
+        const p = Math.min(1, anim.drop);
+        const eased = p * p;
+        const bin = binOf(state.currentMean);
+        const targetY = yScale((state.counts.get(bin) || 0) + 1);
+        const startY = top.stripBottom;
+        const y = startY + (targetY - startY) * eased;
+        ctx.fillStyle = orange;
+        ctx.beginPath();
+        ctx.arc(xScale(state.currentMean), y, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      els.sampleSizeValue.textContent = n;
+      els.popSdValue.textContent = sd;
+      els.formulaSe.textContent = sd + " / √" + n + " = " + se.toFixed(2);
+    }
+
+    // Three stacked panels on one height axis, in the style of the
+    // "world versus sample" figure in Null Distributions: the world
+    // (everyone filled blue, Steves dashed orange), the latest sample (orange
+    // dots and mean line), and the group means so far.
+    function drawSteve(anim) {
+      const { n, sd, se } = settings();
+      const canvas = els.canvas;
+      const dpr = window.devicePixelRatio || 1;
+      const cssW = canvas.clientWidth;
+      const cssH = canvas.clientHeight;
+      if (canvas.width !== Math.round(cssW * dpr) || canvas.height !== Math.round(cssH * dpr)) {
+        canvas.width = Math.round(cssW * dpr);
+        canvas.height = Math.round(cssH * dpr);
+      }
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, cssW, cssH);
+
+      const pad = { left: 14, right: 14 };
+      const plotW = cssW - pad.left - pad.right;
+      const xScale = x => pad.left + ((x - xLimits[0]) / (xLimits[1] - xLimits[0])) * plotW;
+      const small = cssW < 520;
+      const titleFont = small ? "13px system-ui, sans-serif" : "15px system-ui, sans-serif";
+      const tickFont = "11px system-ui, sans-serif";
+
+      // Panel geometry: world, sample, group means; one shared x-axis at the bottom
+      const world = { title: 18, top: 28, base: 28 + cssH * 0.17 };
+      const sample = { title: world.base + 26, top: world.base + 34 };
+      sample.bottom = sample.top + cssH * 0.15;
+      const means = { title: sample.bottom + 28, top: sample.bottom + 40 };
+      means.axis = cssH - (xLabel ? 40 : 24);
+      means.h = means.axis - means.top - 4;
+
+      // Shared gridlines, so the three panels line up on the same heights
+      ctx.strokeStyle = "rgba(216, 228, 239, 0.6)";
+      ctx.lineWidth = 1;
+      for (let tick = xLimits[0]; tick <= xLimits[1]; tick += 10) {
+        ctx.beginPath();
+        ctx.moveTo(xScale(tick), world.top);
+        ctx.lineTo(xScale(tick), means.axis);
+        ctx.stroke();
+      }
+
+      const title = (text, y) => {
+        ctx.fillStyle = ink;
+        ctx.font = titleFont;
+        ctx.textAlign = "left";
+        ctx.fillText(text, pad.left, y);
+      };
+      const baseline = y => {
+        ctx.strokeStyle = grid;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(xScale(xLimits[0]), y);
+        ctx.lineTo(xScale(xLimits[1]), y);
+        ctx.stroke();
+      };
+      const dottedLine = (y0, y1) => {
+        ctx.strokeStyle = "#333333";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([2, 4]);
+        ctx.beginPath();
+        ctx.moveTo(xScale(popMean), y0);
+        ctx.lineTo(xScale(popMean), y1);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      };
+
+      // ---- The world
+      title("The world", world.title);
+      const curveY = x => world.base -
+        Math.min(1, normalDensity(x, popMean, sd) / popDensityMax) * (world.base - world.top);
+      ctx.beginPath();
+      ctx.moveTo(xScale(xLimits[0]), world.base);
+      for (let i = 0; i <= 300; i++) {
+        const x = xLimits[0] + (i / 300) * (xLimits[1] - xLimits[0]);
+        ctx.lineTo(xScale(x), curveY(x));
+      }
+      ctx.lineTo(xScale(xLimits[1]), world.base);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(70, 122, 172, 0.4)";
+      ctx.fill();
+      ctx.strokeStyle = orange;
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([7, 5]);
+      ctx.beginPath();
+      for (let i = 0; i <= 300; i++) {
+        const x = xLimits[0] + (i / 300) * (xLimits[1] - xLimits[0]);
+        if (i === 0) ctx.moveTo(xScale(x), curveY(x)); else ctx.lineTo(xScale(x), curveY(x));
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+      baseline(world.base);
+      dottedLine(world.top, world.base);
+
+      // Legend for the world panel
+      ctx.font = tickFont;
+      ctx.textAlign = "left";
+      const steveText = "People called Steve";
+      const everyoneText = "Everyone";
+      let lx = cssW - pad.right - ctx.measureText(steveText).width - 22;
+      ctx.strokeStyle = orange;
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([5, 3]);
+      ctx.beginPath();
+      ctx.moveTo(lx, world.title - 4);
+      ctx.lineTo(lx + 16, world.title - 4);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = ink;
+      ctx.fillText(steveText, lx + 20, world.title);
+      lx -= ctx.measureText(everyoneText).width + 34;
+      ctx.fillStyle = "rgba(70, 122, 172, 0.4)";
+      ctx.fillRect(lx, world.title - 10, 12, 10);
+      ctx.fillStyle = ink;
+      ctx.fillText(everyoneText, lx + 16, world.title);
+
+      // ---- Our sample: one row per Steve, as in the figure
+      title("Our sample: the latest " + n, sample.title);
+      baseline(sample.bottom);
+      dottedLine(sample.top - 4, sample.bottom);
+      const shownFrac = anim ? anim.dotsShown : 1;
+      const nShown = Math.ceil(shownFrac * state.currentSample.length);
+      const rows = Math.max(1, state.currentSample.length);
+      const dotR = rows > 30 ? 2.5 : rows > 15 ? 3 : 4;
+      const rowY = i => sample.bottom - dotR - 2 - (i / Math.max(1, rows - 1)) * (sample.bottom - sample.top - 2 * dotR - 4);
+      ctx.fillStyle = orange;
+      for (let i = 0; i < nShown; i++) {
+        const d = state.currentSample[i];
+        if (d.x < xLimits[0] || d.x > xLimits[1]) continue;
+        ctx.beginPath();
+        ctx.arc(xScale(d.x), rowY(i), dotR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      const showMean = state.currentMean !== null && (!anim || anim.meanShown);
+      if (showMean) {
+        const mx = xScale(state.currentMean);
+        ctx.strokeStyle = orange;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(mx, sample.top - 4);
+        ctx.lineTo(mx, sample.bottom);
+        ctx.stroke();
+        ctx.font = "bold 12px system-ui, sans-serif";
+        ctx.textAlign = mx > cssW - 120 ? "right" : "left";
+        const label = "sample mean " + state.currentMean.toFixed(1);
+        const tx = mx + (ctx.textAlign === "right" ? -6 : 6);
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 4;
+        ctx.lineJoin = "round";
+        ctx.strokeText(label, tx, sample.top + 6);
+        ctx.fillStyle = orange;
+        ctx.fillText(label, tx, sample.top + 6);
+      }
+
+      // ---- Group means so far
+      title("Group means so far (" + state.means.length + ")", means.title);
+      let maxCount = 0;
+      state.counts.forEach(c => { if (c > maxCount) maxCount = c; });
+      const yMax = Math.max(5, maxCount) * 1.1;
+      const yScale = c => means.axis - (c / yMax) * means.h;
+      const latestBin = state.means.length ? binOf(state.means[state.means.length - 1]) : null;
+      state.counts.forEach((c, bin) => {
+        const x0 = xScale(bin);
+        const x1 = xScale(bin + binWidth);
+        ctx.fillStyle = (anim === null && bin === latestBin) ? orange : blue;
+        ctx.fillRect(x0 + 0.5, yScale(c), Math.max(1, x1 - x0 - 1), means.axis - yScale(c));
+      });
+      if (els.showExpected.checked && state.means.length > 0) {
+        ctx.strokeStyle = ink;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        const from = Math.max(xLimits[0], popMean - 4 * se);
+        const to = Math.min(xLimits[1], popMean + 4 * se);
+        for (let i = 0; i <= 300; i++) {
+          const x = from + (i / 300) * (to - from);
+          const y = Math.max(means.top, yScale(state.means.length * binWidth * normalDensity(x, popMean, se)));
+          if (i === 0) ctx.moveTo(xScale(x), y); else ctx.lineTo(xScale(x), y);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      dottedLine(means.top - 6, means.axis);
+      drawAxis(ctx, xScale, means.axis, tickFont);
+      if (xLabel) {
+        ctx.fillStyle = ink;
+        ctx.font = "12px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(xLabel, pad.left + plotW / 2, means.axis + 32);
+      }
+
+      // Dropping mean
+      if (anim && anim.drop !== null && state.currentMean !== null) {
+        const p = Math.min(1, anim.drop);
+        const bin = binOf(state.currentMean);
+        const targetY = yScale((state.counts.get(bin) || 0) + 1);
+        const y = sample.bottom + (targetY - sample.bottom) * p * p;
+        ctx.fillStyle = orange;
+        ctx.beginPath();
+        ctx.arc(xScale(state.currentMean), y, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      els.sampleSizeValue.textContent = n;
+      els.popSdValue.textContent = sd + unit;
+      els.formulaSe.textContent = sd + " / √" + n + " = " + se.toFixed(2) + unit;
+    }
+
+    function drawAxis(ctx, xScale, y, font) {
+      ctx.strokeStyle = grid;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(xScale(xLimits[0]), y);
+      ctx.lineTo(xScale(xLimits[1]), y);
+      ctx.stroke();
+      ctx.font = font;
+      ctx.fillStyle = muted;
+      ctx.textAlign = "center";
+      for (let tick = xLimits[0]; tick <= xLimits[1]; tick += 10) {
+        const px = xScale(tick);
+        ctx.beginPath();
+        ctx.moveTo(px, y);
+        ctx.lineTo(px, y + 4);
+        ctx.stroke();
+        ctx.fillText(String(tick), px, y + 15);
+      }
+    }
+
+    function updateSummary() {
+      els.count.textContent = state.means.length;
+      els.latest.textContent = state.currentMean === null ? "–" : state.currentMean.toFixed(2) + unit;
+      const s = sdOf(state.means);
+      els.simSe.textContent = s === null ? "–" : s.toFixed(2) + unit;
+    }
+
+    // Tell the book page how tall the widget is, so its frame fits without
+    // scrolling (pages that do not listen for this simply ignore it).
+    function reportHeight() {
+      const h = Math.ceil(document.querySelector(".app").getBoundingClientRect().bottom + 16);
+      if (window.parent !== window) window.parent.postMessage({ demystWidgetHeight: h }, "*");
+    }
+    window.addEventListener("load", reportHeight);
+    window.addEventListener("resize", reportHeight);
+    // Readouts and hints can change length, so report again whenever the content changes size
+    if (window.ResizeObserver) new ResizeObserver(reportHeight).observe(document.querySelector(".app"));
+
+    // ---- Events ------------------------------------------------------------
+
+    els.draw1.addEventListener("click", () => requestSamples(1));
+    els.draw10.addEventListener("click", () => requestSamples(10));
+    els.draw100.addEventListener("click", () => addInstantly(100));
+    els.reset.addEventListener("click", resetAll);
+    els.showExpected.addEventListener("change", () => { if (!state.anim) draw(null); });
+    ["sample-size", "pop-sd"].forEach(id => {
+      document.getElementById(id).addEventListener("input", resetAll);
+    });
+    window.addEventListener("resize", () => { if (!state.anim) draw(null); });
+
+    resetAll();
+  </script>
+</body>
+</html>

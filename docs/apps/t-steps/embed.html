@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One Group, One t-Value</title>
+  <style>
+    :root {
+      --blue: #467AAC;
+      --orange: #D55E00;
+      --ink: #243447;
+      --muted: #53677a;
+      --panel: #eef5fb;
+      --line: #d8e4ef;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+    }
+
+    .app {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+
+    button {
+      width: 100%;
+      padding: 8px 6px;
+      background: var(--blue);
+      color: white;
+      border: 0;
+      border-radius: 4px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button.effect {
+      background: var(--orange);
+    }
+
+    button.secondary {
+      background: #ffffff;
+      color: var(--blue);
+      border: 1px solid var(--blue);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    #sample-plot {
+      height: 260px;
+    }
+
+    #t-plot {
+      height: 260px;
+    }
+
+    .equation {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px 14px;
+      background: #f8fbfd;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .equation h2,
+    .panel-title {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .formula {
+      margin: 0 0 10px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 1rem;
+    }
+
+    .steps {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+
+    .steps th,
+    .steps td {
+      text-align: left;
+      padding: 5px 4px;
+      border-top: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    .steps th {
+      font-weight: 600;
+      width: 42%;
+    }
+
+    .steps td {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    .steps .pending td {
+      color: var(--muted);
+    }
+
+    .steps .result td {
+      color: var(--orange);
+      font-weight: 700;
+    }
+
+    .hint {
+      margin: 8px 0 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .count {
+      margin: 6px 4px 0;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 8px;
+      }
+
+      .controls {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .top {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      #sample-plot {
+        height: 230px;
+      }
+
+      #t-plot {
+        height: 230px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="controls">
+      <button id="sample" type="button">Sample</button>
+      <button id="calculate" type="button" disabled>Calculate t</button>
+      <button id="add" class="effect" type="button" disabled>Add t</button>
+      <button id="reset" class="secondary" type="button">Reset</button>
+    </div>
+
+    <div class="top">
+      <canvas id="sample-plot" aria-label="A sample of Steves' heights as dots, with an orange line at the sample mean and a dotted line at the population average."></canvas>
+      <div class="equation" aria-live="polite">
+        <h2>Calculate t</h2>
+        <p class="formula" id="formula"></p>
+        <table class="steps">
+          <tbody>
+            <tr id="row-mean" class="pending"><th>Sample mean, x&#772;</th><td id="val-mean">&ndash;</td></tr>
+            <tr id="row-sd" class="pending"><th>Sample SD, s</th><td id="val-sd">&ndash;</td></tr>
+            <tr id="row-se" class="pending"><th id="se-label">Standard error</th><td id="val-se">&ndash;</td></tr>
+            <tr id="row-t" class="pending"><th>t</th><td id="val-t">&ndash;</td></tr>
+          </tbody>
+        </table>
+        <p class="hint" id="hint">Press Sample to draw a group.</p>
+      </div>
+    </div>
+
+    <canvas id="t-plot" aria-label="A histogram of the t-values added so far, with the latest one in orange."></canvas>
+    <p class="count">t-values so far: <strong id="count">0</strong></p>
+  </div>
+
+  <script>
+    const blue = "#467AAC";
+    const orange = "#D55E00";
+    const ink = "#243447";
+    const muted = "#53677a";
+    const grid = "#d8e4ef";
+
+    // Settings the book can pass in the address. The defaults are the Steve
+    // world from Null Distributions: groups of 10 heights, mean 175 cm, SD 7.
+    const params = new URLSearchParams(window.location.search);
+    const n = params.has("n") ? Number(params.get("n")) : 10;
+    const popMean = params.has("mean") ? Number(params.get("mean")) : 175;
+    const popSd = params.has("sd") ? Number(params.get("sd")) : 7;
+    const unit = params.has("unit") ? params.get("unit") : "cm";
+    const xLimits = [
+      params.has("xmin") ? Number(params.get("xmin")) : 150,
+      params.has("xmax") ? Number(params.get("xmax")) : 200
+    ];
+    const xLabel = params.get("xlabel") || "Height (cm)";
+    const groupName = params.get("group") || "Steves";
+    const tLimits = [-5, 5];
+    const tBin = 0.5;
+
+    const reduceMotion = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const $ = id => document.getElementById(id);
+    const els = {
+      sample: $("sample"), calculate: $("calculate"), add: $("add"), reset: $("reset"),
+      samplePlot: $("sample-plot"), tPlot: $("t-plot"),
+      formula: $("formula"), hint: $("hint"), count: $("count"),
+      rows: { mean: $("row-mean"), sd: $("row-sd"), se: $("row-se"), t: $("row-t") },
+      vals: { mean: $("val-mean"), sd: $("val-sd"), se: $("val-se"), t: $("val-t") }
+    };
+
+    els.formula.textContent = "t = (x̄ − " + popMean + ") / (s / √" + n + ")";
+    $("se-label").textContent = "Standard error, s / √" + n;
+
+    const state = {
+      sample: null,      // { values, mean, sd, se, t }
+      stepsShown: 0,     // 0 to 3: mean, SD, SE
+      calculated: false,
+      added: false,
+      ts: [],
+      timers: []
+    };
+
+    function randomNormal(mean, sd) {
+      const u1 = Math.max(Math.random(), 1e-12);
+      const u2 = Math.random();
+      return mean + sd * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    }
+
+    function newSample() {
+      const values = Array.from({ length: n }, () => randomNormal(popMean, popSd));
+      const mean = values.reduce((a, b) => a + b, 0) / n;
+      const sd = Math.sqrt(values.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1));
+      const se = sd / Math.sqrt(n);
+      return { values, mean, sd, se, t: (mean - popMean) / se };
+    }
+
+    function clearTimers() {
+      state.timers.forEach(clearTimeout);
+      state.timers = [];
+    }
+
+    // ---- Steps -------------------------------------------------------------
+
+    function showSteps() {
+      const s = state.sample;
+      const show = (key, text) => {
+        els.vals[key].textContent = text;
+        els.rows[key].classList.remove("pending");
+      };
+      ["mean", "sd", "se", "t"].forEach(k => {
+        els.rows[k].classList.add("pending");
+        els.rows[k].classList.remove("result");
+        els.vals[k].textContent = "–";
+      });
+      if (!s) return;
+      if (state.stepsShown >= 1) show("mean", s.mean.toFixed(2) + " " + unit);
+      if (state.stepsShown >= 2) show("sd", s.sd.toFixed(2) + " " + unit);
+      if (state.stepsShown >= 3) {
+        show("se", s.sd.toFixed(2) + " / " + Math.sqrt(n).toFixed(2) + " = " + s.se.toFixed(2) + " " + unit);
+      }
+      if (state.calculated) {
+        show("t", "(" + s.mean.toFixed(2) + " − " + popMean + ") / " + s.se.toFixed(2) + " = " + s.t.toFixed(2));
+        els.rows.t.classList.add("result");
+      }
+    }
+
+    function updateButtons() {
+      const stepsDone = state.sample && state.stepsShown >= 3;
+      els.calculate.disabled = !stepsDone || state.calculated;
+      els.add.disabled = !state.calculated || state.added;
+      if (!state.sample) {
+        els.hint.textContent = "Press Sample to draw a group.";
+      } else if (!stepsDone) {
+        els.hint.textContent = "Working out the mean, SD and standard error…";
+      } else if (!state.calculated) {
+        els.hint.textContent = "Press Calculate t to finish the equation.";
+      } else if (!state.added) {
+        els.hint.textContent = "Press Add t to put this t-value in the histogram.";
+      } else {
+        els.hint.textContent = "Added. Press Sample for a new group.";
+      }
+      els.count.textContent = state.ts.length;
+    }
+
+    // ---- Drawing -----------------------------------------------------------
+
+    function prepare(canvas) {
+      const dpr = window.devicePixelRatio || 1;
+      const W = canvas.clientWidth;
+      const H = canvas.clientHeight;
+      if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) {
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+      }
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, W, H);
+      return { ctx, W, H };
+    }
+
+    function drawAxis(ctx, xScale, y, limits, step, label, W) {
+      ctx.strokeStyle = grid;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(xScale(limits[0]), y);
+      ctx.lineTo(xScale(limits[1]), y);
+      ctx.stroke();
+      ctx.font = "11px system-ui, sans-serif";
+      ctx.fillStyle = muted;
+      ctx.textAlign = "center";
+      for (let v = limits[0]; v <= limits[1] + 1e-9; v += step) {
+        const px = xScale(v);
+        ctx.beginPath();
+        ctx.moveTo(px, y);
+        ctx.lineTo(px, y + 4);
+        ctx.stroke();
+        ctx.fillText(String(Math.round(v * 10) / 10), px, y + 15);
+      }
+      if (label) {
+        ctx.fillStyle = ink;
+        ctx.font = "12px system-ui, sans-serif";
+        ctx.fillText(label, W / 2, y + 31);
+      }
+    }
+
+    function drawSample(dotsShown) {
+      const { ctx, W, H } = prepare(els.samplePlot);
+      const pad = { left: 14, right: 14 };
+      const box = { top: 34, axis: H - 40 };
+      const xScale = x => pad.left + (x - xLimits[0]) / (xLimits[1] - xLimits[0]) * (W - pad.left - pad.right);
+
+      ctx.fillStyle = ink;
+      ctx.font = (W < 520 ? "13px" : "15px") + " system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("A group of " + n + " " + groupName, pad.left, 20);
+
+      // Dotted line at the population average
+      ctx.strokeStyle = "#333333";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([2, 4]);
+      ctx.beginPath();
+      ctx.moveTo(xScale(popMean), box.top - 6);
+      ctx.lineTo(xScale(popMean), box.axis);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = muted;
+      ctx.font = "11px system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("average " + popMean, xScale(popMean) + 4, box.top - 8 + 4);
+
+      const s = state.sample;
+      if (s) {
+        const shown = Math.ceil(dotsShown * n);
+        // Leave room above the top row for the mean label
+        const rowY = i => box.axis - 8 - (i / Math.max(1, n - 1)) * (box.axis - box.top - 32);
+        ctx.fillStyle = orange;
+        for (let i = 0; i < shown; i++) {
+          const x = Math.min(xLimits[1], Math.max(xLimits[0], s.values[i]));
+          ctx.beginPath();
+          ctx.arc(xScale(x), rowY(i), n > 20 ? 3 : 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        if (state.stepsShown >= 1) {
+          const mx = xScale(s.mean);
+          ctx.strokeStyle = orange;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(mx, box.top);
+          ctx.lineTo(mx, box.axis);
+          ctx.stroke();
+          ctx.font = "bold 12px system-ui, sans-serif";
+          ctx.textAlign = mx > W - 110 ? "right" : "left";
+          const label = "mean " + s.mean.toFixed(1);
+          const tx = mx + (ctx.textAlign === "right" ? -6 : 6);
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 4;
+          ctx.lineJoin = "round";
+          ctx.strokeText(label, tx, box.top + 12);
+          ctx.fillStyle = orange;
+          ctx.fillText(label, tx, box.top + 12);
+        }
+      } else {
+        ctx.fillStyle = muted;
+        ctx.font = "13px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("No group yet", W / 2, (box.top + box.axis) / 2);
+      }
+      drawAxis(ctx, xScale, box.axis, xLimits, 10, xLabel, W);
+    }
+
+    function drawTs() {
+      const { ctx, W, H } = prepare(els.tPlot);
+      const pad = { left: 14, right: 14 };
+      const box = { top: 34, axis: H - 40 };
+      const xScale = t => pad.left + (t - tLimits[0]) / (tLimits[1] - tLimits[0]) * (W - pad.left - pad.right);
+
+      ctx.fillStyle = ink;
+      ctx.font = (W < 520 ? "13px" : "15px") + " system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("t-values so far (" + state.ts.length + ")", pad.left, 20);
+
+      // Each t-value is one block, stacked in its bin; the latest one is orange
+      const bins = new Map();
+      let offScale = 0;
+      state.ts.forEach((t, i) => {
+        if (t < tLimits[0] || t >= tLimits[1]) offScale++;
+        const clamped = Math.min(tLimits[1] - 1e-9, Math.max(tLimits[0], t));
+        const b = Math.floor(clamped / tBin) * tBin;
+        if (!bins.has(b)) bins.set(b, []);
+        bins.get(b).push(i);
+      });
+      let maxCount = 0;
+      bins.forEach(list => { maxCount = Math.max(maxCount, list.length); });
+      const rows = Math.max(8, maxCount + 1);
+      const blockH = (box.axis - box.top) / rows;
+      const latest = state.ts.length - 1;
+      bins.forEach((list, b) => {
+        const x0 = xScale(b) + 1;
+        const w = Math.max(2, xScale(b + tBin) - xScale(b) - 2);
+        list.forEach((idx, k) => {
+          ctx.fillStyle = idx === latest ? orange : blue;
+          ctx.fillRect(x0, box.axis - (k + 1) * blockH + 1, w, Math.max(1, blockH - 2));
+        });
+      });
+
+      // Zero: where a group mean exactly on the average would land
+      ctx.strokeStyle = "#333333";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([2, 4]);
+      ctx.beginPath();
+      ctx.moveTo(xScale(0), box.top - 6);
+      ctx.lineTo(xScale(0), box.axis);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      if (offScale > 0) {
+        ctx.fillStyle = muted;
+        ctx.font = "11px system-ui, sans-serif";
+        // On narrow screens the note goes under the title instead of beside it
+        const narrow = W < 520;
+        ctx.textAlign = narrow ? "left" : "right";
+        ctx.fillText(offScale + " beyond the axis, shown at the edge", narrow ? pad.left : W - pad.right, narrow ? 33 : 20);
+      }
+      drawAxis(ctx, xScale, box.axis, tLimits, 1, "t-value", W);
+    }
+
+    function drawAll(dotsShown) {
+      drawSample(dotsShown === undefined ? 1 : dotsShown);
+      drawTs();
+    }
+
+    // ---- Actions -----------------------------------------------------------
+
+    function doSample() {
+      clearTimers();
+      state.sample = newSample();
+      state.stepsShown = 0;
+      state.calculated = false;
+      state.added = false;
+      els.sample.disabled = true;
+      showSteps();
+      updateButtons();
+
+      // Dots appear one by one, then the mean, SD and standard error fill in
+      const dotTime = reduceMotion ? 0 : 500;
+      const stepTime = reduceMotion ? 0 : 450;
+      if (dotTime > 0) {
+        const start = performance.now();
+        const frame = now => {
+          const p = Math.min(1, (now - start) / dotTime);
+          drawAll(p);
+          if (p < 1 && state.sample) requestAnimationFrame(frame);
+        };
+        requestAnimationFrame(frame);
+      }
+      [1, 2, 3].forEach(k => {
+        state.timers.push(setTimeout(() => {
+          state.stepsShown = k;
+          showSteps();
+          drawAll();
+          if (k === 3) els.sample.disabled = false;
+          updateButtons();
+          reportHeight();
+        }, dotTime + k * stepTime));
+      });
+      if (reduceMotion) drawAll();
+    }
+
+    function doCalculate() {
+      if (!state.sample || state.stepsShown < 3 || state.calculated) return;
+      state.calculated = true;
+      showSteps();
+      updateButtons();
+    }
+
+    function doAdd() {
+      if (!state.calculated || state.added) return;
+      state.ts.push(state.sample.t);
+      state.added = true;
+      drawAll();
+      updateButtons();
+    }
+
+    function doReset() {
+      clearTimers();
+      state.sample = null;
+      state.stepsShown = 0;
+      state.calculated = false;
+      state.added = false;
+      state.ts = [];
+      els.sample.disabled = false;
+      showSteps();
+      drawAll();
+      updateButtons();
+    }
+
+    els.sample.addEventListener("click", doSample);
+    els.calculate.addEventListener("click", doCalculate);
+    els.add.addEventListener("click", doAdd);
+    els.reset.addEventListener("click", doReset);
+    window.addEventListener("resize", () => drawAll());
+
+    // Tell the book page how tall the widget is, so its frame fits without scrolling.
+    function reportHeight() {
+      const h = Math.ceil(document.querySelector(".app").getBoundingClientRect().bottom + 16);
+      if (window.parent !== window) window.parent.postMessage({ demystWidgetHeight: h }, "*");
+    }
+    window.addEventListener("load", reportHeight);
+    window.addEventListener("resize", reportHeight);
+    // Readouts and hints can change length, so report again whenever the content changes size
+    if (window.ResizeObserver) new ResizeObserver(reportHeight).observe(document.querySelector(".app"));
+
+    doReset();
+  </script>
+</body>
+</html>

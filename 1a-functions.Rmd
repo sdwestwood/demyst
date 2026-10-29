@@ -1,0 +1,147 @@
+# (PART) Building Test Statistics {-}
+
+# What Are Functions? {#functions}
+
+## The Core Idea
+
+You have already used many functions in R. You may have typed code like `mean(x)`, `sd(x)`, or `summary(x)`. These can feel like magic boxes: you put something in, R thinks for a moment, and an answer appears.
+
+For this book, we will make the box less mysterious.
+
+<div class="summary-box">
+A function takes an <strong>input</strong>, applies a <strong>process</strong>, and returns an <strong>output</strong>.
+</div>
+
+That is also what a statistical formula does. It takes values, performs operations on those values, and gives you a result.
+
+## A Wee Function
+
+Here is a very basic function that adds two numbers together.
+
+```{r add-function}
+add_func <- function(a, b) {
+  output <- a + b
+  return(output)
+}
+
+add_func(2, 5)
+```
+
+Read it as a sentence:
+
+- the inputs are `a` and `b`;
+- the process is `a + b`;
+- the output is returned with `return()`.
+
+This is deliberately small. Before we use functions for statistics, we need to see the basic shape.
+
+What is the output of `add_func(4, 6)`? `r fitb(10)`
+
+## Your Turn: Multiply
+
+Write a function called `multiply_func()` that returns the product of `a` and `b`.
+
+```{r multiply-exercise, eval=FALSE}
+multiply_func <- function(a, b) {
+  output <- 
+  return(output)
+}
+
+multiply_func(2, 5)
+```
+
+`r hide("Show one solution")`
+```{r multiply-solution}
+multiply_func <- function(a, b) {
+  output <- a * b
+  return(output)
+}
+
+multiply_func(2, 5)
+```
+`r unhide()`
+
+## Defaults
+
+Sometimes we want a function to use a sensible value unless we tell it otherwise. These are called default arguments.
+
+```{r default-function}
+subtract_func <- function(a = 5, b = 3) {
+  return(a - b)
+}
+
+subtract_func()
+subtract_func(a = 10, b = 5)
+```
+
+When we run `subtract_func()` without giving it values, R uses `a = 5` and `b = 3`.
+
+The default value of `b` in `subtract_func()` is `r fitb(3)`.
+
+## Data Frames As Inputs
+
+Functions do not have to take single numbers. They can also take vectors, data frames, and columns from data frames.
+
+We will use this simple data frame throughout the book:
+
+```{r show-my-data}
+demo_scores
+```
+
+Here is a function that takes a data frame and adds a new score column with `mutate()`.
+
+```{r dataframe-function}
+add_points <- function(df, points) {
+  output <- mutate(df, adjusted_score = score + points)
+  return(output)
+}
+
+add_points(demo_scores, points = 2)
+```
+
+This uses the same idea as the first example. The only difference is that the addition happens to a column in a data frame.
+
+## A Function With A Default Data Frame
+
+Now we will build a function that:
+
+- takes a data frame and a number;
+- adds that number to the `score` column;
+- returns a copy of the changed data frame.
+
+```{r add-points-default-data}
+add_points <- function(df = demo_scores, points = 2) {
+  output <- mutate(df, adjusted_score = score + points)
+  return(output)
+}
+
+add_points()
+```
+
+If the function worked, the first adjusted score should be 50.
+
+The first adjusted score is `r fitb(50)`.
+
+
+## Repeated Arithmetic
+
+A useful thing about R is that it can repeat simple arithmetic across a whole vector.
+
+Here we add 1 to every score:
+
+```{r repeated-operation-basic}
+score_values
+score_values + 1
+```
+
+R does the same operation to each value in the vector. Later, this will help us unpack statistical formulas one step at a time.
+
+## Bringing The Tools Together
+
+The next chapter uses these tools to translate a statistical equation into R.
+
+The pattern will stay the same:
+
+1. Identify the inputs.
+2. Write down the process.
+3. Return the output.

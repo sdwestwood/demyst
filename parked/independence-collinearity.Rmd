@@ -1,0 +1,5 @@
+# Independence and Collinearity {#independence-collinearity}
+
+*This chapter has not been written yet.*
+
+Independence of observations, and what happens when it is broken (which is where the multilevel models come in). Collinearity, where two predictors carry much the same information, and how to spot it with variance inflation factors.

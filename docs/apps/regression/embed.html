@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Line Of Best Fit Widget</title>
+  <style>
+    :root {
+      --blue: #467AAC;
+      --orange: #D55E00;
+      --ink: #243447;
+      --muted: #53677a;
+      --panel: #eef5fb;
+      --line: #d8e4ef;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 16px;
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    .controls {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px;
+    }
+
+    .control {
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    .value {
+      font-variant-numeric: tabular-nums;
+      font-weight: 400;
+    }
+
+    .pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 7px 4px;
+      background: var(--blue);
+      color: white;
+      border: 0;
+      border-radius: 4px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button.effect {
+      background: var(--orange);
+    }
+
+    button.secondary {
+      background: #ffffff;
+      color: var(--blue);
+      border: 1px solid var(--blue);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .checks label {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-weight: 500;
+      margin: 2px 0;
+    }
+
+    .challenge {
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+
+    .challenge button {
+      margin-bottom: 6px;
+    }
+
+    .lock-note {
+      margin: 0 0 6px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .plot-wrap {
+      min-width: 0;
+    }
+
+    .prompt {
+      grid-column: 1 / -1;
+      margin: 0;
+      padding: 8px 10px;
+      background: #fff6ef;
+      border-left: 4px solid var(--orange);
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    #plot {
+      height: 340px;
+    }
+
+    #sse-plot {
+      height: 170px;
+      margin-top: 8px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .summary div {
+      background: #f8fbfd;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 0.95rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .summary strong {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .summary .current-box {
+      border-left: 4px solid var(--blue);
+    }
+
+    .compare {
+      width: 100%;
+      margin-top: 10px;
+      border-collapse: separate;
+      border-spacing: 6px;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.92rem;
+    }
+
+    .compare th,
+    .compare td {
+      background: #f8fbfd;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 5px 8px;
+      text-align: left;
+    }
+
+    .compare thead th {
+      background: transparent;
+      border: 0;
+      padding: 0 8px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .compare tbody th {
+      font-weight: 600;
+    }
+
+    .compare .guess-row th { border-left: 4px solid #8a97a5; }
+    .compare .best-row th { border-left: 4px solid var(--orange); }
+
+    .note {
+      margin: 4px 6px 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .result {
+      margin: 2px 6px 0;
+      font-weight: 600;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 8px;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .controls {
+        padding: 10px 12px;
+      }
+
+      .control {
+        margin-bottom: 6px;
+      }
+
+      #plot {
+        height: 300px;
+      }
+
+      #sse-plot {
+        height: 150px;
+      }
+
+      .summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        margin-top: 8px;
+      }
+
+      .summary div {
+        padding: 4px 8px;
+      }
+
+      .compare {
+        border-spacing: 4px;
+        font-size: 0.88rem;
+      }
+
+      .compare th,
+      .compare td {
+        padding: 4px 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <p class="prompt" id="prompt">Find the line with the smallest error you can, then submit your guess.</p>
+
+    <aside class="controls">
+      <div class="control">
+        <label for="intercept">Intercept: <span class="value" id="intercept-value"></span></label>
+        <input id="intercept" type="range" min="30" max="75" value="50" step="0.1">
+      </div>
+
+      <div class="control">
+        <label for="slope">Slope: <span class="value" id="slope-value"></span></label>
+        <input id="slope" type="range" min="-3" max="8" value="1" step="0.01">
+      </div>
+
+      <div class="control checks">
+        <label><input id="show-squares" type="checkbox"> Show squares</label>
+      </div>
+
+      <div class="pair">
+        <button id="mean-only" class="secondary" type="button">Mean only</button>
+        <button id="reset" class="secondary" type="button">Reset</button>
+      </div>
+
+      <div class="challenge">
+        <button id="submit" type="button">Submit my line</button>
+        <p class="lock-note" id="lock-note">Show best fit and Run gradient descent unlock after you submit your line.</p>
+        <button id="best" class="effect" type="button" aria-pressed="false">Show best fit</button>
+        <button id="descent" type="button">Run gradient descent</button>
+      </div>
+    </aside>
+
+    <main class="plot-wrap">
+      <canvas id="plot" aria-label="Scatterplot of test score against practice hours for eight people, with the current line and a vertical residual line from each point to it."></canvas>
+      <canvas id="sse-plot" aria-label="The sum of squared errors for every slope, with the intercept held at its current value. A dot marks the current slope."></canvas>
+      <div class="summary" aria-live="polite">
+        <div class="current-box"><strong>Your line</strong><span id="equation"></span></div>
+        <div class="current-box"><strong>SSE</strong><span id="sse"></span></div>
+        <div><strong>Mean only</strong><span id="mean-sse"></span></div>
+        <div><strong>Descent step</strong><span id="step"></span></div>
+      </div>
+      <table class="compare" id="compare" hidden>
+        <thead>
+          <tr><th></th><th>Intercept</th><th>Slope</th><th>SSE</th></tr>
+        </thead>
+        <tbody>
+          <tr class="guess-row"><th>Your guess</th><td id="guess-a"></td><td id="guess-b"></td><td id="guess-sse"></td></tr>
+          <tr class="best-row"><th>Best fit</th><td id="best-a"></td><td id="best-b"></td><td id="best-sse"></td></tr>
+        </tbody>
+      </table>
+      <p class="result" id="result" hidden></p>
+      <p class="note" id="note"></p>
+    </main>
+  </div>
+
+  <script>
+    // ---- Data and least squares ----------------------------------------------
+
+    // The eight practice/score pairs from Covariance and Correlation.
+    const hours = [1, 2, 3, 4, 5, 6, 7, 8];
+    const scores = [48, 55, 51, 62, 58, 70, 65, 71];
+    const n = hours.length;
+
+    const sum = v => v.reduce((s, x) => s + x, 0);
+    const meanX = sum(hours) / n;
+    const meanY = sum(scores) / n;
+
+    function sse(a, b) {
+      let total = 0;
+      for (let i = 0; i < n; i++) {
+        const r = scores[i] - (a + b * hours[i]);
+        total += r * r;
+      }
+      return total;
+    }
+
+    // Least-squares line: slope = covariance / variance of hours
+    let sxy = 0, sxx = 0;
+    for (let i = 0; i < n; i++) {
+      sxy += (hours[i] - meanX) * (scores[i] - meanY);
+      sxx += (hours[i] - meanX) ** 2;
+    }
+    const best = { b: sxy / sxx };
+    best.a = meanY - best.b * meanX;
+    best.sse = sse(best.a, best.b);
+    const meanOnlySse = sse(meanY, 0);
+
+    // ---- Widget --------------------------------------------------------------
+
+    const blue = "#467AAC";
+    const orange = "#D55E00";
+    const ink = "#243447";
+    const muted = "#53677a";
+    const grid = "#d8e4ef";
+
+    const xLimits = [0, 9];
+    const yLimits = [35, 85];
+    const slopeLimits = [-3, 8];
+    const sseMax = 1500;
+    const learningRate = 0.003;   // fixed; stable for these data (unstable above about 0.0047)
+    const maxSteps = 3000;
+
+    const $ = id => document.getElementById(id);
+    const els = {
+      a: $("intercept"), b: $("slope"),
+      aValue: $("intercept-value"), bValue: $("slope-value"),
+      squares: $("show-squares"),
+      meanOnly: $("mean-only"), reset: $("reset"),
+      submit: $("submit"), best: $("best"), descent: $("descent"),
+      lockNote: $("lock-note"), prompt: $("prompt"),
+      plot: $("plot"), ssePlot: $("sse-plot"),
+      equation: $("equation"), sse: $("sse"), meanSse: $("mean-sse"), step: $("step"),
+      compare: $("compare"), result: $("result"), note: $("note"),
+      guessA: $("guess-a"), guessB: $("guess-b"), guessSse: $("guess-sse"),
+      bestA: $("best-a"), bestB: $("best-b"), bestSse: $("best-sse")
+    };
+
+    // Settings the book can pass in the address, e.g. embed.html?challenge=0
+    const params = new URLSearchParams(window.location.search);
+    const challenge = params.get("challenge") !== "0";
+    const start = {
+      a: params.has("intercept") ? Number(params.get("intercept")) : Number(els.a.value),
+      b: params.has("slope") ? Number(params.get("slope")) : Number(els.b.value)
+    };
+
+    const reduceMotion = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const state = {
+      a: start.a,
+      b: start.b,
+      guess: null,
+      showBest: false,
+      descent: null,   // { step, frame, done, id }
+      lastStep: null
+    };
+
+    const unlocked = () => !challenge || state.guess !== null;
+    const fmt2 = v => v.toFixed(2);
+    const fmt1 = v => v.toFixed(1);
+
+    function setLine(a, b) {
+      state.a = a;
+      state.b = b;
+      els.a.value = a;
+      els.b.value = b;
+    }
+
+    // ---- Drawing -------------------------------------------------------------
+
+    function prepare(canvas) {
+      const dpr = window.devicePixelRatio || 1;
+      const W = canvas.clientWidth;
+      const H = canvas.clientHeight;
+      if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) {
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+      }
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, W, H);
+      return { ctx, W, H };
+    }
+
+    function drawAxes(ctx, box, xScale, yScale, xTicks, yTicks, xTitle, yTitle) {
+      const tickFont = "11px system-ui, sans-serif";
+      ctx.strokeStyle = grid;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(box.x0, box.y1);
+      ctx.lineTo(box.x1, box.y1);
+      ctx.moveTo(box.x0, box.y0);
+      ctx.lineTo(box.x0, box.y1);
+      ctx.stroke();
+
+      ctx.font = tickFont;
+      ctx.fillStyle = muted;
+      ctx.textAlign = "center";
+      xTicks.forEach(v => {
+        const px = xScale(v);
+        ctx.beginPath();
+        ctx.moveTo(px, box.y1);
+        ctx.lineTo(px, box.y1 + 4);
+        ctx.stroke();
+        ctx.fillText(String(v), px, box.y1 + 15);
+      });
+      ctx.textAlign = "right";
+      yTicks.forEach(v => {
+        const py = yScale(v);
+        ctx.beginPath();
+        ctx.moveTo(box.x0 - 4, py);
+        ctx.lineTo(box.x0, py);
+        ctx.stroke();
+        ctx.fillText(String(v), box.x0 - 6, py + 4);
+      });
+
+      ctx.textAlign = "center";
+      ctx.fillText(xTitle, (box.x0 + box.x1) / 2, box.y1 + 29);
+      ctx.save();
+      ctx.translate(11, (box.y0 + box.y1) / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText(yTitle, 0, 0);
+      ctx.restore();
+    }
+
+    function lineThrough(ctx, xScale, yScale, a, b) {
+      ctx.beginPath();
+      ctx.moveTo(xScale(xLimits[0]), yScale(a + b * xLimits[0]));
+      ctx.lineTo(xScale(xLimits[1]), yScale(a + b * xLimits[1]));
+      ctx.stroke();
+    }
+
+    // Label a line just inside the right edge, at the height the line reaches there
+    function labelLine(ctx, box, yScale, a, b, text, colour, offset) {
+      const y = yScale(a + b * (xLimits[1] - 0.15));
+      if (y < box.y0 + 8 || y > box.y1 - 4) return;
+      ctx.font = "12px system-ui, sans-serif";
+      ctx.fillStyle = colour;
+      ctx.textAlign = "right";
+      ctx.fillText(text, box.x1 - 4, y + offset);
+    }
+
+    function drawScatter() {
+      const { ctx, W, H } = prepare(els.plot);
+      const small = W < 520;
+      const box = { x0: 44, x1: W - 12, y0: 26, y1: H - 38 };
+      const xScale = x => box.x0 + (x - xLimits[0]) / (xLimits[1] - xLimits[0]) * (box.x1 - box.x0);
+      const yScale = y => box.y1 - (y - yLimits[0]) / (yLimits[1] - yLimits[0]) * (box.y1 - box.y0);
+
+      ctx.fillStyle = ink;
+      ctx.font = small ? "13px system-ui, sans-serif" : "15px system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("Score = intercept + slope × hours", 12, 17);
+
+      drawAxes(ctx, box, xScale, yScale, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [40, 50, 60, 70, 80], "Practice time (hours)", "Test score");
+
+      // Everything that can leave the plot is clipped to it
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(box.x0, box.y0, box.x1 - box.x0, box.y1 - box.y0);
+      ctx.clip();
+
+      // Squared errors: each side is the residual's length on the score axis
+      if (els.squares.checked) {
+        ctx.fillStyle = "rgba(70, 122, 172, 0.16)";
+        ctx.strokeStyle = "rgba(70, 122, 172, 0.55)";
+        ctx.lineWidth = 1;
+        for (let i = 0; i < n; i++) {
+          const py = yScale(scores[i]);
+          const fy = yScale(state.a + state.b * hours[i]);
+          const side = Math.abs(fy - py);
+          // Squares open to the right unless that would run off the plot
+          const px = xScale(hours[i]);
+          const left = px + side > box.x1 ? px - side : px;
+          ctx.fillRect(left, Math.min(py, fy), side, side);
+          ctx.strokeRect(left, Math.min(py, fy), side, side);
+        }
+      }
+
+      // Submitted guess, then best fit, then the current line on top
+      if (state.guess) {
+        ctx.strokeStyle = "rgba(36, 52, 71, 0.45)";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 5]);
+        lineThrough(ctx, xScale, yScale, state.guess.a, state.guess.b);
+        ctx.setLineDash([]);
+      }
+      if (state.showBest) {
+        ctx.strokeStyle = orange;
+        ctx.lineWidth = 2;
+        lineThrough(ctx, xScale, yScale, best.a, best.b);
+      }
+
+      // Residuals
+      ctx.strokeStyle = "rgba(36, 52, 71, 0.6)";
+      ctx.lineWidth = 1.5;
+      for (let i = 0; i < n; i++) {
+        ctx.beginPath();
+        ctx.moveTo(xScale(hours[i]), yScale(scores[i]));
+        ctx.lineTo(xScale(hours[i]), yScale(state.a + state.b * hours[i]));
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = blue;
+      ctx.lineWidth = 3;
+      lineThrough(ctx, xScale, yScale, state.a, state.b);
+
+      // Where the line crosses hours = 0: the intercept
+      const iy = yScale(state.a);
+      if (iy >= box.y0 && iy <= box.y1) {
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = blue;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(xScale(0), iy, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Points
+      ctx.fillStyle = ink;
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1.5;
+      for (let i = 0; i < n; i++) {
+        ctx.beginPath();
+        ctx.arc(xScale(hours[i]), yScale(scores[i]), 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      if (state.guess) labelLine(ctx, box, yScale, state.guess.a, state.guess.b, "your guess", muted, -6);
+      if (state.showBest) labelLine(ctx, box, yScale, best.a, best.b, "best fit", orange, 14);
+    }
+
+    function drawSse() {
+      const { ctx, W, H } = prepare(els.ssePlot);
+      const small = W < 520;
+      const box = { x0: 44, x1: W - 12, y0: 24, y1: H - 36 };
+      const xScale = b => box.x0 + (b - slopeLimits[0]) / (slopeLimits[1] - slopeLimits[0]) * (box.x1 - box.x0);
+      const yScale = v => box.y1 - v / sseMax * (box.y1 - box.y0);
+
+      ctx.fillStyle = ink;
+      ctx.font = small ? "13px system-ui, sans-serif" : "15px system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("SSE for each slope (intercept held at " + fmt2(state.a) + ")", 12, 16);
+
+      const xTicks = [];
+      for (let v = slopeLimits[0]; v <= slopeLimits[1]; v++) xTicks.push(v);
+      drawAxes(ctx, box, xScale, yScale, xTicks, [0, 500, 1000, 1500], "Slope", "SSE");
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(box.x0, box.y0 - 2, box.x1 - box.x0, box.y1 - box.y0 + 2);
+      ctx.clip();
+
+      // Reference lines: the mean-only model, and (once unlocked) the smallest possible SSE
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = "rgba(36, 52, 71, 0.5)";
+      ctx.beginPath();
+      ctx.moveTo(box.x0, yScale(meanOnlySse));
+      ctx.lineTo(box.x1, yScale(meanOnlySse));
+      ctx.stroke();
+      if (state.showBest) {
+        ctx.strokeStyle = orange;
+        ctx.beginPath();
+        ctx.moveTo(box.x0, yScale(best.sse));
+        ctx.lineTo(box.x1, yScale(best.sse));
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+
+      // The SSE curve for the current intercept
+      ctx.strokeStyle = blue;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      const steps = 200;
+      for (let i = 0; i <= steps; i++) {
+        const b = slopeLimits[0] + (i / steps) * (slopeLimits[1] - slopeLimits[0]);
+        // Clipped above the panel rather than flattened, so it never looks like a plateau
+        const y = Math.max(-H, yScale(sse(state.a, b)));
+        if (i === 0) ctx.moveTo(xScale(b), y); else ctx.lineTo(xScale(b), y);
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.font = "11px system-ui, sans-serif";
+      ctx.fillStyle = muted;
+      ctx.textAlign = "right";
+      ctx.fillText("mean only", box.x1 - 4, yScale(meanOnlySse) - 4);
+      if (state.showBest) {
+        ctx.fillStyle = orange;
+        ctx.fillText("smallest possible", box.x1 - 4, yScale(best.sse) - 4);
+      }
+
+      // The current slope: a dot on the curve, or an arrow if it is off the top
+      const current = sse(state.a, state.b);
+      const px = xScale(state.b);
+      ctx.fillStyle = blue;
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      if (current <= sseMax) {
+        ctx.arc(px, yScale(current), 6, 0, Math.PI * 2);
+      } else {
+        ctx.moveTo(px, box.y0 - 2);
+        ctx.lineTo(px - 6, box.y0 + 9);
+        ctx.lineTo(px + 6, box.y0 + 9);
+        ctx.closePath();
+      }
+      ctx.stroke();
+      ctx.fill();
+    }
+
+    function updateText() {
+      const current = sse(state.a, state.b);
+      els.aValue.textContent = fmt2(state.a);
+      els.bValue.textContent = fmt2(state.b);
+      els.equation.textContent = fmt2(state.a) + " + " + fmt2(state.b) + " × hours";
+      els.sse.textContent = fmt1(current);
+      els.meanSse.textContent = fmt1(meanOnlySse) + " (score = " + fmt2(meanY) + ")";
+      els.step.textContent = state.descent ? String(state.descent.step) :
+        state.lastStep === null ? "–" : String(state.lastStep);
+
+      const open = unlocked();
+      els.best.disabled = !open;
+      els.descent.disabled = !open;
+      els.lockNote.hidden = open;
+      els.prompt.hidden = !challenge || state.guess !== null;
+      els.best.textContent = state.showBest ? "Hide best fit" : "Show best fit";
+      els.best.setAttribute("aria-pressed", String(state.showBest));
+      els.descent.textContent = state.descent ? "Stop" : "Run gradient descent";
+      els.submit.textContent = state.guess ? "Try again" : "Submit my line";
+      els.submit.className = state.guess ? "secondary" : "";
+
+      els.compare.hidden = !state.guess;
+      els.result.hidden = !state.guess;
+      if (state.guess) {
+        const g = state.guess;
+        els.guessA.textContent = fmt2(g.a);
+        els.guessB.textContent = fmt2(g.b);
+        els.guessSse.textContent = fmt1(g.sse);
+        els.bestA.textContent = fmt2(best.a);
+        els.bestB.textContent = fmt2(best.b);
+        els.bestSse.textContent = fmt1(best.sse);
+        const above = g.sse - best.sse;
+        els.result.textContent = above < 0.05 ?
+          "Your SSE matches the minimum to one decimal place: no line does better." :
+          "Your SSE was " + fmt1(above) + " above the minimum (" +
+            (100 * above / best.sse).toFixed(1) + "% more error than the best line).";
+      }
+
+      const notes = [];
+      if (els.squares.checked) {
+        notes.push("Each square's side is that point's residual on the score axis, so its area is the squared error. The hours axis uses a different scale, so these are squares on screen, not in data units.");
+      }
+      if (state.descent) {
+        notes.push("Gradient descent: each step moves the intercept and slope a little way downhill on the error (fixed learning rate " + learningRate + ").");
+      } else if (state.lastStep === 0) {
+        notes.push("This line is already at the bottom of the error, so gradient descent has nowhere to go.");
+      } else if (state.lastStep !== null) {
+        notes.push("Gradient descent stopped after " + state.lastStep + " steps, at intercept " +
+          fmt2(state.a) + ", slope " + fmt2(state.b) + ", SSE " + fmt1(sse(state.a, state.b)) + ".");
+      }
+      els.note.textContent = notes.join(" ");
+    }
+
+    function render() {
+      drawScatter();
+      drawSse();
+      updateText();
+      reportHeight();
+    }
+
+    // ---- Gradient descent ------------------------------------------------------
+
+    function gradient(a, b) {
+      let ga = 0, gb = 0;
+      for (let i = 0; i < n; i++) {
+        const r = scores[i] - (a + b * hours[i]);
+        ga += -2 * r;
+        gb += -2 * hours[i] * r;
+      }
+      return [ga, gb];
+    }
+
+    // Slow at first so each step is visible, then faster as the steps shrink
+    function stepsThisFrame(d) {
+      if (reduceMotion) return 40;
+      if (d.step < 30) return d.frame % 4 === 0 ? 1 : 0;
+      if (d.step < 120) return 1;
+      if (d.step < 300) return 3;
+      return 8;
+    }
+
+    function descentFrame() {
+      const d = state.descent;
+      if (!d) return;
+      d.frame++;
+      const k = stepsThisFrame(d);
+      let a = state.a, b = state.b;
+      for (let i = 0; i < k; i++) {
+        const [ga, gb] = gradient(a, b);
+        if (Math.hypot(ga, gb) < 0.002 || d.step >= maxSteps) {
+          d.done = true;
+          break;
+        }
+        a -= learningRate * ga;
+        b -= learningRate * gb;
+        d.step++;
+      }
+      setLine(a, b);
+      if (d.done) {
+        stopDescent();
+        return;
+      }
+      render();
+      d.id = requestAnimationFrame(descentFrame);
+    }
+
+    function startDescent() {
+      state.descent = { step: 0, frame: 0, done: false, id: null };
+      state.lastStep = null;
+      render();
+      state.descent.id = requestAnimationFrame(descentFrame);
+    }
+
+    function stopDescent() {
+      if (!state.descent) return;
+      cancelAnimationFrame(state.descent.id);
+      state.lastStep = state.descent.step;
+      state.descent = null;
+      render();
+    }
+
+    function cancelDescent() {
+      if (state.descent) cancelAnimationFrame(state.descent.id);
+      state.descent = null;
+      state.lastStep = null;
+    }
+
+    // ---- Events ----------------------------------------------------------------
+
+    // Read only the slider that moved, so the other keeps its exact value
+    els.a.addEventListener("input", () => {
+      cancelDescent();
+      state.a = Number(els.a.value);
+      render();
+    });
+    els.b.addEventListener("input", () => {
+      cancelDescent();
+      state.b = Number(els.b.value);
+      render();
+    });
+
+    els.squares.addEventListener("change", render);
+
+    els.meanOnly.addEventListener("click", () => {
+      cancelDescent();
+      setLine(meanY, 0);
+      render();
+    });
+
+    els.reset.addEventListener("click", () => {
+      cancelDescent();
+      setLine(start.a, start.b);
+      render();
+    });
+
+    els.submit.addEventListener("click", () => {
+      cancelDescent();
+      if (state.guess) {
+        state.guess = null;
+        if (challenge) state.showBest = false;
+      } else {
+        state.guess = { a: state.a, b: state.b, sse: sse(state.a, state.b) };
+      }
+      render();
+    });
+
+    els.best.addEventListener("click", () => {
+      if (!unlocked()) return;
+      state.showBest = !state.showBest;
+      render();
+    });
+
+    els.descent.addEventListener("click", () => {
+      if (!unlocked()) return;
+      if (state.descent) stopDescent(); else startDescent();
+    });
+
+    window.addEventListener("resize", render);
+
+    // Tell the book page how tall the widget is, so its frame fits without scrolling.
+    function reportHeight() {
+      const h = Math.ceil(document.querySelector(".app").getBoundingClientRect().bottom + 16);
+      if (window.parent !== window) window.parent.postMessage({ demystWidgetHeight: h }, "*");
+    }
+    window.addEventListener("load", reportHeight);
+
+    setLine(start.a, start.b);
+    render();
+  </script>
+</body>
+</html>

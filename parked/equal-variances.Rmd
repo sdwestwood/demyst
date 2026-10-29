@@ -1,0 +1,5 @@
+# Equal Variances {#equal-variances}
+
+*This chapter has not been written yet.*
+
+Many tests assume the spread of the residuals is the same across groups or across the range of a predictor. You check this with plots of residuals against fitted values and with Levene's test, and see what to do when it fails, such as Welch's t-test.

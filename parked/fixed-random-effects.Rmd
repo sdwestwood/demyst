@@ -1,0 +1,5 @@
+# Fixed and Random Effects {#fixed-random-effects}
+
+*This chapter has not been written yet.*
+
+So far, every observation has come from a different person. When the same people are measured more than once, their observations are not independent. Multilevel models handle this by adding random effects: for example, a separate baseline for each participant, drawn from a distribution, alongside the fixed effects we are interested in.

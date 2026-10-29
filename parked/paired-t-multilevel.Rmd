@@ -1,0 +1,5 @@
+# The Paired t-Test as a Multilevel Model {#paired-t-multilevel}
+
+*This chapter has not been written yet.*
+
+The paired t-test from Chapter \@ref(two-sample-t), rebuilt as a model with condition as a categorical predictor and a random intercept for each participant (`y ~ condition + (1 | participant)`). With two conditions and no missing data, its t-value matches the paired t-test. Real data: the two sleeping drugs in `sleep`.

@@ -1,0 +1,5 @@
+# Multiple Predictors {#lm-multiple-predictors}
+
+*This chapter has not been written yet.*
+
+Models with more than one predictor. Factorial ANOVA is a linear model with two categorical predictors and their interaction. ANCOVA adds a continuous predictor (a covariate) to a categorical one, and multiple regression uses several continuous predictors.

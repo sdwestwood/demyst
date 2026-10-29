@@ -1,0 +1,154 @@
+---
+title: "Exercises: The One-Sample t-Test"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# error = TRUE lets the file knit even if one of your chunks is not finished yet
+knitr::opts_chunk$set(error = TRUE)
+```
+
+Work through this file alongside the chapter "The One-Sample t-Test" in the book. Keep it in the same folder as your `my_functions.R`.
+
+## The data
+
+```{r data}
+scores <- c(44, 47, 48, 49, 50, 50, 51, 52, 53, 56)
+comparison_value <- 49
+```
+
+## Load your toolbox
+
+```{r load-toolbox}
+library(tidyverse)
+source("my_functions.R")
+
+all.equal(my_mean(scores), mean(scores))
+all.equal(my_var(scores), var(scores))
+all.equal(my_sd(scores), sd(scores))
+all.equal(my_se(scores), t.test(scores)$stderr)
+```
+
+You are looking for four `TRUE`s. If you see `could not find function`, finish the toolbox section at the end of the "Spread and Standard Error" exercise file first.
+
+## Build the pieces
+
+```{r t-pieces}
+mean_score <- my_mean(scores)
+se_score <- my_se(scores)
+
+c(mean = mean_score, se = se_score)
+```
+
+### Your turn: put the pieces into the equation
+
+Subtract the comparison value from the mean, then divide by the standard error. You should get about 0.95.
+
+```{r t-by-hand}
+t_value <-
+t_value
+```
+
+## Your turn: write `my_t_value()`
+
+```{r my-t-value}
+my_t_value <- function(x, comparison_value) {
+  mean_x <-
+  se_x <-
+  output <-
+  return(output)
+}
+
+my_t_value(scores, comparison_value = 49)
+```
+
+### Check it against `t.test()`
+
+```{r my-t-value-check}
+t_result <- t.test(scores, mu = comparison_value)
+t_result
+
+c(mine = my_t_value(scores, comparison_value), R = unname(t_result$statistic))
+all.equal(my_t_value(scores, comparison_value), unname(t_result$statistic))
+```
+
+## Your turn: write `my_t_test()`
+
+```{r my-t-test}
+my_t_test <- function(x, comparison_value) {
+  t <-
+  df <-
+  output <- tibble(t = t, df = df)
+  return(output)
+}
+
+my_t_test(scores, comparison_value = 49)
+```
+
+### Check the whole test
+
+```{r my-t-test-check}
+my_result <- my_t_test(scores, comparison_value)
+r_result <- tibble(
+  t = unname(t_result$statistic),
+  df = unname(t_result$parameter)
+)
+
+bind_rows(mine = my_result, R = r_result, .id = "version")
+all.equal(my_result, r_result)
+```
+
+## A second comparison value
+
+```{r second-comparison}
+my_t_test(scores, comparison_value = 46)
+t.test(scores, mu = 46)
+```
+
+Which numbers changed, and which stayed the same? Now predict the sign of t for a comparison value of 55, then check.
+
+```{r third-comparison}
+
+```
+
+## Try it on real data
+
+Did the first drug in `sleep` add any sleep, on average? If it did nothing, the mean of `extra` would be 0.
+
+```{r real-data}
+drug_1 <- sleep %>% filter(group == 1) %>% pull(extra)
+
+my_result <- my_t_test(drug_1, comparison_value = 0)
+drug_t_result <- t.test(drug_1, mu = 0)
+drug_r_result <- tibble(
+  t = unname(drug_t_result$statistic),
+  df = unname(drug_t_result$parameter)
+)
+
+bind_rows(mine = my_result, R = drug_r_result, .id = "version")
+all.equal(my_result, drug_r_result)
+```
+
+## Add to your toolbox
+
+1. Open `my_functions.R`.
+2. Copy your finished `my_t_value()` and `my_t_test()` into it, under **The One-Sample t-Test** heading. Copy only the functions.
+3. Save `my_functions.R`.
+
+Now check that the saved toolbox works on its own. You are looking for `TRUE`.
+
+```{r toolbox-check}
+rm(list = ls())
+source("my_functions.R")
+
+values <- c(44, 47, 48, 49, 50, 50, 51, 52, 53, 56)
+mine <- my_t_test(values, comparison_value = 46)
+theirs <- t.test(values, mu = 46)
+
+all.equal(
+  c(mine$t, mine$df),
+  unname(c(theirs$statistic, theirs$parameter))
+)
+```
+
+If you see `could not find function`, that function is not in `my_functions.R` yet, or the file was not saved.

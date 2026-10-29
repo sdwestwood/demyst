@@ -1,0 +1,1094 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sample To t Widget</title>
+  <style>
+    :root {
+      --blue: #467AAC;
+      --orange: #D55E00;
+      --ink: #243447;
+      --muted: #53677a;
+      --panel: #eef5fb;
+      --line: #d8e4ef;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 16px;
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    .controls {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px;
+    }
+
+    .control {
+      margin-bottom: 10px;
+    }
+
+    label,
+    .row-label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    input[type="range"],
+    select {
+      width: 100%;
+    }
+
+    select {
+      padding: 4px;
+      font: inherit;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #ffffff;
+    }
+
+    .value {
+      font-variant-numeric: tabular-nums;
+      font-weight: 400;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 4.2em repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .button-row .row-label {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 7px 4px;
+      background: var(--blue);
+      color: white;
+      border: 0;
+      border-radius: 4px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button.effect {
+      background: var(--orange);
+    }
+
+    button.secondary {
+      background: #ffffff;
+      color: var(--blue);
+      border: 1px solid var(--blue);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+
+    .checks label {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-weight: 500;
+      margin: 2px 0;
+    }
+
+    .plot-wrap {
+      min-width: 0;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 470px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .summary div {
+      background: #f8fbfd;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 0.95rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .summary strong {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .summary .null-box {
+      border-left: 4px solid var(--blue);
+    }
+
+    /* Null-only mode (embed.html?mode=null): hide everything about the true population */
+    body.null-mode .effect-only,
+    body.null-mode .effect-box {
+      display: none !important;
+    }
+
+    .counts {
+      width: 100%;
+      margin-top: 10px;
+      border-collapse: separate;
+      border-spacing: 6px;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.92rem;
+    }
+
+    .counts th,
+    .counts td {
+      background: #f8fbfd;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 5px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .counts thead th {
+      background: transparent;
+      border: 0;
+      padding: 0 8px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .counts tbody th {
+      font-weight: 600;
+      width: 26%;
+    }
+
+    .counts .null-row th { border-left: 4px solid var(--blue); }
+    .counts .effect-row th { border-left: 4px solid var(--orange); }
+
+    .counts small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .counts .hit {
+      font-weight: 700;
+    }
+
+    .counts-note {
+      margin: 2px 6px 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .summary .effect-box {
+      border-left: 4px solid var(--orange);
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 8px;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 16px;
+        row-gap: 2px;
+        padding: 10px 12px;
+      }
+
+      .control {
+        margin-bottom: 4px;
+      }
+
+      .wide {
+        grid-column: 1 / -1;
+      }
+
+      /* Put Reset beside the test choice, and the curve options on one line */
+      .reset-control {
+        order: 1;
+        align-self: end;
+      }
+
+      .button-row,
+      .checks {
+        order: 2;
+      }
+
+      .checks {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      canvas {
+        height: 410px;
+      }
+
+      .summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        margin-top: 8px;
+      }
+
+      .summary div {
+        padding: 4px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="controls">
+      <div class="control">
+        <label for="sample-size">Sample size: <span class="value" id="sample-size-value"></span></label>
+        <input id="sample-size" type="range" min="5" max="60" value="20" step="1">
+      </div>
+
+      <div class="control effect-only">
+        <label for="true-mean">True mean: <span class="value" id="true-mean-value"></span></label>
+        <input id="true-mean" type="range" min="44" max="58" value="54" step="0.5">
+      </div>
+
+      <div class="control">
+        <label for="pop-sd">Population SD: <span class="value" id="pop-sd-value"></span></label>
+        <input id="pop-sd" type="range" min="5" max="15" value="10" step="1">
+      </div>
+
+      <div class="control">
+        <label for="alpha">Alpha</label>
+        <select id="alpha">
+          <option value="0.05" selected>.05</option>
+          <option value="0.01">.01</option>
+        </select>
+      </div>
+
+      <div class="control">
+        <label for="tails">Test</label>
+        <select id="tails">
+          <option value="two" selected>Two-sided</option>
+          <option value="greater">One-sided: &gt; 50</option>
+          <option value="less">One-sided: &lt; 50</option>
+        </select>
+      </div>
+
+      <div class="control">
+        <label for="view">Show t-values as</label>
+        <select id="view">
+          <option value="hist" selected>Histogram</option>
+          <option value="dots">Dots</option>
+        </select>
+      </div>
+
+      <div class="button-row wide">
+        <span class="row-label">Null</span>
+        <button id="null-1" type="button">+1</button>
+        <button id="null-10" type="button">+10</button>
+        <button id="null-1000" type="button">+1000</button>
+      </div>
+
+      <div class="button-row wide effect-only">
+        <span class="row-label">True</span>
+        <button id="effect-1" class="effect" type="button">+1</button>
+        <button id="effect-10" class="effect" type="button">+10</button>
+        <button id="effect-1000" class="effect" type="button">+1000</button>
+      </div>
+
+      <div class="control checks wide">
+        <label><input id="show-null-curve" type="checkbox"> Null t curve</label>
+        <label class="effect-only"><input id="show-effect-curve" type="checkbox"> True-effect t curve</label>
+      </div>
+
+      <div class="control reset-control">
+        <button id="reset" class="secondary" type="button">Reset</button>
+      </div>
+
+      <!-- Seed control from the Shiny version, left out to save space.
+      <div class="control">
+        <label for="seed">Seed</label>
+        <input id="seed" type="number" min="1" step="1" value="123">
+      </div>
+      -->
+    </aside>
+
+    <main class="plot-wrap">
+      <canvas id="plot" aria-label="Top: the null and true populations with the latest sample. Middle: the t-value calculation for that sample. Bottom: every t-value calculated so far, with the cutoffs for significance."></canvas>
+      <table class="counts" aria-live="polite">
+        <thead>
+          <tr><th></th><th>Not past the cutoff</th><th>Past the cutoff</th></tr>
+        </thead>
+        <tbody>
+          <tr class="null-row">
+            <th>Null samples<br><span id="null-count">0</span></th>
+            <td id="null-not">&ndash;</td>
+            <td id="null-past">&ndash;</td>
+          </tr>
+          <tr class="effect-row effect-only">
+            <th>True samples<br><span id="effect-count">0</span></th>
+            <td id="effect-not">&ndash;</td>
+            <td id="effect-past">&ndash;</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="counts-note" id="counts-note"></p>
+    </main>
+  </div>
+
+  <script>
+    // Statistical helpers for the NHST widget. Kept dependency-free so the
+    // widget runs as a static page.
+    
+    function logGamma(x) {
+      const g = 7;
+      const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+        771.32342877765313, -176.61502916214059, 12.507343278686905,
+        -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+      if (x < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * x)) - logGamma(1 - x);
+      x -= 1;
+      let a = c[0];
+      const t = x + g + 0.5;
+      for (let i = 1; i < g + 2; i++) a += c[i] / (x + i);
+      return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(a);
+    }
+    
+    function betaContinuedFraction(a, b, x) {
+      const maxIter = 300;
+      const eps = 1e-14;
+      const tiny = 1e-300;
+      let qab = a + b, qap = a + 1, qam = a - 1;
+      let c = 1, d = 1 - qab * x / qap;
+      if (Math.abs(d) < tiny) d = tiny;
+      d = 1 / d;
+      let h = d;
+      for (let m = 1; m <= maxIter; m++) {
+        const m2 = 2 * m;
+        let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+        d = 1 + aa * d; if (Math.abs(d) < tiny) d = tiny;
+        c = 1 + aa / c; if (Math.abs(c) < tiny) c = tiny;
+        d = 1 / d; h *= d * c;
+        aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+        d = 1 + aa * d; if (Math.abs(d) < tiny) d = tiny;
+        c = 1 + aa / c; if (Math.abs(c) < tiny) c = tiny;
+        d = 1 / d;
+        const del = d * c;
+        h *= del;
+        if (Math.abs(del - 1) < eps) break;
+      }
+      return h;
+    }
+    
+    function incompleteBeta(x, a, b) {
+      if (x <= 0) return 0;
+      if (x >= 1) return 1;
+      const bt = Math.exp(logGamma(a + b) - logGamma(a) - logGamma(b) +
+        a * Math.log(x) + b * Math.log(1 - x));
+      if (x < (a + 1) / (a + b + 2)) return bt * betaContinuedFraction(a, b, x) / a;
+      return 1 - bt * betaContinuedFraction(b, a, 1 - x) / b;
+    }
+    
+    function tCdf(t, df) {
+      const x = df / (df + t * t);
+      const tail = 0.5 * incompleteBeta(x, df / 2, 0.5);
+      return t > 0 ? 1 - tail : tail;
+    }
+    
+    function tQuantile(p, df) {
+      let lo = -60, hi = 60;
+      for (let i = 0; i < 200; i++) {
+        const mid = (lo + hi) / 2;
+        if (tCdf(mid, df) < p) lo = mid; else hi = mid;
+      }
+      return (lo + hi) / 2;
+    }
+    
+    function tPdf(t, df) {
+      return Math.exp(logGamma((df + 1) / 2) - logGamma(df / 2) -
+        0.5 * Math.log(df * Math.PI) - (df + 1) / 2 * Math.log(1 + t * t / df));
+    }
+    
+    function normalPdf(z) {
+      return Math.exp(-0.5 * z * z) / Math.sqrt(2 * Math.PI);
+    }
+    
+    function normalCdf(z) {
+      // Complementary error function (Numerical Recipes erfc, ~1e-7 accuracy)
+      const x = Math.abs(z) / Math.SQRT2;
+      const t = 1 / (1 + 0.5 * x);
+      const erfc = t * Math.exp(-x * x - 1.26551223 + t * (1.00002368 + t * (0.37409196 +
+        t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 +
+        t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+      return z >= 0 ? 1 - erfc / 2 : erfc / 2;
+    }
+    
+    function chiSquarePdf(v, df) {
+      if (v <= 0) return 0;
+      return Math.exp((df / 2 - 1) * Math.log(v) - v / 2 - (df / 2) * Math.log(2) - logGamma(df / 2));
+    }
+    
+    // Integrate a function of the chi-square variable V (df degrees of freedom)
+    // against its density, using Simpson's rule.
+    function integrateOverChiSquare(f, df) {
+      const upper = df + 14 * Math.sqrt(2 * df) + 30;
+      const steps = 800;
+      const h = upper / steps;
+      let total = 0;
+      for (let i = 0; i <= steps; i++) {
+        const v = i * h;
+        const w = (i === 0 || i === steps) ? 1 : (i % 2 === 1 ? 4 : 2);
+        total += w * f(v) * chiSquarePdf(v, df);
+      }
+      return total * h / 3;
+    }
+    
+    // Density of the noncentral t: T = (Z + ncp) / sqrt(V / df)
+    function noncentralTPdf(t, df, ncp) {
+      if (ncp === 0) return tPdf(t, df);
+      return integrateOverChiSquare(v => {
+        const s = Math.sqrt(v / df);
+        return normalPdf(t * s - ncp) * s;
+      }, df);
+    }
+    
+    // P(T <= t) for the noncentral t
+    function noncentralTCdf(t, df, ncp) {
+      if (ncp === 0) return tCdf(t, df);
+      return integrateOverChiSquare(v => normalCdf(t * Math.sqrt(v / df) - ncp), df);
+    }
+    
+    function criticalValues(alpha, df, tails) {
+      if (tails === "two") return { lower: tQuantile(alpha / 2, df), upper: tQuantile(1 - alpha / 2, df) };
+      if (tails === "greater") return { lower: -Infinity, upper: tQuantile(1 - alpha, df) };
+      return { lower: tQuantile(alpha, df), upper: Infinity };
+    }
+    
+    function isSignificant(t, crit) {
+      return t <= crit.lower || t >= crit.upper;
+    }
+    
+    function theoreticalPower(df, ncp, crit) {
+      let p = 0;
+      if (isFinite(crit.lower)) p += noncentralTCdf(crit.lower, df, ncp);
+      if (isFinite(crit.upper)) p += 1 - noncentralTCdf(crit.upper, df, ncp);
+      return p;
+    }
+    
+
+    // ---- Widget ------------------------------------------------------------
+
+    const blue = "#467AAC";
+    const orange = "#D55E00";
+    const ink = "#243447";
+    const muted = "#53677a";
+    const grid = "#d8e4ef";
+
+    let tLimits = [-6, 12];
+    const tBin = 0.25;
+
+    // Settings the book can pass in the address, e.g. embed.html?mode=null&n=10
+    const params = new URLSearchParams(window.location.search);
+
+    // Population settings: null=175&sd=7&unit=cm sets the null population's
+    // mean, its SD and a unit for the labels. Without them, the widget uses
+    // the 0 to 100 score scale (mean 50, SD 10).
+    const nullMean = params.has("null") ? Number(params.get("null")) : 50;  // the value the t-test compares against
+    const unit = params.has("unit") ? " " + params.get("unit") : "";
+    const sdInput = document.getElementById("pop-sd");
+    const trueMeanInput = document.getElementById("true-mean");
+    const customWorld = params.has("null") || params.has("sd");
+    if (params.has("sd")) {
+      const sd = Number(params.get("sd"));
+      sdInput.min = Math.max(1, Math.round(sd / 2));
+      sdInput.max = Math.round(sd * 1.5);
+      sdInput.value = sd;
+    }
+    if (customWorld) {
+      // True mean from 1 SD below to 2 SDs above the null mean, in steps of
+      // 0.1, so a true mean given in the address (e.g. mean=180) lands exactly
+      const sd = Number(sdInput.value);
+      const tenth = x => Math.round(x * 10) / 10;
+      trueMeanInput.min = tenth(nullMean - sd);
+      trueMeanInput.max = tenth(nullMean + 2 * sd);
+      trueMeanInput.step = 0.1;
+      trueMeanInput.value = tenth(nullMean + 0.4 * sd);
+    }
+    const rawLimits = customWorld ? [
+      Math.floor((nullMean - 5 * Number(sdInput.value)) / 10) * 10,
+      Math.ceil((nullMean + 5 * Number(sdInput.value)) / 10) * 10
+    ] : [0, 100];
+    const popDensityMax = 1 / (Number(sdInput.min) * Math.sqrt(2 * Math.PI)) * 1.05;
+    document.querySelector('#tails option[value="greater"]').textContent = "One-sided: > " + nullMean;
+    document.querySelector('#tails option[value="less"]').textContent = "One-sided: < " + nullMean;
+
+    const nullOnly = params.get("mode") === "null";
+    if (nullOnly) {
+      document.body.classList.add("null-mode");
+      document.querySelector("#null-1").closest(".button-row").querySelector(".row-label").textContent = "Add";
+    }
+    if (params.has("n")) document.getElementById("sample-size").value = params.get("n");
+    if (params.has("mean")) document.getElementById("true-mean").value = params.get("mean");
+    if (params.get("view") === "dots") document.getElementById("view").value = "dots";
+    if (nullOnly) tLimits = [-6, 6];  // nothing is shifted right, so keep the axis symmetric
+
+    const reduceMotion = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const $ = id => document.getElementById(id);
+    const els = {
+      n: $("sample-size"), trueMean: $("true-mean"), sd: $("pop-sd"),
+      alpha: $("alpha"), tails: $("tails"),
+      nValue: $("sample-size-value"), trueMeanValue: $("true-mean-value"), sdValue: $("pop-sd-value"),
+      showNull: $("show-null-curve"), showEffect: $("show-effect-curve"),
+      reset: $("reset"), canvas: $("plot"),
+      view: $("view"),
+      nullCount: $("null-count"), nullNot: $("null-not"), nullPast: $("null-past"),
+      effectCount: $("effect-count"), effectNot: $("effect-not"), effectPast: $("effect-past"),
+      note: $("counts-note")
+    };
+    const buttons = ["null-1", "null-10", "null-1000", "effect-1", "effect-10", "effect-1000"].map($);
+
+    const state = {
+      results: { null: [], effect: [] },
+      counts: { null: new Map(), effect: new Map() },
+      offScale: { null: 0, effect: 0 },
+      latest: null,
+      queue: 0,
+      anim: null
+    };
+
+    function settings() {
+      const n = Number(els.n.value);
+      const sd = Number(els.sd.value);
+      const trueMean = Number(els.trueMean.value);
+      const alpha = Number(els.alpha.value);
+      const tails = els.tails.value;
+      const df = n - 1;
+      const crit = criticalValues(alpha, df, tails);
+      const ncp = (trueMean - nullMean) / (sd / Math.sqrt(n));
+      return { n, sd, trueMean, alpha, tails, df, crit, ncp };
+    }
+
+    let cachedKey = null;
+    let cachedPower = null;
+    function powerFor(s) {
+      const key = [s.df, s.ncp, s.alpha, s.tails].join("|");
+      if (key !== cachedKey) {
+        cachedKey = key;
+        cachedPower = theoreticalPower(s.df, s.ncp, s.crit);
+      }
+      return cachedPower;
+    }
+
+    function randomNormal(mean, sd) {
+      const u1 = Math.max(Math.random(), 1e-12);
+      const u2 = Math.random();
+      return mean + sd * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    }
+
+    function popDensity(x, mean, sd) {
+      return Math.exp(-0.5 * Math.pow((x - mean) / sd, 2)) / (sd * Math.sqrt(2 * Math.PI));
+    }
+
+    // The same steps as the book's functions: mean, SD, SE, then t.
+    function drawSample(source) {
+      const s = settings();
+      const mu = source === "null" ? nullMean : s.trueMean;
+      const values = Array.from({ length: s.n }, () => randomNormal(mu, s.sd));
+      const mean = values.reduce((a, b) => a + b, 0) / s.n;
+      const ss = values.reduce((a, b) => a + (b - mean) * (b - mean), 0);
+      const sampleSd = Math.sqrt(ss / (s.n - 1));
+      const se = sampleSd / Math.sqrt(s.n);
+      const t = (mean - nullMean) / se;
+      return {
+        source,
+        values: values.map(v => ({ x: v, jitter: Math.random() })),
+        mean, sd: sampleSd, se, t, n: s.n,
+        jitter: Math.random(),
+        significant: isSignificant(t, s.crit)
+      };
+    }
+
+    function binOf(t) {
+      return Math.floor(t / tBin) * tBin;
+    }
+
+    function addResult(r) {
+      state.results[r.source].push(r);
+      if (r.t < tLimits[0] || r.t >= tLimits[1]) {
+        state.offScale[r.source] += 1;
+      } else {
+        const b = binOf(r.t);
+        state.counts[r.source].set(b, (state.counts[r.source].get(b) || 0) + 1);
+      }
+    }
+
+    // ---- Animation ---------------------------------------------------------
+
+    function durations() {
+      if (reduceMotion) return { dots: 0, calc: 0, drop: 0 };
+      if (state.queue > 0) return { dots: 140, calc: 80, drop: 160 };
+      return { dots: 900, calc: 700, drop: 550 };
+    }
+
+    function startNext(source) {
+      state.latest = drawSample(source);
+      state.anim = { start: performance.now(), d: durations(), source };
+      requestAnimationFrame(step);
+    }
+
+    function step(now) {
+      if (!state.anim) return;
+      const a = state.anim;
+      const t = now - a.start;
+      const total = a.d.dots + a.d.calc + a.d.drop;
+      if (t >= total) {
+        addResult(state.latest);
+        state.anim = null;
+        draw(null);
+        updateSummary();
+        if (state.queue > 0) {
+          state.queue -= 1;
+          startNext(a.source);
+        } else {
+          setButtons(true);
+        }
+        return;
+      }
+      draw({
+        dotsShown: a.d.dots === 0 ? 1 : Math.min(1, t / a.d.dots),
+        calcShown: t >= a.d.dots,
+        drop: t < a.d.dots + a.d.calc ? null : (t - a.d.dots - a.d.calc) / a.d.drop
+      });
+      requestAnimationFrame(step);
+    }
+
+    function animateSamples(source, k) {
+      if (state.anim) return;
+      setButtons(false);
+      state.queue = k - 1;
+      startNext(source);
+    }
+
+    function addInstantly(source, k) {
+      if (state.anim) return;
+      let r = null;
+      for (let i = 0; i < k; i++) {
+        r = drawSample(source);
+        addResult(r);
+      }
+      state.latest = r;
+      draw(null);
+      updateSummary();
+    }
+
+    function setButtons(enabled) {
+      buttons.concat([els.reset]).forEach(b => { b.disabled = !enabled; });
+    }
+
+    function resetAll() {
+      state.results = { null: [], effect: [] };
+      state.counts = { null: new Map(), effect: new Map() };
+      state.offScale = { null: 0, effect: 0 };
+      state.latest = null;
+      state.queue = 0;
+      state.anim = null;
+      setButtons(true);
+      draw(null);
+      updateSummary();
+    }
+
+    // ---- Drawing -----------------------------------------------------------
+
+    function draw(anim) {
+      const s = settings();
+      const canvas = els.canvas;
+      const dpr = window.devicePixelRatio || 1;
+      const W = canvas.clientWidth;
+      const H = canvas.clientHeight;
+      if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) {
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+      }
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, W, H);
+
+      const small = W < 520;
+      const titleFont = small ? "13px system-ui, sans-serif" : "15px system-ui, sans-serif";
+      const tickFont = "11px system-ui, sans-serif";
+      const pad = { left: 14, right: 14 };
+      const plotW = W - pad.left - pad.right;
+      const rawX = x => pad.left + ((x - rawLimits[0]) / (rawLimits[1] - rawLimits[0])) * plotW;
+      const tX = t => pad.left + ((t - tLimits[0]) / (tLimits[1] - tLimits[0])) * plotW;
+
+      // Geometry
+      const top = { y0: 22, curveH: H * 0.15, stripH: H * 0.10 };
+      top.base = top.y0 + top.curveH;
+      top.stripTop = top.base + 6;
+      top.stripBottom = top.stripTop + top.stripH;
+      top.axis = top.stripBottom + 4;
+      const calcY = top.axis + 44;
+      const bottom = { y0: calcY + 62 };
+      bottom.axis = H - 22;
+      bottom.h = bottom.axis - bottom.y0 - 4;
+
+      // ---- 1. Populations and the latest sample
+      ctx.fillStyle = ink;
+      ctx.font = titleFont;
+      ctx.textAlign = "left";
+      ctx.fillText((nullOnly ? "1. Population (mean " + nullMean + unit + ") and the latest sample of " : "1. Populations and the latest sample of ") + s.n, pad.left, 15);
+
+      drawPopulation(ctx, rawX, top, nullMean, s.sd, blue, "rgba(70, 122, 172, 0.13)");
+      if (!nullOnly) drawPopulation(ctx, rawX, top, s.trueMean, s.sd, orange, "rgba(213, 94, 0, 0.10)");
+
+      // Null value marker
+      ctx.strokeStyle = "rgba(36, 52, 71, 0.5)";
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(rawX(nullMean), top.y0);
+      ctx.lineTo(rawX(nullMean), top.axis);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      drawAxis(ctx, rawX, top.axis, rawLimits, 10, tickFont);
+
+      const L = state.latest;
+      if (L) {
+        const colour = L.source === "null" ? blue : orange;
+        const nShown = Math.ceil((anim ? anim.dotsShown : 1) * L.values.length);
+        const r = L.values.length > 30 ? 3 : 4;
+        ctx.fillStyle = colour;
+        for (let i = 0; i < nShown; i++) {
+          const d = L.values[i];
+          if (d.x < rawLimits[0] || d.x > rawLimits[1]) continue;
+          ctx.beginPath();
+          ctx.arc(rawX(d.x), top.stripTop + r + d.jitter * (top.stripH - 2 * r), r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        if (!anim || anim.calcShown) {
+          const mx = rawX(L.mean);
+          ctx.strokeStyle = ink;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(mx, top.stripTop - 4);
+          ctx.lineTo(mx, top.stripBottom + 2);
+          ctx.stroke();
+        }
+      }
+
+      // ---- 2. The calculation
+      ctx.fillStyle = ink;
+      ctx.font = titleFont;
+      ctx.textAlign = "left";
+      ctx.fillText("2. Calculate t", pad.left, calcY - 18);
+      ctx.font = (small ? "12px" : "14px") + " ui-monospace, SFMono-Regular, Consolas, monospace";
+      if (L && (!anim || anim.calcShown)) {
+        ctx.fillStyle = L.source === "null" ? blue : orange;
+        let line1 = "mean = " + L.mean.toFixed(2) + "   SD = " + L.sd.toFixed(2) +
+          "   SE = " + L.sd.toFixed(2) + " / √" + L.n + " = " + L.se.toFixed(2);
+        if (ctx.measureText(line1).width > plotW) {
+          line1 = "mean = " + L.mean.toFixed(2) + "  SD = " + L.sd.toFixed(2) + "  SE = " + L.se.toFixed(2);
+        }
+        const line2 = "t = (" + L.mean.toFixed(2) + " − " + nullMean + ") / " +
+          L.se.toFixed(2) + " = " + L.t.toFixed(2) + (isSignificant(L.t, s.crit) ? "   past the cutoff" : "");
+        ctx.fillText(line1, pad.left, calcY + 2);
+        ctx.fillText(line2, pad.left, calcY + 22);
+      } else {
+        ctx.fillStyle = muted;
+        ctx.fillText(L ? "" : "Add a sample to calculate its t-value.", pad.left, calcY + 4);
+      }
+
+      // ---- 3. Accumulated t-values
+      ctx.fillStyle = ink;
+      ctx.font = titleFont;
+      ctx.textAlign = "left";
+      const nNull = state.results.null.length;
+      const nEff = state.results.effect.length;
+      ctx.fillText("3. Every t-value so far (" + (nNull + nEff) + ")", pad.left, bottom.y0 - 10);
+
+      // Rejection regions
+      ctx.fillStyle = "rgba(36, 52, 71, 0.07)";
+      if (isFinite(s.crit.lower)) {
+        ctx.fillRect(tX(tLimits[0]), bottom.y0, tX(Math.max(tLimits[0], s.crit.lower)) - tX(tLimits[0]), bottom.axis - bottom.y0);
+      }
+      if (isFinite(s.crit.upper)) {
+        ctx.fillRect(tX(Math.min(tLimits[1], s.crit.upper)), bottom.y0, tX(tLimits[1]) - tX(Math.min(tLimits[1], s.crit.upper)), bottom.axis - bottom.y0);
+      }
+
+      let maxCount = 0;
+      ["null", "effect"].forEach(src => state.counts[src].forEach(c => { if (c > maxCount) maxCount = c; }));
+      const yMax = Math.max(5, maxCount) * 1.1;
+      const yScale = c => bottom.axis - (c / yMax) * bottom.h;
+      const dotsView = els.view.value === "dots";
+
+      // Solid = past the cutoff, faded = not past it
+      const fills = {
+        null: ["rgba(70, 122, 172, 0.30)", "rgba(70, 122, 172, 0.90)"],
+        effect: ["rgba(213, 94, 0, 0.25)", "rgba(213, 94, 0, 0.85)"]
+      };
+
+      // Dot view: one row per population, one dot per t-value
+      const rows = nullOnly ? { null: [bottom.y0 + 16, bottom.axis - 6] } : {
+        null: [bottom.y0 + 16, bottom.y0 + 16 + (bottom.h - 22) / 2 - 4],
+        effect: [bottom.y0 + 16 + (bottom.h - 22) / 2 + 4, bottom.axis - 6]
+      };
+      const dotY = r => {
+        const band = rows[r.source];
+        return band[0] + r.jitter * (band[1] - band[0]);
+      };
+      const clampT = t => Math.min(tLimits[1] - 0.01, Math.max(tLimits[0] + 0.01, t));
+
+      if (dotsView) {
+        const total = state.results.null.length + state.results.effect.length;
+        const radius = total > 1200 ? 1.8 : total > 400 ? 2.4 : 3;
+        Object.keys(rows).forEach(src => {
+          state.results[src].forEach(r => {
+            if (anim && r === L) return;
+            ctx.fillStyle = fills[src][isSignificant(r.t, s.crit) ? 1 : 0];
+            ctx.beginPath();
+            ctx.arc(tX(clampT(r.t)), dotY(r), radius, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        });
+        if (!nullOnly) {
+          ctx.fillStyle = muted;
+          ctx.font = tickFont;
+          ctx.textAlign = "left";
+          ctx.fillText("Null", pad.left + 2, rows.null[0] + 4);
+          ctx.fillText("True", pad.left + 2, rows.effect[0] + 4);
+          ctx.strokeStyle = grid;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          const mid = (rows.null[1] + rows.effect[0]) / 2;
+          ctx.moveTo(tX(tLimits[0]), mid);
+          ctx.lineTo(tX(tLimits[1]), mid);
+          ctx.stroke();
+        }
+      } else {
+        ["null", "effect"].forEach(src => {
+          state.counts[src].forEach((c, b) => {
+            const x0 = tX(b), x1 = tX(b + tBin);
+            ctx.fillStyle = fills[src][isSignificant(b + tBin / 2, s.crit) ? 1 : 0];
+            ctx.fillRect(x0 + 0.5, yScale(c), Math.max(1, x1 - x0 - 1), bottom.axis - yScale(c));
+          });
+        });
+      }
+
+      // Theoretical curves, scaled to the number of samples
+      const curve = (count, ncp, colour) => {
+        if (count === 0) return;
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        const steps = 160;
+        for (let i = 0; i <= steps; i++) {
+          const t = tLimits[0] + (i / steps) * (tLimits[1] - tLimits[0]);
+          const y = Math.max(bottom.y0, yScale(count * tBin * noncentralTPdf(t, s.df, ncp)));
+          if (i === 0) ctx.moveTo(tX(t), y); else ctx.lineTo(tX(t), y);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+      };
+      if (!dotsView && els.showNull.checked) curve(nNull, 0, blue);
+      if (!dotsView && els.showEffect.checked) curve(nEff, s.ncp, orange);
+
+      // Cutoff lines
+      ctx.strokeStyle = ink;
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([5, 4]);
+      ctx.font = tickFont;
+      ctx.fillStyle = ink;
+      [s.crit.lower, s.crit.upper].forEach(c => {
+        if (!isFinite(c)) return;
+        ctx.beginPath();
+        ctx.moveTo(tX(c), bottom.y0);
+        ctx.lineTo(tX(c), bottom.axis);
+        ctx.stroke();
+        ctx.textAlign = c < 0 ? "right" : "left";
+        ctx.fillText("cutoff " + c.toFixed(2), tX(c) + (c < 0 ? -4 : 4), bottom.y0 + 10);
+      });
+      ctx.setLineDash([]);
+
+      drawAxis(ctx, tX, bottom.axis, tLimits, 2, tickFont);
+
+      const off = state.offScale.null + state.offScale.effect;
+      if (off > 0) {
+        ctx.fillStyle = muted;
+        ctx.font = tickFont;
+        ctx.textAlign = "right";
+        ctx.fillText(off + " beyond the axis", W - pad.right, bottom.y0 + 24);
+      }
+
+      // Latest t: falling during the animation, marked afterwards
+      if (L) {
+        const colour = L.source === "null" ? blue : orange;
+        const tClamped = clampT(L.t);
+        const b = binOf(tClamped);
+        const restY = dotsView ? dotY(L) - 4 : yScale((state.counts[L.source].get(b) || 0) + (anim ? 1 : 0)) - 6;
+        if (anim && anim.drop !== null) {
+          const p = Math.min(1, anim.drop);
+          const y = calcY + 28 + (restY - calcY - 28) * p * p;
+          ctx.fillStyle = colour;
+          ctx.beginPath();
+          ctx.arc(tX(tClamped), y, 5, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (!anim) {
+          ctx.fillStyle = colour;
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(tX(tClamped), restY + 4);
+          ctx.lineTo(tX(tClamped) - 6, restY - 6);
+          ctx.lineTo(tX(tClamped) + 6, restY - 6);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.fill();
+        }
+      }
+
+      els.nValue.textContent = s.n + " (df " + s.df + ")";
+      const d = (s.trueMean - nullMean) / s.sd;
+      els.trueMeanValue.textContent = s.trueMean.toFixed(1) + unit + (s.trueMean === nullMean ? " (no effect)" : " (d = " + d.toFixed(2) + ")");
+      els.sdValue.textContent = s.sd + unit;
+    }
+
+    function drawPopulation(ctx, xScale, top, mean, sd, stroke, fill) {
+      const pts = [];
+      for (let i = 0; i <= 300; i++) {
+        const x = rawLimits[0] + (i / 300) * (rawLimits[1] - rawLimits[0]);
+        pts.push([xScale(x), top.base - Math.min(1, popDensity(x, mean, sd) / popDensityMax) * top.curveH]);
+      }
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], top.base);
+      pts.forEach(p => ctx.lineTo(p[0], p[1]));
+      ctx.lineTo(pts[pts.length - 1][0], top.base);
+      ctx.closePath();
+      ctx.fillStyle = fill;
+      ctx.fill();
+      ctx.beginPath();
+      pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function drawAxis(ctx, xScale, y, limits, step, font) {
+      ctx.strokeStyle = grid;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(xScale(limits[0]), y);
+      ctx.lineTo(xScale(limits[1]), y);
+      ctx.stroke();
+      ctx.font = font;
+      ctx.fillStyle = muted;
+      ctx.textAlign = "center";
+      for (let v = limits[0]; v <= limits[1]; v += step) {
+        const px = xScale(v);
+        ctx.beginPath();
+        ctx.moveTo(px, y);
+        ctx.lineTo(px, y + 4);
+        ctx.stroke();
+        ctx.fillText(String(v), px, y + 15);
+      }
+    }
+
+    function pct(k, n) {
+      return n === 0 ? "–" : (100 * k / n).toFixed(1) + "%";
+    }
+
+    function updateSummary() {
+      const s = settings();
+      const nr = state.results.null, er = state.results.effect;
+      // Recalculated from the current cutoffs, so changing alpha or the test
+      // re-judges the same t-values.
+      const nSig = nr.filter(r => isSignificant(r.t, s.crit)).length;
+      const eSig = er.filter(r => isSignificant(r.t, s.crit)).length;
+      const cell = (k, n, label) => n === 0 ? "&ndash;" :
+        k + " (" + pct(k, n) + ")<small>" + label + "</small>";
+      els.nullCount.textContent = nr.length;
+      els.nullNot.innerHTML = cell(nr.length - nSig, nr.length, "correct: no effect found");
+      els.nullPast.innerHTML = cell(nSig, nr.length, "Type I error");
+      els.effectCount.textContent = er.length;
+      els.effectNot.innerHTML = cell(er.length - eSig, er.length, "Type II error (beta)");
+      els.effectPast.innerHTML = cell(eSig, er.length, "correct: power");
+      els.nullPast.classList.toggle("hit", nr.length > 0);
+      els.effectPast.classList.toggle("hit", er.length > 0);
+      els.note.textContent = "Alpha is " + (100 * s.alpha) + "%." +
+        (nullOnly ? "" : " Theoretical power for this design: " + (100 * powerFor(s)).toFixed(0) + "%.");
+    }
+
+    // ---- Events ------------------------------------------------------------
+
+    $("null-1").addEventListener("click", () => animateSamples("null", 1));
+    $("null-10").addEventListener("click", () => animateSamples("null", 10));
+    $("null-1000").addEventListener("click", () => addInstantly("null", 1000));
+    $("effect-1").addEventListener("click", () => animateSamples("effect", 1));
+    $("effect-10").addEventListener("click", () => animateSamples("effect", 10));
+    $("effect-1000").addEventListener("click", () => addInstantly("effect", 1000));
+    els.reset.addEventListener("click", resetAll);
+    [els.showNull, els.showEffect, els.view].forEach(el => el.addEventListener("change", () => { if (!state.anim) draw(null); }));
+    [els.n, els.trueMean, els.sd].forEach(el => el.addEventListener("input", resetAll));
+    // Alpha and the test only move the cutoffs, so keep the t-values.
+    [els.alpha, els.tails].forEach(el => el.addEventListener("change", () => {
+      if (state.anim) return;
+      draw(null);
+      updateSummary();
+    }));
+    window.addEventListener("resize", () => { if (!state.anim) draw(null); });
+
+    // Tell the book page how tall the widget is, so its frame fits without scrolling.
+    function reportHeight() {
+      const h = Math.ceil(document.querySelector(".app").getBoundingClientRect().bottom + 16);
+      if (window.parent !== window) window.parent.postMessage({ demystWidgetHeight: h }, "*");
+    }
+    window.addEventListener("load", reportHeight);
+    window.addEventListener("resize", reportHeight);
+
+    resetAll();
+  </script>
+</body>
+</html>

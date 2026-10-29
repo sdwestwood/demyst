@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 2 From Equations to Code | Demystifying Functions For Statistics</title>
+<meta name="author" content="Sean Westwood">
+<meta name="description" content="2.1 Equations are Blueprints A statistical equation can look intimidating because it compresses a lot of instructions into a small space. R code can help us unfold those instructions. This chapter...">
+<meta name="generator" content="bookdown 0.47 with bs4_book()">
+<meta property="og:title" content="Chapter 2 From Equations to Code | Demystifying Functions For Statistics">
+<meta property="og:type" content="book">
+<meta property="og:description" content="2.1 Equations are Blueprints A statistical equation can look intimidating because it compresses a lot of instructions into a small space. R code can help us unfold those instructions. This chapter...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 2 From Equations to Code | Demystifying Functions For Statistics">
+<meta name="twitter:description" content="2.1 Equations are Blueprints A statistical equation can look intimidating because it compresses a lot of instructions into a small space. R code can help us unfold those instructions. This chapter...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.10.0/transition.js"></script><script src="libs/bs3compat-0.10.0/tabs.js"></script><script src="libs/bs3compat-0.10.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-6NP3MF25W3"></script><script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-6NP3MF25W3');
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<link rel="stylesheet" href="include/psyteachr.css">
+<link rel="stylesheet" href="include/webex.css">
+<link rel="stylesheet" href="include/style.css">
+<link rel="stylesheet" href="demyst.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Demystifying Functions For Statistics</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Overview</a></li>
+<li class="book-part">Building Test Statistics</li>
+<li><a class="" href="functions.html"><span class="header-section-number">1</span> What Are Functions?</a></li>
+<li><a class="active" href="equations.html"><span class="header-section-number">2</span> From Equations to Code</a></li>
+<li><a class="" href="standard-error.html"><span class="header-section-number">3</span> Spread and Standard Error</a></li>
+<li><a class="" href="t-statistic.html"><span class="header-section-number">4</span> The One-Sample t-Test</a></li>
+<li><a class="" href="two-sample-t.html"><span class="header-section-number">5</span> Two-Sample t-Tests</a></li>
+<li><a class="" href="correlation.html"><span class="header-section-number">6</span> Covariance and Correlation</a></li>
+<li><a class="" href="one-way-anova.html"><span class="header-section-number">7</span> One-Way ANOVA</a></li>
+<li><a class="" href="factorial-anova.html"><span class="header-section-number">8</span> Factorial ANOVA</a></li>
+<li><a class="" href="chi-square.html"><span class="header-section-number">9</span> Chi-Square</a></li>
+<li class="book-part">Testing by Simulation</li>
+<li><a class="" href="null-distributions.html"><span class="header-section-number">10</span> Null Distributions</a></li>
+<li><a class="" href="p-values.html"><span class="header-section-number">11</span> p-values</a></li>
+<li><a class="" href="effects-power.html"><span class="header-section-number">12</span> Effects and Power</a></li>
+<li class="book-part">The General Linear Model</li>
+<li><a class="" href="lm-mean.html"><span class="header-section-number">13</span> The Mean as a Model</a></li>
+<li><a class="" href="lm-correlation.html"><span class="header-section-number">14</span> Correlation as a Linear Model</a></li>
+<li><a class="" href="lm-t-test.html"><span class="header-section-number">15</span> The Independent t-Test as a Linear Model</a></li>
+<li><a class="" href="lm-one-way-anova.html"><span class="header-section-number">16</span> One-Way ANOVA as a Linear Model</a></li>
+<li class="book-part">Non-Parametric Tests</li>
+<li><a class="" href="wilcoxon-signed-rank.html"><span class="header-section-number">17</span> Wilcoxon Signed-Rank Test</a></li>
+<li><a class="" href="mann-whitney.html"><span class="header-section-number">18</span> Mann-Whitney U Test</a></li>
+<li><a class="" href="spearman.html"><span class="header-section-number">19</span> Spearman's Rho</a></li>
+<li><a class="" href="kruskal-wallis.html"><span class="header-section-number">20</span> Kruskal-Wallis Test</a></li>
+<li><a class="" href="friedman.html"><span class="header-section-number">21</span> Friedman Test</a></li>
+</ul>
+
+        <div class="book-extra">
+          
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="equations" class="section level1" number="2">
+<h1>
+<span class="header-section-number">2</span> From Equations to Code<a class="anchor" aria-label="anchor" href="#equations"><i class="fas fa-link"></i></a>
+</h1>
+<div id="equations-are-blueprints" class="section level2" number="2.1">
+<h2>
+<span class="header-section-number">2.1</span> Equations are Blueprints<a class="anchor" aria-label="anchor" href="#equations-are-blueprints"><i class="fas fa-link"></i></a>
+</h2>
+<p>A statistical equation can look intimidating because it compresses a lot of instructions into a small space. R code can help us unfold those instructions.</p>
+<p>This chapter focuses on the mean and variance. The mean tells us where the centre of a set of values is. Variance tells us how spread out the values are around that centre.</p>
+<p>The rough path from the raw set of values all the way to a standard deviation function is:</p>
+<pre class="text"><code>values -&gt; mean -&gt; distances from the mean -&gt; variance -&gt; standard deviation</code></pre>
+<p>This is the first bit of the wider tree. We start with raw values, then build the summaries that later become standard error and the t-statistic.</p>
+</div>
+<div id="files-for-this-chapter" class="section level2" number="2.2">
+<h2>
+<span class="header-section-number">2.2</span> Files For This Chapter<a class="anchor" aria-label="anchor" href="#files-for-this-chapter"><i class="fas fa-link"></i></a>
+</h2>
+<p>You will write your own functions in RStudio as you read. Download these two files and save them in the same folder:</p>
+<ul>
+<li>
+<a href="exercises/1b-equations-exercises.Rmd" download>1b-equations-exercises.Rmd</a>: the exercises from this chapter with blanks for you to fill in;</li>
+<li>
+<a href="exercises/my_functions.R" download>my_functions.R</a>: your toolbox. You will add each function you build to this file and reuse them in later chapters.</li>
+</ul>
+<p>Open the exercise file in RStudio and keep this page open next to it. When the book asks you to write a function, write it in the exercise file and run it there.</p>
+</div>
+<div id="seeing-the-mean" class="section level2" number="2.3">
+<h2>
+<span class="header-section-number">2.3</span> Seeing The Mean<a class="anchor" aria-label="anchor" href="#seeing-the-mean"><i class="fas fa-link"></i></a>
+</h2>
+<p>Let us start with a small set of values.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">44</span>, <span class="fl">47</span>, <span class="fl">48</span>, <span class="fl">49</span>, <span class="fl">50</span>, <span class="fl">50</span>, <span class="fl">51</span>, <span class="fl">52</span>, <span class="fl">53</span>, <span class="fl">56</span><span class="op">)</span></span>
+<span><span class="va">mean_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>value <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">scores</span></span></code></pre></div>
+<div class="kable-table">
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="right">value</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">44</td>
+</tr>
+<tr class="even">
+<td align="right">47</td>
+</tr>
+<tr class="odd">
+<td align="right">48</td>
+</tr>
+<tr class="even">
+<td align="right">49</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+</tr>
+<tr class="odd">
+<td align="right">51</td>
+</tr>
+<tr class="even">
+<td align="right">52</td>
+</tr>
+<tr class="odd">
+<td align="right">53</td>
+</tr>
+<tr class="even">
+<td align="right">56</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p>Their mean is 50.</p>
+<p>The mean is the balance point of the values. In the graph below, each dot is one value on the x-axis and the orange line is the mean.</p>
+<div class="figure">
+<span style="display:block;" id="fig:mean-visual"></span>
+<img src="1b-equations_files/figure-html/mean-visual-1.png" alt="The mean as the centre of a small set of values." width="672"><p class="caption">
+Figure 2.1: The mean as the centre of a small set of values.
+</p>
+</div>
+<div class="webex-solution">
+<button>
+Show the plot code
+</button>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mean_data</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span></span>
+<span>  value <span class="op">=</span> <span class="va">x</span>,</span>
+<span>  y <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ggplot</span><span class="op">(</span><span class="va">mean_data</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">value</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_segment</span><span class="op">(</span></span>
+<span>    <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, xend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">y</span>, yend <span class="op">=</span> <span class="va">y</span><span class="op">)</span>,</span>
+<span>    colour <span class="op">=</span> <span class="st">"grey90"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">4</span>, colour <span class="op">=</span> <span class="st">"#467AAC"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">mean_x</span>, linewidth <span class="op">=</span> <span class="fl">1.2</span>, colour <span class="op">=</span> <span class="st">"#D55E00"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">44</span>, <span class="fl">56</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_y_continuous</span><span class="op">(</span><span class="cn">NULL</span>, breaks <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Score"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>The orange line happens to land on 50, which is also one of the values, but that is a coincidence: the mean is calculated from all ten values together.</p>
+<p>What is the mean of <code>c(44, 47, 48, 49, 50, 50, 51, 52, 53, 56)</code>? <input class="webex-solveme nospaces" size="2" data-answer='["50"]'></p>
+</div>
+<div id="building-a-mean-function" class="section level2" number="2.4">
+<h2>
+<span class="header-section-number">2.4</span> Building A Mean Function<a class="anchor" aria-label="anchor" href="#building-a-mean-function"><i class="fas fa-link"></i></a>
+</h2>
+<p>You have probably calculated a mean before: add everything up, then divide by how many things you added. We are going to write that recipe as an equation, pull the equation apart, and turn each part into a line of R. By the end you will have your own mean function. The variance, standard deviation, standard error, and t-statistic functions later in the book are all built on top of it.</p>
+<div id="the-mean-equation" class="section level3" number="2.4.1">
+<h3>
+<span class="header-section-number">2.4.1</span> The Mean Equation<a class="anchor" aria-label="anchor" href="#the-mean-equation"><i class="fas fa-link"></i></a>
+</h3>
+<p>Here is the mean written as an equation:</p>
+<p><span class="math display">\[
+\bar{x} = \frac{\sum_{i=1}^{n} x_i}{n}
+\]</span></p>
+<p>Each symbol has a job:</p>
+<div class="inline-table"><table style="width:100%;" class="table table-sm">
+<colgroup>
+<col width="14%">
+<col width="57%">
+<col width="28%">
+</colgroup>
+<thead><tr class="header">
+<th>Maths</th>
+<th>Read it as</th>
+<th>R</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(x\)</span></td>
+<td>the set of values</td>
+<td><code>x</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(x_i\)</span></td>
+<td>one value from the set; <span class="math inline">\(i\)</span> says which one, so <span class="math inline">\(x_1\)</span> is the first value and <span class="math inline">\(x_2\)</span> is the second</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(n\)</span></td>
+<td>how many values there are</td>
+<td><code>length(x)</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\sum_{i=1}^{n}\)</span></td>
+<td>add up every value, from the first (<span class="math inline">\(i = 1\)</span>) to the last (<span class="math inline">\(i = n\)</span>)</td>
+<td><code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\bar{x}\)</span></td>
+<td>the mean of <span class="math inline">\(x\)</span>, said "x bar"</td>
+<td>what our function returns</td>
+</tr>
+</tbody>
+</table></div>
+<p>Put into words, the equation says: <strong>add up every value of <span class="math inline">\(x\)</span>, then divide by how many values there are.</strong></p>
+</div>
+<div id="step-1-add-up-the-values" class="section level3" number="2.4.2">
+<h3>
+<span class="header-section-number">2.4.2</span> Step 1: Add Up The Values<a class="anchor" aria-label="anchor" href="#step-1-add-up-the-values"><i class="fas fa-link"></i></a>
+</h3>
+<p>The <span class="math inline">\(\sum\)</span> symbol is a capital Greek letter sigma, and it stands for "sum". It tends to be the bit that puts people off, but all it asks for is repeated addition. With our ten values, we could write every step out:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fl">44</span> <span class="op">+</span> <span class="fl">47</span> <span class="op">+</span> <span class="fl">48</span> <span class="op">+</span> <span class="fl">49</span> <span class="op">+</span> <span class="fl">50</span> <span class="op">+</span> <span class="fl">50</span> <span class="op">+</span> <span class="fl">51</span> <span class="op">+</span> <span class="fl">52</span> <span class="op">+</span> <span class="fl">53</span> <span class="op">+</span> <span class="fl">56</span></span></code></pre></div>
+<pre><code>## [1] 500</code></pre>
+<p>That works, but it would be miserable with 200 values, and we would have to retype it every time the data changed. The <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code> function does the same repeated addition for any vector we give it:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">total</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">total</span></span></code></pre></div>
+<pre><code>## [1] 500</code></pre>
+<p>Same answer. Whenever you see <span class="math inline">\(\sum\)</span> in an equation, you can expect <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code> somewhere in the R code.</p>
+<p>The total of the values in <code>x</code> is <input class="webex-solveme nospaces" size="3" data-answer='["500"]'>.</p>
+</div>
+<div id="step-2-count-the-values" class="section level3" number="2.4.3">
+<h3>
+<span class="header-section-number">2.4.3</span> Step 2: Count The Values<a class="anchor" aria-label="anchor" href="#step-2-count-the-values"><i class="fas fa-link"></i></a>
+</h3>
+<p>The <code><a href="https://rdrr.io/r/base/length.html">length()</a></code> function tells us how many values are in a vector. That is our <span class="math inline">\(n\)</span>.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">n</span></span></code></pre></div>
+<pre><code>## [1] 10</code></pre>
+</div>
+<div id="step-3-divide" class="section level3" number="2.4.4">
+<h3>
+<span class="header-section-number">2.4.4</span> Step 3: Divide<a class="anchor" aria-label="anchor" href="#step-3-divide"><i class="fas fa-link"></i></a>
+</h3>
+<p>The last part of the equation is the fraction line: the total goes on top and <span class="math inline">\(n\)</span> goes underneath. You now have both pieces saved, as <code>total</code> and <code>n</code>. Write the line that divides one by the other:</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mean_value</span> <span class="op">&lt;-</span></span>
+<span><span class="va">mean_value</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p>In R, <code>/</code> divides. The top of the fraction goes before it and the bottom goes after it.</p>
+</div>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mean_value</span> <span class="op">&lt;-</span> <span class="va">total</span> <span class="op">/</span> <span class="va">n</span></span>
+<span><span class="va">mean_value</span></span></code></pre></div>
+<pre><code>## [1] 50</code></pre>
+</div>
+<p>That is the mean, and it is the same value the orange line marked in the plot above.</p>
+</div>
+<div id="your-turn-write-my_mean" class="section level3" number="2.4.5">
+<h3>
+<span class="header-section-number">2.4.5</span> Your Turn: Write <code>my_mean()</code><a class="anchor" aria-label="anchor" href="#your-turn-write-my_mean"><i class="fas fa-link"></i></a>
+</h3>
+<p>Now put the three steps inside a function, using the same shape as the functions in Chapter <a href="functions.html#functions">1</a>:</p>
+<ul>
+<li>the input is a vector of values, <code>x</code>;</li>
+<li>the process is add up, count, then divide;</li>
+<li>the output is the mean.</li>
+</ul>
+<p>Fill in the blanks below.</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_mean</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">total</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p>Each blank is one of the steps above. <code>total</code> uses <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code>, <code>n</code> uses <code><a href="https://rdrr.io/r/base/length.html">length()</a></code>, and <code>output</code> divides one by the other.</p>
+</div>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_mean</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">total</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="va">total</span> <span class="op">/</span> <span class="va">n</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] 50</code></pre>
+</div>
+</div>
+<div id="check-it-against-mean" class="section level3" number="2.4.6">
+<h3>
+<span class="header-section-number">2.4.6</span> Check It Against <code>mean()</code><a class="anchor" aria-label="anchor" href="#check-it-against-mean"><i class="fas fa-link"></i></a>
+</h3>
+<p>R already has a mean function, <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code>, which comes with R in the <code>stats</code> package. Every function you build in this book gets checked against the version R provides. If the two agree, you have reproduced exactly what the professional version does.</p>
+<p>The check has two parts. First, print both answers so you can see them side by side. Putting them inside <code><a href="https://rdrr.io/r/base/c.html">c()</a></code> and giving each one a name, <code>mine</code> and <code>R</code>, labels the output so you can tell which answer is which:</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## mine    R 
+##   50   50</code></pre>
+<p>Second, ask R to compare them for you with <code><a href="https://rdrr.io/r/base/all.equal.html">all.equal()</a></code>:</p>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<p><code><a href="https://rdrr.io/r/base/all.equal.html">all.equal()</a></code> takes two results and returns <code>TRUE</code> if they match. If they do not match, it tells you how far apart they are instead. We use it rather than <code>==</code> because computers sometimes produce tiny differences far past the tenth decimal place when they do the same calculation in a slightly different order. <code><a href="https://rdrr.io/r/base/all.equal.html">all.equal()</a></code> ignores those, so a <code>TRUE</code> means the answers really are the same.</p>
+<p>One example could match by luck, so check a second set of values too. <code>score_values</code> holds eight test scores, the <code>score</code> column from the <code>demo_scores</code> data in Chapter <a href="functions.html#functions">1</a>:</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">score_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">48</span>, <span class="fl">51</span>, <span class="fl">49</span>, <span class="fl">54</span>, <span class="fl">52</span>, <span class="fl">50</span>, <span class="fl">53</span>, <span class="fl">51</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">score_values</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">score_values</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_mean</span><span class="op">(</span><span class="va">score_values</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">score_values</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## mine    R 
+##   51   51 
+## [1] TRUE</code></pre>
+<p>If you get <code>TRUE</code> both times, your function does what <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> does. If you do not, check the brackets and the order of the steps. A common slip is dividing by the wrong thing.</p>
+<p>Which line in <code>my_mean()</code> counts how many values are in <code>x</code>? <select class="webex-select"><option value="blank"></option>
+<option value="">total &lt;- sum(x)</option>
+<option value="answer">n &lt;- length(x)</option>
+<option value="">return(output)</option></select></p>
+<p>Before you run it, work out the mean of <code>c(2, 4, 9)</code> in your head. Then check it with <code>my_mean(c(2, 4, 9))</code>. The mean is <input class="webex-solveme nospaces" size="1" data-answer='["5"]'>.</p>
+</div>
+<div id="what-the-mean-tells-us" class="section level3" number="2.4.7">
+<h3>
+<span class="header-section-number">2.4.7</span> What The Mean Tells Us<a class="anchor" aria-label="anchor" href="#what-the-mean-tells-us"><i class="fas fa-link"></i></a>
+</h3>
+<p>That last example has a mean of 5, and 5 is not one of the values. The mean summarises all the values at once, so it does not have to match any of them.</p>
+<p>It is also the <strong>balance point</strong> of the values. If we take each value's distance from the mean, the distances below the mean and the distances above it cancel each other out exactly:</p>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##  [1] -6 -3 -2 -1  0  0  1  2  3  6
+## [1] 0</code></pre>
+<p>The negative and positive distances add up to zero. That is what "balance point" means, and it happens with any set of values. Try it with <code>score_values</code> or <code>c(2, 4, 9)</code>.</p>
+<p>Keep this result in mind. Next we want to measure how spread out the values are using their distances from the mean. Simply adding those distances up will always give zero, so we will need another step.</p>
+</div>
+</div>
+<div id="seeing-distances-from-the-mean" class="section level2" number="2.5">
+<h2>
+<span class="header-section-number">2.5</span> Seeing Distances From The Mean<a class="anchor" aria-label="anchor" href="#seeing-distances-from-the-mean"><i class="fas fa-link"></i></a>
+</h2>
+<p>Variance starts by asking how far each value is from the mean.</p>
+<div class="figure">
+<span style="display:block;" id="fig:distance-visual"></span>
+<img src="1b-equations_files/figure-html/distance-visual-1.png" alt="Each value has a distance from the mean." width="672"><p class="caption">
+Figure 2.2: Each value has a distance from the mean.
+</p>
+</div>
+<div class="webex-solution">
+<button>
+Show the plot code
+</button>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">distance_data</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span></span>
+<span>  value <span class="op">=</span> <span class="va">x</span>,</span>
+<span>  mean <span class="op">=</span> <span class="va">mean_x</span>,</span>
+<span>  y <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ggplot</span><span class="op">(</span><span class="va">distance_data</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_segment</span><span class="op">(</span></span>
+<span>    <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, xend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">y</span>, yend <span class="op">=</span> <span class="va">y</span><span class="op">)</span>,</span>
+<span>    colour <span class="op">=</span> <span class="st">"grey90"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_segment</span><span class="op">(</span></span>
+<span>    <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">mean</span>, xend <span class="op">=</span> <span class="va">value</span>, y <span class="op">=</span> <span class="va">y</span>, yend <span class="op">=</span> <span class="va">y</span><span class="op">)</span>,</span>
+<span>    colour <span class="op">=</span> <span class="st">"#D55E00"</span>,</span>
+<span>    linewidth <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">.65</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">value</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">3.5</span>, colour <span class="op">=</span> <span class="st">"#467AAC"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">mean_x</span>, linewidth <span class="op">=</span> <span class="fl">1.1</span>, colour <span class="op">=</span> <span class="st">"#D55E00"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">44</span>, <span class="fl">56</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_y_continuous</span><span class="op">(</span><span class="cn">NULL</span>, breaks <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Score"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>The orange line segments are the distances from each value to the mean. Some values are close to the mean and some are further away. Variance is a way of turning all those distances into one number.</p>
+</div>
+<div id="from-points-to-a-distribution" class="section level2" number="2.6">
+<h2>
+<span class="header-section-number">2.6</span> From Points To A Distribution<a class="anchor" aria-label="anchor" href="#from-points-to-a-distribution"><i class="fas fa-link"></i></a>
+</h2>
+<p>The same values can also be shown as a small distribution.</p>
+<div class="figure">
+<span style="display:block;" id="fig:value-distribution"></span>
+<img src="1b-equations_files/figure-html/value-distribution-1.png" alt="The same values shown as a small distribution." width="672"><p class="caption">
+Figure 2.3: The same values shown as a small distribution.
+</p>
+</div>
+<div class="webex-solution">
+<button>
+Show the plot code
+</button>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">scores</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_histogram</span><span class="op">(</span></span>
+<span>    binwidth <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>    boundary <span class="op">=</span> <span class="fl">43</span>,</span>
+<span>    colour <span class="op">=</span> <span class="st">"white"</span>,</span>
+<span>    fill <span class="op">=</span> <span class="st">"#467AAC"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">mean_x</span>, linewidth <span class="op">=</span> <span class="fl">1.2</span>, colour <span class="op">=</span> <span class="st">"#D55E00"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">44</span>, <span class="fl">56</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Score"</span>, y <span class="op">=</span> <span class="st">"Count"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>This is the same x-axis as the dot plot. The values are exactly the same, but we are viewing it in a different way. We are showing which values (or small ranges of values) show up the most in the data, since the height of the bars in the histogram show how many values lie in that range (or "bin").</p>
+<p>That allows us to move further along the process of summarising the data:</p>
+<pre class="text"><code>individual points -&gt; distribution of values -&gt; summaries of that distribution</code></pre>
+</div>
+<div id="seeing-variance" class="section level2" number="2.7">
+<h2>
+<span class="header-section-number">2.7</span> Seeing Variance<a class="anchor" aria-label="anchor" href="#seeing-variance"><i class="fas fa-link"></i></a>
+</h2>
+<p>Here are three distributions with the same mean but different standard deviations.</p>
+<div class="figure">
+<span style="display:block;" id="fig:variance-visual"></span>
+<img src="1b-equations_files/figure-html/variance-visual-1.png" alt="Same mean, different spread." width="672"><p class="caption">
+Figure 2.4: Same mean, different spread.
+</p>
+</div>
+<div class="webex-solution">
+<button>
+Show the plot code
+</button>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dist_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">4</span>, <span class="fl">4</span>, <span class="fl">0.01</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">dist_data</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span></span>
+<span>  value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">dist_x</span>, <span class="va">dist_x</span>, <span class="va">dist_x</span><span class="op">)</span>,</span>
+<span>  density <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">dist_x</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">dist_x</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">dist_x</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">1.6</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  spread <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Small spread"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">dist_x</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Medium spread"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">dist_x</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Large spread"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">dist_x</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ggplot</span><span class="op">(</span><span class="va">dist_data</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">value</span>, y <span class="op">=</span> <span class="va">density</span>, colour <span class="op">=</span> <span class="va">spread</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_line</span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">0</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_colour_manual</span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Small spread"</span> <span class="op">=</span> <span class="st">"#467AAC"</span>,</span>
+<span>    <span class="st">"Medium spread"</span> <span class="op">=</span> <span class="st">"#D55E00"</span>,</span>
+<span>    <span class="st">"Large spread"</span> <span class="op">=</span> <span class="st">"#7B4AB8"</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Value"</span>, y <span class="op">=</span> <span class="st">"Density"</span>, colour <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>All three curves are centred in the same place. The difference is how far the values tend to sit from that centre. This is the visual idea behind variance.</p>
+</div>
+<div id="try-it-interactively" class="section level2" number="2.8">
+<h2>
+<span class="header-section-number">2.8</span> Try It Interactively<a class="anchor" aria-label="anchor" href="#try-it-interactively"><i class="fas fa-link"></i></a>
+</h2>
+<p>Use the widget below to change the mean and variance of a normal distribution.</p>
+<iframe src="apps/mean-variance/embed.html" width="100%" height="720" title="Mean and variance interactive widget" style="border: 0;">
+</iframe>
+<p>Move the mean and the whole distribution shifts left or right. Increase the variance and the distribution spreads out. Decrease the variance and it gets tighter. You can also switch the dots and the bell curve on and off to focus on one part at a time.</p>
+</div>
+<div id="the-variance-equation" class="section level2" number="2.9">
+<h2>
+<span class="header-section-number">2.9</span> The Variance Equation<a class="anchor" aria-label="anchor" href="#the-variance-equation"><i class="fas fa-link"></i></a>
+</h2>
+<p>Now we can connect the picture to the equation:</p>
+<p><span class="math display">\[
+s^2 = \frac{\sum_{i=1}^{n}(x_i - \bar{x})^2}{n-1}
+\]</span></p>
+<p>The formula says:</p>
+<ol style="list-style-type: decimal">
+<li>take each value in <code>x</code>;</li>
+<li>subtract the mean of <code>x</code>;</li>
+<li>square that distance;</li>
+<li>add all the squared distances together;</li>
+<li>divide by <code>n - 1</code>.</li>
+</ol>
+<p>So although it might look scary, all it actually is is repeated subtraction, squaring, addition, and division.</p>
+</div>
+<div id="notation-to-r" class="section level2" number="2.10">
+<h2>
+<span class="header-section-number">2.10</span> Notation To R<a class="anchor" aria-label="anchor" href="#notation-to-r"><i class="fas fa-link"></i></a>
+</h2>
+<p>You met most of these symbols in the mean equation. The new piece is the squared distance from the mean.</p>
+<div class="inline-table"><table class="table table-sm">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Maths</th>
+<th>Meaning</th>
+<th>R</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(x\)</span></td>
+<td>a vector of values</td>
+<td><code>x</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(n\)</span></td>
+<td>number of values</td>
+<td><code>length(x)</code></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\bar{x}\)</span></td>
+<td>mean of <code>x</code>
+</td>
+<td><code>my_mean(x)</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\((x_i - \bar{x})^2\)</span></td>
+<td>squared distance from the mean</td>
+<td><code>(x - mean_x)^2</code></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\sum\)</span></td>
+<td>add repeated values</td>
+<td><code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code></td>
+</tr>
+</tbody>
+</table></div>
+<p>As with the mean, read <span class="math inline">\(\sum\)</span> as:</p>
+<div class="summary-box">
+<p>Do this same calculation for every value, then add the results with <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code>.</p>
+</div>
+</div>
+<div id="squared-distances" class="section level2" number="2.11">
+<h2>
+<span class="header-section-number">2.11</span> Squared Distances<a class="anchor" aria-label="anchor" href="#squared-distances"><i class="fas fa-link"></i></a>
+</h2>
+<p>Variance is based on distances from the mean. We will keep using the ten values from the start of the chapter, so the mean is still 50:</p>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mean_x</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<p>Before writing the whole function, work out the middle of the equation yourself. Use <code>mutate()</code> to add two columns to <code>scores</code>, the table we made at the start of the chapter:</p>
+<ul>
+<li>
+<code>distance</code>: each value minus the mean;</li>
+<li>
+<code>squared</code>: each distance, squared.</li>
+</ul>
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">mutate</span><span class="op">(</span></span>
+<span>  <span class="va">scores</span>,</span>
+<span>  distance <span class="op">=</span> ,</span>
+<span>  squared <span class="op">=</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p>The values are in the <code>value</code> column and the mean is in <code>mean_x</code>. <code>^2</code> squares a number. <code>mutate()</code> can use a column it has only just made, so <code>squared</code> can build on <code>distance</code>.</p>
+</div>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">mutate</span><span class="op">(</span></span>
+<span>  <span class="va">scores</span>,</span>
+<span>  distance <span class="op">=</span> <span class="va">value</span> <span class="op">-</span> <span class="va">mean_x</span>,</span>
+<span>  squared <span class="op">=</span> <span class="va">distance</span><span class="op">^</span><span class="fl">2</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="kable-table">
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="right">value</th>
+<th align="right">distance</th>
+<th align="right">squared</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">44</td>
+<td align="right">-6</td>
+<td align="right">36</td>
+</tr>
+<tr class="even">
+<td align="right">47</td>
+<td align="right">-3</td>
+<td align="right">9</td>
+</tr>
+<tr class="odd">
+<td align="right">48</td>
+<td align="right">-2</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="right">49</td>
+<td align="right">-1</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">50</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">51</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">52</td>
+<td align="right">2</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="right">53</td>
+<td align="right">3</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="right">56</td>
+<td align="right">6</td>
+<td align="right">36</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<p>Squaring makes every distance positive, so the distances below the mean and above it no longer cancel each other out. Which values have the largest squared distance? <select class="webex-select"><option value="blank"></option>
+<option value="answer">44 and 56</option>
+<option value="">50 and 50</option>
+<option value="">47 and 53</option></select></p>
+<p>Next, add the squared distances up. A function will not have a <code>scores</code> table to work with, only the vector <code>x</code>, so do this step with <code>x</code>. <code>x - mean_x</code> gives the same distances as the <code>distance</code> column, because <code>x</code> holds the same values as <code>value</code>. Square them and add them up with <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code>:</p>
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>The total squared distance is <input class="webex-solveme nospaces" size="3" data-answer='["100"]'>.</p>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">mean_x</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] 100</code></pre>
+</div>
+<p>That total is the numerator of the variance equation. The rest of the equation turns it into an average squared distance.</p>
+</div>
+<div id="your-turn-write-my_var" class="section level2" number="2.12">
+<h2>
+<span class="header-section-number">2.12</span> Your Turn: Write <code>my_var()</code><a class="anchor" aria-label="anchor" href="#your-turn-write-my_var"><i class="fas fa-link"></i></a>
+</h2>
+<p>Now we can build the whole formula. Each line of the function is one step from the list under the variance equation:</p>
+<ol style="list-style-type: decimal">
+<li>count the values;</li>
+<li>calculate the mean, using your own <code>my_mean()</code>;</li>
+<li>square each distance from the mean;</li>
+<li>add the squared distances together;</li>
+<li>divide by <code>n - 1</code>.</li>
+</ol>
+<p>Fill in the blanks below.</p>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_var</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">mean_x</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">squared_distances</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">total_squared_distance</span> <span class="op">&lt;-</span></span>
+<span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_var</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p>You worked out the middle of this in the Squared Distances section. <code>mean_x</code> uses <code>my_mean(x)</code>, <code>squared_distances</code> is the squared distances you added up there, and <code>total_squared_distance</code> adds them with <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code>. Put brackets around <code>n - 1</code> when you divide.</p>
+</div>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_var</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">mean_x</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">squared_distances</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">mean_x</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span>
+<span>  <span class="va">total_squared_distance</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">squared_distances</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="va">total_squared_distance</span> <span class="op">/</span> <span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_var</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] 11.11111</code></pre>
+</div>
+<p>Notice that <code>my_var()</code> uses <code>my_mean()</code> inside it. Your variance function is built on your mean function.</p>
+</div>
+<div id="check-it-against-var" class="section level2" number="2.13">
+<h2>
+<span class="header-section-number">2.13</span> Check It Against <code>var()</code><a class="anchor" aria-label="anchor" href="#check-it-against-var"><i class="fas fa-link"></i></a>
+</h2>
+<p>R's version is <code><a href="https://rdrr.io/r/stats/cor.html">var()</a></code>, also from the <code>stats</code> package. Run the same two-part check as before: print both answers, then compare them with <code><a href="https://rdrr.io/r/base/all.equal.html">all.equal()</a></code>.</p>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="fu">my_var</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">var</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_var</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">var</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##     mine        R 
+## 11.11111 11.11111 
+## [1] TRUE</code></pre>
+<p>And on a second set of values:</p>
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="fu">my_var</span><span class="op">(</span><span class="va">score_values</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">var</a></span><span class="op">(</span><span class="va">score_values</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_var</span><span class="op">(</span><span class="va">score_values</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">var</a></span><span class="op">(</span><span class="va">score_values</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## mine    R 
+##    4    4 
+## [1] TRUE</code></pre>
+<p>Two <code>TRUE</code>s means your function reproduces <code><a href="https://rdrr.io/r/stats/cor.html">var()</a></code>.</p>
+<p>What does <code>length(x)</code> give us in this formula? <select class="webex-select"><option value="blank"></option>
+<option value="answer">the number of values</option>
+<option value="">the largest value</option>
+<option value="">the mean</option></select></p>
+</div>
+<div id="why-divide-by-n---1" class="section level2" number="2.14">
+<h2>
+<span class="header-section-number">2.14</span> Why Divide By <code>n - 1</code>?<a class="anchor" aria-label="anchor" href="#why-divide-by-n---1"><i class="fas fa-link"></i></a>
+</h2>
+<p>For sample variance, we divide by <code>n - 1</code> rather than <code>n</code>. The short version is that we are using the sample mean as an estimate of the population mean, and that costs us one degree of freedom.</p>
+<p>As a brief explanation, when we estimate something about a population from a sample, that estimate puts a constraint on the sample. One of the values is no longer <strong>free to vary</strong>. For example, say we use the ten values from the start of this chapter to estimate the population mean. Our best estimate is the sample mean, <span class="math inline">\(\bar{x} = 50\)</span>, which means the ten values must add up to 500. If the first nine values are 44, 47, 48, 49, 50, 50, 51, 52 and 53, they add up to 444, so the tenth value <strong>has</strong> to be 56. No other number would give us a mean of 50. It is <strong>not free to vary</strong>.</p>
+<p>You have already seen this from another angle: the distances from the mean always add up to zero. Once you know nine of them, the tenth is decided. Since variance is built from those distances, only <span class="math inline">\(n - 1\)</span> of them are free to vary, and that is what we divide by.</p>
+<div class="webex-solution">
+<button>
+Bonus: more on degrees of freedom
+</button>
+<p><strong>Where else you will see it</strong></p>
+<p>Each estimate we use costs one degree of freedom. You will see this again in the t-test, and later in regression, where we estimate two things (an intercept and a slope) and lose two degrees of freedom. It comes from using an estimate from the sample that fills in for a population parameter we can't see.</p>
+<p><strong>Which value is not free to vary?</strong></p>
+<p>The 56 is not special. There is technically no "last" value, because we could write the values out or add them up in any order we want. The constraint applies equally to all of them. It is a statement about the relationship between the values and the estimate we derive from them, not about any single value.</p>
+<p>Think of the angles in a triangle. We know they add up to 180, so if we know two of them, the third is not free to vary: it can only be one number. But that is not true of one particular angle. They all equally constrain each other.</p>
+<p>If I am being honest, I always found this concept a bit paradoxical and hard to get my head around: how can it constrain all of the values and none of them at the same time? The answer is that it is a <strong>rule linking the values together</strong> that is fixed, not a specific value. One rule costs one piece of information, so we only need to know <span class="math inline">\(n - 1\)</span> of the values to work out the last one, whichever one we leave until last.</p>
+<p>If that still makes zero sense to you, the good news is that you do not need to be able to write the proof for the equation we decide to use - we can just trust the brainboxes that have already gone to the trouble, and as long as you understand the concept behind it you are fine!</p>
+</div>
+<p>Dividing by <code>n - 1</code> is part of the blueprint, so our function needs to do it, and you can check that <code><a href="https://rdrr.io/r/stats/cor.html">var()</a></code> does the same.</p>
+<p>Try changing the final line of <code>my_var()</code> to divide by <code>n</code> instead, then run the <code><a href="https://rdrr.io/r/base/all.equal.html">all.equal()</a></code> check again. Does it still match <code><a href="https://rdrr.io/r/stats/cor.html">var()</a></code>?</p>
+<div class="webex-solution">
+<button>
+Expected result
+</button>
+<p>No. Instead of <code>TRUE</code>, <code><a href="https://rdrr.io/r/base/all.equal.html">all.equal()</a></code> reports <code>"Mean relative difference: 0.1111111"</code>. That is what a failed check looks like: R tells you the answers differ, and by how much. R's <code><a href="https://rdrr.io/r/stats/cor.html">var()</a></code> calculates sample variance, so it divides by <code>n - 1</code>. Change your function back before moving on.</p>
+</div>
+</div>
+<div id="standard-deviation" class="section level2" number="2.15">
+<h2>
+<span class="header-section-number">2.15</span> Standard Deviation<a class="anchor" aria-label="anchor" href="#standard-deviation"><i class="fas fa-link"></i></a>
+</h2>
+<p>Standard deviation is the square root of variance:</p>
+<p><span class="math display">\[
+s = \sqrt{s^2}
+\]</span></p>
+<p>Work out the standard deviation of <code>x</code> from your <code>my_var()</code>, then check it against R's <code><a href="https://rdrr.io/r/stats/sd.html">sd()</a></code>:</p>
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sd_x</span> <span class="op">&lt;-</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="va">sd_x</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="va">sd_x</span>, <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p><code><a href="https://rdrr.io/r/base/MathFun.html">sqrt()</a></code> returns the square root of whatever you put in its brackets, so put <code>my_var(x)</code> inside it. You could also write the square root as <code>^0.5</code>.</p>
+</div>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sd_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="fu">my_var</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="va">sd_x</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="va">sd_x</span>, <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##     mine        R 
+## 3.333333 3.333333 
+## [1] TRUE</code></pre>
+</div>
+<p>So if we understand variance, standard deviation is just one more operation. You will turn it into its own function, <code>my_sd()</code>, in the next chapter.</p>
+</div>
+<div id="add-to-your-toolbox" class="section level2" number="2.16">
+<h2>
+<span class="header-section-number">2.16</span> Add To Your Toolbox<a class="anchor" aria-label="anchor" href="#add-to-your-toolbox"><i class="fas fa-link"></i></a>
+</h2>
+<p>You have now built two functions. Rather than typing them out again in every chapter, you will keep them in one file, <code>my_functions.R</code>, and load that file whenever you need them. You downloaded it at the start of this chapter. It should be saved in the same folder as your exercise file.</p>
+<div id="what-goes-in-the-file" class="section level3" number="2.16.1">
+<h3>
+<span class="header-section-number">2.16.1</span> What Goes In The File<a class="anchor" aria-label="anchor" href="#what-goes-in-the-file"><i class="fas fa-link"></i></a>
+</h3>
+<p><code>my_functions.R</code> is an ordinary R script, but it only contains function definitions: the code that creates each function, from <code>my_mean &lt;- function(x) {</code> down to its closing <code>}</code>. It does not contain any data, or any lines that run the functions.</p>
+</div>
+<div id="copy-your-functions-in" class="section level3" number="2.16.2">
+<h3>
+<span class="header-section-number">2.16.2</span> Copy Your Functions In<a class="anchor" aria-label="anchor" href="#copy-your-functions-in"><i class="fas fa-link"></i></a>
+</h3>
+<ol style="list-style-type: decimal">
+<li>In RStudio's <strong>Files</strong> pane, click <code>my_functions.R</code> to open it in a new tab.</li>
+<li>In your exercise file, select your finished <code>my_mean()</code> function, from <code>my_mean &lt;- function(x) {</code> down to its closing <code>}</code>. Copy it with Ctrl+C (Cmd+C on a Mac).</li>
+<li>Switch to the <code>my_functions.R</code> tab and paste it under the <strong>From Equations to Code</strong> heading with Ctrl+V (Cmd+V on a Mac).</li>
+<li>Do the same for <code>my_var()</code>.</li>
+<li>Save the file with Ctrl+S (Cmd+S on a Mac). A tab with unsaved changes shows its name in red.</li>
+</ol>
+<p>Your file should now contain both functions under the <strong>From Equations to Code</strong> heading, with the other headings still empty. Open the box below to check it against the full file.</p>
+<div class="webex-solution">
+<button>
+Show what my_functions.R should look like now
+</button>
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># My statistics functions</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># Add each function you build to this file, under the heading of the</span></span>
+<span><span class="co"># chapter you built it in. Later chapters load it with</span></span>
+<span><span class="co"># source("my_functions.R"), so every function here can be reused.</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># Keep only the functions in this file. Run and check them in your</span></span>
+<span><span class="co"># exercise files, not here.</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># Some functions return a tibble, so load the tidyverse before using them.</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># PART I: BUILDING TEST STATISTICS =========================================</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># From Equations to Code ---------------------------------------------------</span></span>
+<span><span class="va">my_mean</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">total</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="va">total</span> <span class="op">/</span> <span class="va">n</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_var</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">mean_x</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">squared_distances</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">mean_x</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span>
+<span>  <span class="va">total_squared_distance</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">squared_distances</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="va">total_squared_distance</span> <span class="op">/</span> <span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Spread and Standard Error ------------------------------------------------</span></span>
+<span><span class="co"># my_sd(), my_se(), my_summary() and my_z_score() go here</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># The One-Sample t-Test ----------------------------------------------------</span></span>
+<span><span class="co"># my_t_value() and my_t_test() go here</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Covariance and Correlation -----------------------------------------------</span></span>
+<span><span class="co"># my_covariance(), my_correlation() and my_correlation_t() go here</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># PART II: TESTING BY SIMULATION ===========================================</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Null Distributions -------------------------------------------------------</span></span>
+<span><span class="co"># my_null_t() and my_cutoffs() go here</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># p-values -----------------------------------------------------------------</span></span>
+<span><span class="co"># my_sim_p_value() and my_p_value() go here</span></span>
+<span><span class="co"># (and my_null_correlation_t() if you did the correlation section)</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Effects and Power --------------------------------------------------------</span></span>
+<span><span class="co"># my_effect_t(), my_power() and my_cohens_d() go here</span></span></code></pre></div>
+</div>
+<p>The lines starting with <code>#</code> are comments. R ignores them, so they are only there to help you find your way around the file.</p>
+</div>
+<div id="load-the-file-with-source" class="section level3" number="2.16.3">
+<h3>
+<span class="header-section-number">2.16.3</span> Load The File With <code>source()</code><a class="anchor" aria-label="anchor" href="#load-the-file-with-source"><i class="fas fa-link"></i></a>
+</h3>
+<p><code><a href="https://rdrr.io/r/base/source.html">source()</a></code> runs every line of an R script. Because <code>my_functions.R</code> only contains function definitions, running it creates your functions and does nothing else. Afterwards, <code>my_mean()</code> and <code>my_var()</code> exist in your session, just as if you had run their chunks yourself.</p>
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html">source</a></span><span class="op">(</span><span class="st">"my_functions.R"</span><span class="op">)</span></span></code></pre></div>
+<p>R looks for the file in the same folder as your exercise file, which is why the two need to be saved together. Every chapter from now on starts with this line.</p>
+</div>
+<div id="check-the-saved-file-works" class="section level3" number="2.16.4">
+<h3>
+<span class="header-section-number">2.16.4</span> Check The Saved File Works<a class="anchor" aria-label="anchor" href="#check-the-saved-file-works"><i class="fas fa-link"></i></a>
+</h3>
+<p>The last chunk of the exercise file checks that your saved file works on its own. Its first line, <code>rm(list = ls())</code>, clears everything from your session, so the functions can only come from your file:</p>
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span>list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html">source</a></span><span class="op">(</span><span class="st">"my_functions.R"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_mean</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">9</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">9</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_var</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">9</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">var</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">9</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>You should see:</p>
+<pre class="text"><code>[1] TRUE
+[1] TRUE</code></pre>
+</div>
+<div id="common-slips" class="section level3" number="2.16.5">
+<h3>
+<span class="header-section-number">2.16.5</span> Common Slips<a class="anchor" aria-label="anchor" href="#common-slips"><i class="fas fa-link"></i></a>
+</h3>
+<ul>
+<li>
+<strong>Copying the version with blanks</strong> instead of your finished function. <code><a href="https://rdrr.io/r/base/source.html">source()</a></code> runs without complaint, but the check fails with an error such as <code>object 'output' not found</code>.</li>
+<li>
+<strong>Missing the closing <code>}</code>.</strong> <code><a href="https://rdrr.io/r/base/source.html">source()</a></code> stops with <code>unexpected end of input</code>.</li>
+<li>
+<strong>Copying a line that runs the function</strong>, such as <code>my_mean(x)</code>. When the file is loaded on its own, <code>x</code> does not exist, so <code><a href="https://rdrr.io/r/base/source.html">source()</a></code> stops with <code>object 'x' not found</code>.</li>
+<li>
+<strong>Forgetting to save.</strong> <code><a href="https://rdrr.io/r/base/source.html">source()</a></code> reads the saved file, so unsaved changes are ignored.</li>
+<li>
+<strong><code>cannot open file 'my_functions.R'</code></strong> means the file is not in the same folder as your exercise file.</li>
+</ul>
+</div>
+</div>
+<div id="next-step" class="section level2" number="2.17">
+<h2>
+<span class="header-section-number">2.17</span> Next Step<a class="anchor" aria-label="anchor" href="#next-step"><i class="fas fa-link"></i></a>
+</h2>
+<p>Other summary statistics use the same ideas:</p>
+<ul>
+<li>start with a set of values;</li>
+<li>calculate small useful pieces;</li>
+<li>combine those pieces in a clear order;</li>
+<li>return the result.</li>
+</ul>
+<p>In the next chapter, we will build a few small generic statistic functions ourselves.</p>
+
+</div>
+</div>
+<script>
+
+/* update total correct if #webex-total_correct exists */
+update_total_correct = function() {
+  console.log("webex: update total_correct");
+
+  if (t = document.getElementById("webex-total_correct")) {
+    var correct = document.getElementsByClassName("webex-correct").length;
+    var solvemes = document.getElementsByClassName("webex-solveme").length;
+    var radiogroups = document.getElementsByClassName("webex-radiogroup").length;
+    var selects = document.getElementsByClassName("webex-select").length;
+    
+    t.innerHTML = correct + " of " + (solvemes + radiogroups + selects) + " correct";
+  }
+}
+
+/* webex-solution button toggling function */
+b_func = function() {
+  console.log("webex: toggle hide");
+  
+  var cl = this.parentElement.classList;
+  if (cl.contains('open')) {
+    cl.remove("open");
+  } else {
+    cl.add("open");
+  }
+}
+
+/* function for checking solveme answers */
+solveme_func = function(e) {
+  console.log("webex: check solveme");
+
+  var real_answers = JSON.parse(this.dataset.answer);
+  var my_answer = this.value;
+  var cl = this.classList;
+  if (cl.contains("ignorecase")) {
+    my_answer = my_answer.toLowerCase();
+  }
+  if (cl.contains("nospaces")) {
+    my_answer = my_answer.replace(/ /g, "")
+  }
+
+  if (my_answer == "") {
+    cl.remove("webex-correct");
+    cl.remove("webex-incorrect");
+  } else if (real_answers.includes(my_answer)) {
+    cl.add("webex-correct");
+    cl.remove("webex-incorrect");
+  } else {
+    cl.add("webex-incorrect");
+    cl.remove("webex-correct");
+  }
+
+  // match numeric answers within a specified tolerance
+  if(this.dataset.tol > 0){
+    var tol = JSON.parse(this.dataset.tol);
+    var matches = real_answers.map(x => Math.abs(x - my_answer) < tol)
+    if (matches.reduce((a, b) => a + b, 0) > 0) {
+      cl.add("webex-correct");
+    } else {
+      cl.remove("webex-correct");
+    }
+  }
+
+  // added regex bit
+  if (cl.contains("regex")){
+    answer_regex = RegExp(real_answers.join("|"))
+    if (answer_regex.test(my_answer)) {
+      cl.add("webex-correct");
+    }
+  }
+
+  update_total_correct();
+}
+
+/* function for checking select answers */
+select_func = function(e) {
+  console.log("webex: check select");
+  
+  var cl = this.classList
+  
+  /* add style */
+  cl.remove("webex-incorrect");
+  cl.remove("webex-correct");
+  if (this.value == "answer") {
+    cl.add("webex-correct");
+  } else if (this.value != "blank") {
+    cl.add("webex-incorrect");
+  }
+  
+  update_total_correct();
+}
+
+/* function for checking radiogroups answers */
+radiogroups_func = function(e) {
+  console.log("webex: check radiogroups");
+
+  var checked_button = document.querySelector('input[name=' + this.id + ']:checked');
+  var cl = checked_button.parentElement.classList;
+  var labels = checked_button.parentElement.parentElement.children;
+  
+  /* get rid of styles */
+  for (i = 0; i < labels.length; i++) {
+    labels[i].classList.remove("webex-incorrect");
+    labels[i].classList.remove("webex-correct");
+  }
+  
+  /* add style */
+  if (checked_button.value == "answer") {
+    cl.add("webex-correct");
+  } else {
+    cl.add("webex-incorrect");
+  }
+  
+  update_total_correct();
+}
+
+window.onload = function() {
+  console.log("onload");
+  /* set up solution buttons */
+  var buttons = document.getElementsByTagName("button");
+
+  for (var i = 0; i < buttons.length; i++) {
+    if (buttons[i].parentElement.classList.contains('webex-solution')) {
+      buttons[i].onclick = b_func;
+    }
+  }
+
+  /* set up webex-solveme inputs */
+  var solveme = document.getElementsByClassName("webex-solveme");
+
+  for (var i = 0; i < solveme.length; i++) {
+    /* make sure input boxes don't auto-anything */
+    solveme[i].setAttribute("autocomplete","off");
+    solveme[i].setAttribute("autocorrect", "off");
+    solveme[i].setAttribute("autocapitalize", "off");
+    solveme[i].setAttribute("spellcheck", "false");
+    solveme[i].value = "";
+
+    /* adjust answer for ignorecase or nospaces */
+    var cl = solveme[i].classList;
+    var real_answer = solveme[i].dataset.answer;
+    if (cl.contains("ignorecase")) {
+      real_answer = real_answer.toLowerCase();
+    }
+    if (cl.contains("nospaces")) {
+      real_answer = real_answer.replace(/ /g, "");
+    }
+    solveme[i].dataset.answer = real_answer;
+
+    /* attach checking function */
+    solveme[i].onkeyup = solveme_func;
+    solveme[i].onchange = solveme_func;
+  }
+  
+  /* set up radiogroups */
+  var radiogroups = document.getElementsByClassName("webex-radiogroup");
+  for (var i = 0; i < radiogroups.length; i++) {
+    radiogroups[i].onchange = radiogroups_func;
+  }
+  
+  /* set up selects */
+  var selects = document.getElementsByClassName("webex-select");
+  for (var i = 0; i < selects.length; i++) {
+    selects[i].onchange = select_func;
+  }
+
+  update_total_correct();
+}
+
+</script><script>
+$( document ).ready(function() {
+  var cite = ' ';
+  var psyteachr = ' <a href="https://psyteachr.github.io/"><img src="images/logos/psyteachr_logo.png" style="height: 31px; color: white;" alt="psyTeachR: Reproducible Research" /></a>';
+  var license = ' <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/" target="blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png"></a>';
+
+  $("footer div.row div:eq(1) p").html(
+    psyteachr + license + cite
+  );
+});
+</script><div class="chapter-nav">
+<div class="prev"><a href="functions.html"><span class="header-section-number">1</span> What Are Functions?</a></div>
+<div class="next"><a href="standard-error.html"><span class="header-section-number">3</span> Spread and Standard Error</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#equations"><span class="header-section-number">2</span> From Equations to Code</a></li>
+<li><a class="nav-link" href="#equations-are-blueprints"><span class="header-section-number">2.1</span> Equations are Blueprints</a></li>
+<li><a class="nav-link" href="#files-for-this-chapter"><span class="header-section-number">2.2</span> Files For This Chapter</a></li>
+<li><a class="nav-link" href="#seeing-the-mean"><span class="header-section-number">2.3</span> Seeing The Mean</a></li>
+<li>
+<a class="nav-link" href="#building-a-mean-function"><span class="header-section-number">2.4</span> Building A Mean Function</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#the-mean-equation"><span class="header-section-number">2.4.1</span> The Mean Equation</a></li>
+<li><a class="nav-link" href="#step-1-add-up-the-values"><span class="header-section-number">2.4.2</span> Step 1: Add Up The Values</a></li>
+<li><a class="nav-link" href="#step-2-count-the-values"><span class="header-section-number">2.4.3</span> Step 2: Count The Values</a></li>
+<li><a class="nav-link" href="#step-3-divide"><span class="header-section-number">2.4.4</span> Step 3: Divide</a></li>
+<li><a class="nav-link" href="#your-turn-write-my_mean"><span class="header-section-number">2.4.5</span> Your Turn: Write my_mean()</a></li>
+<li><a class="nav-link" href="#check-it-against-mean"><span class="header-section-number">2.4.6</span> Check It Against mean()</a></li>
+<li><a class="nav-link" href="#what-the-mean-tells-us"><span class="header-section-number">2.4.7</span> What The Mean Tells Us</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#seeing-distances-from-the-mean"><span class="header-section-number">2.5</span> Seeing Distances From The Mean</a></li>
+<li><a class="nav-link" href="#from-points-to-a-distribution"><span class="header-section-number">2.6</span> From Points To A Distribution</a></li>
+<li><a class="nav-link" href="#seeing-variance"><span class="header-section-number">2.7</span> Seeing Variance</a></li>
+<li><a class="nav-link" href="#try-it-interactively"><span class="header-section-number">2.8</span> Try It Interactively</a></li>
+<li><a class="nav-link" href="#the-variance-equation"><span class="header-section-number">2.9</span> The Variance Equation</a></li>
+<li><a class="nav-link" href="#notation-to-r"><span class="header-section-number">2.10</span> Notation To R</a></li>
+<li><a class="nav-link" href="#squared-distances"><span class="header-section-number">2.11</span> Squared Distances</a></li>
+<li><a class="nav-link" href="#your-turn-write-my_var"><span class="header-section-number">2.12</span> Your Turn: Write my_var()</a></li>
+<li><a class="nav-link" href="#check-it-against-var"><span class="header-section-number">2.13</span> Check It Against var()</a></li>
+<li><a class="nav-link" href="#why-divide-by-n---1"><span class="header-section-number">2.14</span> Why Divide By n - 1?</a></li>
+<li><a class="nav-link" href="#standard-deviation"><span class="header-section-number">2.15</span> Standard Deviation</a></li>
+<li>
+<a class="nav-link" href="#add-to-your-toolbox"><span class="header-section-number">2.16</span> Add To Your Toolbox</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#what-goes-in-the-file"><span class="header-section-number">2.16.1</span> What Goes In The File</a></li>
+<li><a class="nav-link" href="#copy-your-functions-in"><span class="header-section-number">2.16.2</span> Copy Your Functions In</a></li>
+<li><a class="nav-link" href="#load-the-file-with-source"><span class="header-section-number">2.16.3</span> Load The File With source()</a></li>
+<li><a class="nav-link" href="#check-the-saved-file-works"><span class="header-section-number">2.16.4</span> Check The Saved File Works</a></li>
+<li><a class="nav-link" href="#common-slips"><span class="header-section-number">2.16.5</span> Common Slips</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#next-step"><span class="header-section-number">2.17</span> Next Step</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+          
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Demystifying Functions For Statistics</strong>" was written by Sean Westwood. It was last built on 2026-10-29.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

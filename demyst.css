@@ -41,3 +41,21 @@ pre code {
   margin: 1rem 0;
   padding: .75rem 1rem;
 }
+
+/* Chapters not written yet: shown in red in the contents sidebar.
+   When a chapter is written, delete its line from this list. */
+.book-toc li a[href="two-sample-t.html"],
+.book-toc li a[href="one-way-anova.html"],
+.book-toc li a[href="factorial-anova.html"],
+.book-toc li a[href="chi-square.html"],
+.book-toc li a[href="lm-mean.html"],
+.book-toc li a[href="lm-correlation.html"],
+.book-toc li a[href="lm-t-test.html"],
+.book-toc li a[href="lm-one-way-anova.html"],
+.book-toc li a[href="wilcoxon-signed-rank.html"],
+.book-toc li a[href="mann-whitney.html"],
+.book-toc li a[href="spearman.html"],
+.book-toc li a[href="kruskal-wallis.html"],
+.book-toc li a[href="friedman.html"] {
+  color: #c0392b;
+}

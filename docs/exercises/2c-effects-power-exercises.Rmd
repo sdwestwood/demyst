@@ -1,0 +1,187 @@
+---
+title: "Exercises: Effects and Power"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# error = TRUE lets the file knit even if one of your chunks is not finished yet
+knitr::opts_chunk$set(error = TRUE)
+```
+
+Work through this file alongside the chapter "Effects and Power" in the book. Keep it in the same folder as your `my_functions.R`.
+
+## The data
+
+```{r data}
+scores <- c(44, 47, 48, 49, 50, 50, 51, 52, 53, 56)
+```
+
+## Load your toolbox
+
+```{r load-toolbox}
+library(tidyverse)
+source("my_functions.R")
+library(pwr)
+
+all.equal(my_t_value(scores, 46), unname(t.test(scores, mu = 46)$statistic))
+all.equal(my_p_value(my_t_value(scores, 46), df = 9), t.test(scores, mu = 46)$p.value)
+all.equal(my_cutoffs(20:1, alpha = 0.1), c(2, 19))
+```
+
+You are looking for three `TRUE`s. If `library(pwr)` gives an error, install the package once with `install.packages("pwr")`.
+
+## A world with an effect
+
+Steves really are taller here: their heights have a mean of 180 cm, while everyone's have a mean of 175 cm. Both have an SD of 7 cm. Cohen's d is the difference in SDs:
+
+```{r true-d}
+(180 - 175) / 7
+```
+
+## Build both distributions
+
+The second line is what `my_effect_t()` will do; you write it yourself further down.
+
+```{r both-worlds}
+null_ts <- replicate(1000, my_null_t(n = 10, pop_mean = 175, pop_sd = 7))
+effect_ts <- replicate(
+  1000, my_t_value(rnorm(n = 10, mean = 180, sd = 7), comparison_value = 175)
+)
+
+cutoffs <- my_cutoffs(null_ts)
+cutoffs
+
+hist(null_ts, breaks = 40, xlim = c(-5, 8), col = rgb(0.27, 0.48, 0.67, 0.5))
+hist(effect_ts, breaks = 40, add = TRUE, col = rgb(0.84, 0.37, 0, 0.5))
+abline(v = cutoffs, lty = 2)
+```
+
+## Counting
+
+```{r count-both}
+null_past <- null_ts < cutoffs[1] | null_ts > cutoffs[2]
+effect_past <- effect_ts < cutoffs[1] | effect_ts > cutoffs[2]
+
+tibble(
+  world = c("null", "effect"),
+  past = c(sum(null_past), sum(effect_past)),
+  not_past = c(sum(!null_past), sum(!effect_past))
+)
+```
+
+Which of these four numbers is the Type I error count? Which is the Type II error count? About how often did the groups of 10 Steves find the real 5 cm difference?
+
+## Your turn: write `my_effect_t()`
+
+```{r my-effect-t}
+my_effect_t <- function(n, pop_mean, pop_sd, comparison_value) {
+  sample_values <-
+  output <-
+  return(output)
+}
+
+my_effect_t(n = 10, pop_mean = 180, pop_sd = 7, comparison_value = 175)
+```
+
+### Check it against R
+
+```{r my-effect-t-check}
+set.seed(1)
+mine <- my_effect_t(n = 10, pop_mean = 180, pop_sd = 7, comparison_value = 175)
+
+set.seed(1)
+r_version <- unname(
+  t.test(rnorm(n = 10, mean = 180, sd = 7), mu = 175)$statistic
+)
+
+c(mine = mine, R = r_version)
+all.equal(mine, r_version)
+```
+
+## Your turn: write `my_power()`
+
+```{r my-power}
+my_power <- function(ts, cutoffs) {
+  past <-
+  output <-
+  return(output)
+}
+
+my_power(effect_ts, cutoffs)
+```
+
+Power in a world with no effect:
+
+```{r power-on-null}
+my_power(null_ts, cutoffs)
+```
+
+### Check it: close enough
+
+```{r power-check}
+c(
+  simulated = my_power(effect_ts, cutoffs),
+  power.t.test = power.t.test(n = 10, delta = 5, sd = 7,
+                              type = "one.sample")$power,
+  pwr.t.test = pwr.t.test(n = 10, d = 5 / 7, type = "one.sample")$power
+)
+
+abs(
+  my_power(effect_ts, cutoffs) -
+    pwr.t.test(n = 10, d = 5 / 7, type = "one.sample")$power
+) < 0.12
+```
+
+## Your turn: write `my_cohens_d()`
+
+```{r my-cohens-d}
+my_cohens_d <- function(x, comparison_value) {
+  mean_x <-
+  sd_x <-
+  output <-
+  return(output)
+}
+
+my_cohens_d(scores, comparison_value = 46)
+```
+
+### Check it: d and t
+
+The t-value is d multiplied by the square root of the sample size. Write that in code, then compare it with `my_t_value()`.
+
+```{r my-cohens-d-check}
+d_times_root_n <-
+c(d_times_root_n = d_times_root_n, t = my_t_value(scores, 46))
+all.equal(d_times_root_n, my_t_value(scores, 46))
+```
+
+## Add to your toolbox
+
+1. Open `my_functions.R`.
+2. Copy your finished `my_effect_t()`, `my_power()` and `my_cohens_d()` into it, under the **Effects and Power** heading. Copy only the functions.
+3. Save `my_functions.R`.
+
+Now check that the saved toolbox works on its own. You are looking for three `TRUE`s.
+
+```{r toolbox-check}
+rm(list = ls())
+source("my_functions.R")
+
+set.seed(1)
+mine <- my_effect_t(n = 10, pop_mean = 180, pop_sd = 7, comparison_value = 175)
+set.seed(1)
+r_version <- unname(
+  t.test(rnorm(n = 10, mean = 180, sd = 7), mu = 175)$statistic
+)
+all.equal(mine, r_version)
+
+all.equal(my_power(c(-3, -1, 0, 1, 2.5), c(-2, 2)), 0.4)
+
+scores <- c(44, 47, 48, 49, 50, 50, 51, 52, 53, 56)
+all.equal(
+  my_cohens_d(scores, 46) * sqrt(length(scores)),
+  my_t_value(scores, 46)
+)
+```
+
+If you see `could not find function`, that function is not in `my_functions.R` yet, or the file was not saved.

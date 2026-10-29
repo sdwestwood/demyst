@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 11 p-values | Demystifying Functions For Statistics</title>
+<meta name="author" content="Sean Westwood">
+<meta name="description" content="In Chapter 10, we built a world where Steves are exactly average, drew 1000 groups of 10 from it, and turned each group into a t-value. We found the cutoffs that leave the most extreme 5% of those...">
+<meta name="generator" content="bookdown 0.47 with bs4_book()">
+<meta property="og:title" content="Chapter 11 p-values | Demystifying Functions For Statistics">
+<meta property="og:type" content="book">
+<meta property="og:description" content="In Chapter 10, we built a world where Steves are exactly average, drew 1000 groups of 10 from it, and turned each group into a t-value. We found the cutoffs that leave the most extreme 5% of those...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 11 p-values | Demystifying Functions For Statistics">
+<meta name="twitter:description" content="In Chapter 10, we built a world where Steves are exactly average, drew 1000 groups of 10 from it, and turned each group into a t-value. We found the cutoffs that leave the most extreme 5% of those...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.10.0/transition.js"></script><script src="libs/bs3compat-0.10.0/tabs.js"></script><script src="libs/bs3compat-0.10.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-6NP3MF25W3"></script><script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-6NP3MF25W3');
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<link rel="stylesheet" href="include/psyteachr.css">
+<link rel="stylesheet" href="include/webex.css">
+<link rel="stylesheet" href="include/style.css">
+<link rel="stylesheet" href="demyst.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Demystifying Functions For Statistics</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Overview</a></li>
+<li class="book-part">Building Test Statistics</li>
+<li><a class="" href="functions.html"><span class="header-section-number">1</span> What Are Functions?</a></li>
+<li><a class="" href="equations.html"><span class="header-section-number">2</span> From Equations to Code</a></li>
+<li><a class="" href="standard-error.html"><span class="header-section-number">3</span> Spread and Standard Error</a></li>
+<li><a class="" href="t-statistic.html"><span class="header-section-number">4</span> The One-Sample t-Test</a></li>
+<li><a class="" href="two-sample-t.html"><span class="header-section-number">5</span> Two-Sample t-Tests</a></li>
+<li><a class="" href="correlation.html"><span class="header-section-number">6</span> Covariance and Correlation</a></li>
+<li><a class="" href="one-way-anova.html"><span class="header-section-number">7</span> One-Way ANOVA</a></li>
+<li><a class="" href="factorial-anova.html"><span class="header-section-number">8</span> Factorial ANOVA</a></li>
+<li><a class="" href="chi-square.html"><span class="header-section-number">9</span> Chi-Square</a></li>
+<li class="book-part">Testing by Simulation</li>
+<li><a class="" href="null-distributions.html"><span class="header-section-number">10</span> Null Distributions</a></li>
+<li><a class="active" href="p-values.html"><span class="header-section-number">11</span> p-values</a></li>
+<li><a class="" href="effects-power.html"><span class="header-section-number">12</span> Effects and Power</a></li>
+<li class="book-part">The General Linear Model</li>
+<li><a class="" href="lm-mean.html"><span class="header-section-number">13</span> The Mean as a Model</a></li>
+<li><a class="" href="lm-correlation.html"><span class="header-section-number">14</span> Correlation as a Linear Model</a></li>
+<li><a class="" href="lm-t-test.html"><span class="header-section-number">15</span> The Independent t-Test as a Linear Model</a></li>
+<li><a class="" href="lm-one-way-anova.html"><span class="header-section-number">16</span> One-Way ANOVA as a Linear Model</a></li>
+<li class="book-part">Non-Parametric Tests</li>
+<li><a class="" href="wilcoxon-signed-rank.html"><span class="header-section-number">17</span> Wilcoxon Signed-Rank Test</a></li>
+<li><a class="" href="mann-whitney.html"><span class="header-section-number">18</span> Mann-Whitney U Test</a></li>
+<li><a class="" href="spearman.html"><span class="header-section-number">19</span> Spearman's Rho</a></li>
+<li><a class="" href="kruskal-wallis.html"><span class="header-section-number">20</span> Kruskal-Wallis Test</a></li>
+<li><a class="" href="friedman.html"><span class="header-section-number">21</span> Friedman Test</a></li>
+</ul>
+
+        <div class="book-extra">
+          
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="p-values" class="section level1" number="11">
+<h1>
+<span class="header-section-number">11</span> p-values<a class="anchor" aria-label="anchor" href="#p-values"><i class="fas fa-link"></i></a>
+</h1>
+<p>In Chapter <a href="null-distributions.html#null-distributions">10</a>, we built a world where Steves are exactly average, drew 1000 groups of 10 from it, and turned each group into a t-value. We found the cutoffs that leave the most extreme 5% of those null t-values outside, and saw that rare groups turn up even when nothing is going on.</p>
+<p>This chapter puts a number on "rare". If a t-value comes from the null world, the share of null t-values beyond a point is the probability of landing beyond it. Only 5% of the null t-values fall past the cutoffs, so a sample from the null world has a 5% probability of landing past them. The probability of a result at least as extreme as ours, if the null hypothesis is true, is called the <strong>p-value</strong>.</p>
+<div class="summary-box">
+<p>null t-values -&gt; share at least as extreme as ours -&gt; p-value</p>
+</div>
+<div class="note">
+<p><strong>What you need for this chapter</strong></p>
+<p>Chapter <a href="null-distributions.html#null-distributions">10</a>, and the chapters it needs. The last section of this chapter applies the same ideas to correlation: do it if you have done Chapter <a href="correlation.html#correlation">6</a>, and skip it if not.</p>
+</div>
+<div id="files-for-this-chapter-5" class="section level2" number="11.1">
+<h2>
+<span class="header-section-number">11.1</span> Files For This Chapter<a class="anchor" aria-label="anchor" href="#files-for-this-chapter-5"><i class="fas fa-link"></i></a>
+</h2>
+<p>Download the exercise file for this chapter and save it in the same folder as your <code>my_functions.R</code>:</p>
+<ul>
+<li><a href="exercises/2b-p-values-exercises.Rmd" download>2b-p-values-exercises.Rmd</a></li>
+</ul>
+</div>
+<div id="load-your-toolbox-4" class="section level2" number="11.2">
+<h2>
+<span class="header-section-number">11.2</span> Load Your Toolbox<a class="anchor" aria-label="anchor" href="#load-your-toolbox-4"><i class="fas fa-link"></i></a>
+</h2>
+<p>We will need the ten scores from Chapter <a href="t-statistic.html#t-statistic">4</a> later on:</p>
+<div class="sourceCode" id="cb211"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">44</span>, <span class="fl">47</span>, <span class="fl">48</span>, <span class="fl">49</span>, <span class="fl">50</span>, <span class="fl">50</span>, <span class="fl">51</span>, <span class="fl">52</span>, <span class="fl">53</span>, <span class="fl">56</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb212"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html">source</a></span><span class="op">(</span><span class="st">"my_functions.R"</span><span class="op">)</span></span></code></pre></div>
+<p>This chapter leans on <code>my_t_value()</code> and on <code>my_null_t()</code> and <code>my_cutoffs()</code> from Chapter <a href="null-distributions.html#null-distributions">10</a>. Check them first:</p>
+<div class="sourceCode" id="cb213"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_t_value</span><span class="op">(</span><span class="va">scores</span>, <span class="fl">49</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">scores</span>, mu <span class="op">=</span> <span class="fl">49</span><span class="op">)</span><span class="op">$</span><span class="va">statistic</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">mine</span> <span class="op">&lt;-</span> <span class="fu">my_null_t</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, pop_mean <span class="op">=</span> <span class="fl">175</span>, pop_sd <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">r_version</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, mean <span class="op">=</span> <span class="fl">175</span>, sd <span class="op">=</span> <span class="fl">7</span><span class="op">)</span>, mu <span class="op">=</span> <span class="fl">175</span><span class="op">)</span><span class="op">$</span><span class="va">statistic</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="va">mine</span>, <span class="va">r_version</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_cutoffs</span><span class="op">(</span><span class="fl">20</span><span class="op">:</span><span class="fl">1</span>, alpha <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">19</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] TRUE
+## [1] TRUE
+## [1] TRUE</code></pre>
+<p>Then recreate <code>null_ts</code> from Chapter <a href="null-distributions.html#null-distributions">10</a>: 1000 null t-values from groups of 10 Steves.</p>
+<div class="sourceCode" id="cb215"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">null_ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">replicate</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fu">my_null_t</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span>, pop_mean <span class="op">=</span> <span class="fl">175</span>, pop_sd <span class="op">=</span> <span class="fl">7</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div id="alpha-and-type-i-errors" class="section level2" number="11.3">
+<h2>
+<span class="header-section-number">11.3</span> Alpha And Type I Errors<a class="anchor" aria-label="anchor" href="#alpha-and-type-i-errors"><i class="fas fa-link"></i></a>
+</h2>
+<p>Every one of the 1000 t-values in <code>null_ts</code> came from a world where the null hypothesis is true: Steves really are exactly average. Say we used the cutoffs that mark the rarest 5%, <code>my_cutoffs(null_ts)</code>, to decide whether Steves are taller or shorter than average. We would wrongly call the result "far" for the 5% of samples that land past them. That kind of mistake is called a <strong>Type I error</strong>.</p>
+<p>In the last chapter, alpha was the share of null values we marked as rare. Here is what that share means for a test: <strong>alpha</strong> is the probability of calling a result "far" when nothing is going on. With alpha = .05, 5% of samples from the null world land past the cutoffs, so a test that uses them makes a Type I error 5% of the time when the null hypothesis is true.</p>
+</div>
+<div id="watch-it-build" class="section level2" number="11.4">
+<h2>
+<span class="header-section-number">11.4</span> Watch It Build<a class="anchor" aria-label="anchor" href="#watch-it-build"><i class="fas fa-link"></i></a>
+</h2>
+<p>You built this null distribution yourself in Chapter <a href="null-distributions.html#null-distributions">10</a>. The widget below is its testing view: the same groups of 10 Steves and the same t-values, now with the cutoffs drawn in and a table counting how often samples land past them. It uses the exact cutoffs from the t distribution, which you will meet later in this chapter.</p>
+<iframe class="demyst-widget" src="apps/nhst/embed.html?mode=null&amp;n=10&amp;null=175&amp;sd=7&amp;unit=cm" width="100%" height="760" title="Null distribution of t interactive widget" style="border: 0;">
+</iframe>
+<script>
+// Let each widget set its own frame height, so it never needs a scroll bar.
+window.addEventListener("message", function (event) {
+  if (!event.data || !event.data.demystWidgetHeight) return;
+  document.querySelectorAll("iframe.demyst-widget").forEach(function (frame) {
+    if (frame.contentWindow === event.source) {
+      frame.style.height = event.data.demystWidgetHeight + "px";
+    }
+  });
+});
+</script><ol style="list-style-type: decimal">
+<li>Click <strong>+1</strong> a few times, then <strong>+1000</strong>. Watch the share of null t-values past the cutoffs in the table: it settles near alpha, 5%. That is the Type I error rate.</li>
+<li>Switch <strong>Show t-values as</strong> to <strong>Dots</strong>. The solid dots are the samples that would be wrongly called "far".</li>
+<li>Change <strong>Alpha</strong> to .01 without adding samples. The cutoffs move outwards over the same t-values, and fewer of them are past the cutoffs.</li>
+<li>Change the sample size and build it again. With very small samples, the tails get fatter, so the cutoffs move further out.</li>
+</ol>
+</div>
+<div id="your-turn-write-my_sim_p_value" class="section level2" number="11.5">
+<h2>
+<span class="header-section-number">11.5</span> Your Turn: Write <code>my_sim_p_value()</code><a class="anchor" aria-label="anchor" href="#your-turn-write-my_sim_p_value"><i class="fas fa-link"></i></a>
+</h2>
+<p>Now we can answer the question from the start of Chapter <a href="null-distributions.html#null-distributions">10</a>: how far is far enough? A <strong>p-value</strong> is the proportion of the null distribution that is at least as far from zero as our t-value.</p>
+<p>The recipe is:</p>
+<ol style="list-style-type: decimal">
+<li>for every null t-value, ask whether it is at least as far from zero as ours: <code>abs(null_ts) &gt;= abs(t)</code>;</li>
+<li>take the proportion of <code>TRUE</code>s.</li>
+</ol>
+<p>The proportion of <code>TRUE</code>s is the mean of a set of <code>TRUE</code> and <code>FALSE</code> values, because R counts <code>TRUE</code> as 1 and <code>FALSE</code> as 0. So your own <code>my_mean()</code> does the job.</p>
+<div class="sourceCode" id="cb216"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_sim_p_value</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span>, <span class="va">null_ts</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">as_extreme</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_sim_p_value</span><span class="op">(</span>t <span class="op">=</span> <span class="fl">0.95</span>, null_ts <span class="op">=</span> <span class="va">null_ts</span><span class="op">)</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p><code>as_extreme</code> is <code>abs(null_ts) &gt;= abs(t)</code>, and <code>output</code> is <code>my_mean(as_extreme)</code>.</p>
+</div>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb217"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_sim_p_value</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span>, <span class="va">null_ts</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">as_extreme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">null_ts</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">t</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">as_extreme</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_sim_p_value</span><span class="op">(</span>t <span class="op">=</span> <span class="fl">0.95</span>, null_ts <span class="op">=</span> <span class="va">null_ts</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] 0.403</code></pre>
+</div>
+<p><code><a href="https://rdrr.io/r/base/MathFun.html">abs()</a></code> means both tails count: a t-value of -3 is just as far from zero as 3. This is a <strong>two-sided</strong> p-value.</p>
+</div>
+<div id="check-it-close-enough" class="section level2" number="11.6">
+<h2>
+<span class="header-section-number">11.6</span> Check It: Close Enough<a class="anchor" aria-label="anchor" href="#check-it-close-enough"><i class="fas fa-link"></i></a>
+</h2>
+<p>So far the null world has been Steves. For the p-values, we go back to the ten scores from Chapter <a href="t-statistic.html#t-statistic">4</a> and their two comparison values, 49 and 46. The null t-values from the Steve world still work for them: under the null hypothesis, the distribution of t depends only on the sample size, not on the mean or SD, so any sample of 10 has the same null distribution.</p>
+<p>Use <code>my_sim_p_value()</code> on the scores against the first comparison value, 49, and compare with the p-value from <code><a href="https://rdrr.io/r/stats/t.test.html">t.test()</a></code>. A simulated p-value comes from 1000 random samples, so it wobbles a little around the exact one, just like a sample mean wobbles around the population mean. That means <code><a href="https://rdrr.io/r/base/all.equal.html">all.equal()</a></code> would say <code>FALSE</code> even when your function is correct. For simulations, we check that the gap is small instead: <code><a href="https://rdrr.io/r/base/MathFun.html">abs()</a></code> turns the gap into a positive distance, and <code>&lt; 0.05</code> asks whether it is smaller than 0.05.</p>
+<div class="sourceCode" id="cb219"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">t_49</span> <span class="op">&lt;-</span> <span class="fu">my_t_value</span><span class="op">(</span><span class="va">scores</span>, comparison_value <span class="op">=</span> <span class="fl">49</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>  simulated <span class="op">=</span> <span class="fu">my_sim_p_value</span><span class="op">(</span><span class="va">t_49</span>, <span class="va">null_ts</span><span class="op">)</span>,</span>
+<span>  R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">scores</span>, mu <span class="op">=</span> <span class="fl">49</span><span class="op">)</span><span class="op">$</span><span class="va">p.value</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="fu">my_sim_p_value</span><span class="op">(</span><span class="va">t_49</span>, <span class="va">null_ts</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">scores</span>, mu <span class="op">=</span> <span class="fl">49</span><span class="op">)</span><span class="op">$</span><span class="va">p.value</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.05</span></span></code></pre></div>
+<pre><code>## simulated         R 
+## 0.4050000 0.3675581 
+## [1] TRUE</code></pre>
+<p>Now the second comparison value, 46:</p>
+<div class="sourceCode" id="cb221"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">t_46</span> <span class="op">&lt;-</span> <span class="fu">my_t_value</span><span class="op">(</span><span class="va">scores</span>, comparison_value <span class="op">=</span> <span class="fl">46</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>  simulated <span class="op">=</span> <span class="fu">my_sim_p_value</span><span class="op">(</span><span class="va">t_46</span>, <span class="va">null_ts</span><span class="op">)</span>,</span>
+<span>  R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">scores</span>, mu <span class="op">=</span> <span class="fl">46</span><span class="op">)</span><span class="op">$</span><span class="va">p.value</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="fu">my_sim_p_value</span><span class="op">(</span><span class="va">t_46</span>, <span class="va">null_ts</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">scores</span>, mu <span class="op">=</span> <span class="fl">46</span><span class="op">)</span><span class="op">$</span><span class="va">p.value</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.05</span></span></code></pre></div>
+<pre><code>##   simulated           R 
+## 0.003000000 0.004251621 
+## [1] TRUE</code></pre>
+<p>A <code>TRUE</code> each time means your simulated p-values are within 0.05 of the exact ones. You worked out a p-value by building the null distribution yourself.</p>
+</div>
+<div id="from-simulation-to-the-t-distribution" class="section level2" number="11.7">
+<h2>
+<span class="header-section-number">11.7</span> From Simulation To The t Distribution<a class="anchor" aria-label="anchor" href="#from-simulation-to-the-t-distribution"><i class="fas fa-link"></i></a>
+</h2>
+<p>If we simulated more and more samples, the histogram would get smoother and smoother. With endlessly many, it would become a smooth curve: the <strong>t distribution</strong>. Its exact shape depends only on the degrees of freedom.</p>
+<div class="figure">
+<span style="display:block;" id="fig:t-curve"></span>
+<img src="2b-p-values_files/figure-html/t-curve-1.png" alt="Histogram of simulated t-values with a smooth t distribution curve following its shape closely." width="672"><p class="caption">
+Figure 11.1: The simulated null t-values with the exact t distribution for 9 degrees of freedom drawn over them.
+</p>
+</div>
+<div class="webex-solution">
+<button>
+Show the plot code
+</button>
+<div class="sourceCode" id="cb223"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">curve_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">6</span>, <span class="fl">6</span>, <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>count <span class="op">=</span> <span class="fl">1000</span> <span class="op">*</span> <span class="fl">0.25</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">t</span>, df <span class="op">=</span> <span class="fl">9</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>t <span class="op">=</span> <span class="va">null_ts</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span>binwidth <span class="op">=</span> <span class="fl">0.25</span>, colour <span class="op">=</span> <span class="st">"white"</span>, fill <span class="op">=</span> <span class="st">"#467AAC"</span>,</span>
+<span>                 alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">curve_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">t</span>, y <span class="op">=</span> <span class="va">count</span><span class="op">)</span>, colour <span class="op">=</span> <span class="st">"#D55E00"</span>,</span>
+<span>            linewidth <span class="op">=</span> <span class="fl">1.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">6</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"t-value"</span>, y <span class="op">=</span> <span class="st">"Count"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>Because R knows that curve exactly, it does not need to simulate. <code><a href="https://rdrr.io/r/stats/TDist.html">pt()</a></code> gives the area of the t distribution <em>below</em> a value. For example, <code>pt(-2, df = 9)</code> is the proportion of t-values below -2. We will use <code><a href="https://rdrr.io/r/stats/TDist.html">pt()</a></code> the way we used <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code>: it is the one piece that would take far more than a chapter to build by hand.</p>
+</div>
+<div id="your-turn-write-my_p_value" class="section level2" number="11.8">
+<h2>
+<span class="header-section-number">11.8</span> Your Turn: Write <code>my_p_value()</code><a class="anchor" aria-label="anchor" href="#your-turn-write-my_p_value"><i class="fas fa-link"></i></a>
+</h2>
+<p>The recipe is:</p>
+<ol style="list-style-type: decimal">
+<li>find the area in the lower tail, beyond the negative version of our t-value: <code>pt(-abs(t), df)</code>;</li>
+<li>double it, because a two-sided test counts both tails.</li>
+</ol>
+<p><code>-abs(t)</code> is always negative, so the same code works whether our t-value is above or below zero.</p>
+<div class="sourceCode" id="cb224"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_p_value</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span>, <span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">lower_tail</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_p_value</span><span class="op">(</span>t <span class="op">=</span> <span class="fl">0.95</span>, df <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p><code>lower_tail</code> is <code>pt(-abs(t), df)</code>, and <code>output</code> is two times <code>lower_tail</code>.</p>
+</div>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb225"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_p_value</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span>, <span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">lower_tail</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">pt</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">t</span><span class="op">)</span>, <span class="va">df</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">lower_tail</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_p_value</span><span class="op">(</span>t <span class="op">=</span> <span class="fl">0.95</span>, df <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] 0.366924</code></pre>
+</div>
+</div>
+<div id="check-it-against-t.test-1" class="section level2" number="11.9">
+<h2>
+<span class="header-section-number">11.9</span> Check It Against <code>t.test()</code><a class="anchor" aria-label="anchor" href="#check-it-against-t.test-1"><i class="fas fa-link"></i></a>
+</h2>
+<p>This time there is no simulation, so we expect an exact match:</p>
+<div class="sourceCode" id="cb227"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="fu">my_p_value</span><span class="op">(</span><span class="va">t_49</span>, df <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">scores</span>, mu <span class="op">=</span> <span class="fl">49</span><span class="op">)</span><span class="op">$</span><span class="va">p.value</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_p_value</span><span class="op">(</span><span class="va">t_49</span>, df <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">scores</span>, mu <span class="op">=</span> <span class="fl">49</span><span class="op">)</span><span class="op">$</span><span class="va">p.value</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_p_value</span><span class="op">(</span><span class="va">t_46</span>, df <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">scores</span>, mu <span class="op">=</span> <span class="fl">46</span><span class="op">)</span><span class="op">$</span><span class="va">p.value</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##      mine         R 
+## 0.3675581 0.3675581 
+## [1] TRUE
+## [1] TRUE</code></pre>
+</div>
+<div id="back-to-our-two-comparison-values" class="section level2" number="11.10">
+<h2>
+<span class="header-section-number">11.10</span> Back To Our Two Comparison Values<a class="anchor" aria-label="anchor" href="#back-to-our-two-comparison-values"><i class="fas fa-link"></i></a>
+</h2>
+<div class="inline-table"><table class="table table-sm">
+<colgroup>
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+</colgroup>
+<thead><tr class="header">
+<th>Comparison value</th>
+<th>t</th>
+<th>Simulated p</th>
+<th>Exact p</th>
+<th>Past the cutoff at alpha .05?</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>49</td>
+<td>0.95</td>
+<td>0.405</td>
+<td>0.368</td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td>46</td>
+<td>3.79</td>
+<td>0.003</td>
+<td>0.004</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table></div>
+<p>Against 49, a t-value as far from zero as ours turns up in about 37% of samples even when the null is true. That is not unusual, so we would not reject the null hypothesis. That does not show that the population mean is exactly 49. It only means our data are quite compatible with it.</p>
+<p>Against 46, a t-value that far out turns up in less than 1% of samples when the null is true. That is unusual enough to pass the cutoff, so we would reject the null hypothesis that the population mean is 46.</p>
+<p>Two warnings:</p>
+<ul>
+<li>the p-value is <strong>not</strong> the probability that the null hypothesis is true. It is the probability of a result at least this extreme, <em>if</em> the null hypothesis were true;</li>
+<li>the exact p-value from <code><a href="https://rdrr.io/r/stats/t.test.html">t.test()</a></code> assumes independent observations from a normal population. Our simulation made the same assumption when it used <code><a href="https://rdrr.io/r/stats/Normal.html">rnorm()</a></code>.</li>
+</ul>
+<p>Which statement describes a p-value of .004? <select class="webex-select"><option value="blank"></option>
+<option value="">There is a 0.4% chance that the null hypothesis is true</option>
+<option value="answer">If the null hypothesis were true, a t-value at least this extreme would turn up in about 0.4% of samples</option>
+<option value="">There is a 99.6% chance that there is a real difference</option></select></p>
+</div>
+<div id="the-t-value-as-an-anchor" class="section level2" number="11.11">
+<h2>
+<span class="header-section-number">11.11</span> The t-Value As An Anchor<a class="anchor" aria-label="anchor" href="#the-t-value-as-an-anchor"><i class="fas fa-link"></i></a>
+</h2>
+<p>Everything in this chapter worked on a t-value. Many statistics can be turned into a t-value, so the same tools work for them too. If you have done Chapter <a href="correlation.html#correlation">6</a>, the bonus section at the end of this chapter turns a correlation into a t-value and uses these same tools on it.</p>
+</div>
+<div id="try-it-on-real-data-3" class="section level2" number="11.12">
+<h2>
+<span class="header-section-number">11.12</span> Try It On Real Data<a class="anchor" aria-label="anchor" href="#try-it-on-real-data-3"><i class="fas fa-link"></i></a>
+</h2>
+<p>Back to the <code>sleep</code> data. In Chapter <a href="t-statistic.html#t-statistic">4</a>, the first drug's mean extra sleep was about 1.3 standard errors above 0. There are 10 patients, so we can reuse <code>null_ts</code>, the null distribution we built from groups of 10:</p>
+<div class="sourceCode" id="cb229"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">drug_1</span> <span class="op">&lt;-</span> <span class="va">sleep</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">group</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">extra</span><span class="op">)</span></span>
+<span><span class="va">drug_t</span> <span class="op">&lt;-</span> <span class="fu">my_t_value</span><span class="op">(</span><span class="va">drug_1</span>, comparison_value <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>  simulated <span class="op">=</span> <span class="fu">my_sim_p_value</span><span class="op">(</span><span class="va">drug_t</span>, <span class="va">null_ts</span><span class="op">)</span>,</span>
+<span>  exact <span class="op">=</span> <span class="fu">my_p_value</span><span class="op">(</span><span class="va">drug_t</span>, df <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>,</span>
+<span>  R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">drug_1</span>, mu <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">$</span><span class="va">p.value</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="fu">my_sim_p_value</span><span class="op">(</span><span class="va">drug_t</span>, <span class="va">null_ts</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">drug_1</span>, mu <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">$</span><span class="va">p.value</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.05</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_p_value</span><span class="op">(</span><span class="va">drug_t</span>, df <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">drug_1</span>, mu <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">$</span><span class="va">p.value</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## simulated     exact         R 
+## 0.2400000 0.2175978 0.2175978 
+## [1] TRUE
+## [1] TRUE</code></pre>
+<p><code>null_ts</code> came from Steves' heights, with a mean of 175 cm and an SD of 7 cm, nothing like hours of sleep. This is fine, because under the null hypothesis, the distribution of t depends only on the sample size, not on the mean or SD of the values.</p>
+<p>A p-value of about 0.22 is not past the cutoff at alpha .05, so we would not reject the null hypothesis that the first drug adds no sleep on average. That does not show the drug has no effect: with only 10 patients, a modest effect could easily be missed. Chapter <a href="effects-power.html#effects-power">12</a> shows how often a real effect gets missed.</p>
+</div>
+<div id="bonus-correlation" class="section level2" number="11.13">
+<h2>
+<span class="header-section-number">11.13</span> Bonus: Correlation<a class="anchor" aria-label="anchor" href="#bonus-correlation"><i class="fas fa-link"></i></a>
+</h2>
+<p>This section needs Chapter <a href="correlation.html#correlation">6</a>. There we turned a correlation into a t-value, which means everything in this chapter works for it too. The question is the same: if there were no relationship at all, how unusual would a t-value like ours be?</p>
+<p>We will use the eight practice-time and test-score pairs from Chapter <a href="correlation.html#correlation">6</a>:</p>
+<div class="sourceCode" id="cb231"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">8</span><span class="op">)</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">48</span>, <span class="fl">55</span>, <span class="fl">51</span>, <span class="fl">62</span>, <span class="fl">58</span>, <span class="fl">70</span>, <span class="fl">65</span>, <span class="fl">71</span><span class="op">)</span></span>
+<span><span class="va">correlation_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.test.html">cor.test</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, method <span class="op">=</span> <span class="st">"pearson"</span><span class="op">)</span></span></code></pre></div>
+<p>To build the null distribution, we need samples where the null hypothesis is true. We keep the practice hours as they are, and pair them with test scores drawn completely at random, so there is no relationship between the two. Correlation does not depend on the mean or SD of the scores, so <code><a href="https://rdrr.io/r/stats/Normal.html">rnorm()</a></code> with its defaults (a mean of 0 and an SD of 1) is fine.</p>
+<div id="your-turn-write-my_null_correlation_t" class="section level3" number="11.13.1">
+<h3>
+<span class="header-section-number">11.13.1</span> Your Turn: Write <code>my_null_correlation_t()</code><a class="anchor" aria-label="anchor" href="#your-turn-write-my_null_correlation_t"><i class="fas fa-link"></i></a>
+</h3>
+<p>This works just like <code>my_null_t()</code>:</p>
+<ol style="list-style-type: decimal">
+<li>draw random y values, one for each x value: <code>rnorm(length(x))</code>;</li>
+<li>calculate the correlation t-value with <code>my_correlation_t()</code>.</li>
+</ol>
+<div class="sourceCode" id="cb232"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_null_correlation_t</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">null_y</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_null_correlation_t</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p><code>null_y</code> is <code>rnorm(length(x))</code>, and <code>output</code> is <code>my_correlation_t(x, null_y)</code>.</p>
+</div>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb233"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_null_correlation_t</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">null_y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu">my_correlation_t</span><span class="op">(</span><span class="va">x</span>, <span class="va">null_y</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_null_correlation_t</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] -0.7486412</code></pre>
+</div>
+</div>
+<div id="check-it-against-r-3" class="section level3" number="11.13.2">
+<h3>
+<span class="header-section-number">11.13.2</span> Check It Against R<a class="anchor" aria-label="anchor" href="#check-it-against-r-3"><i class="fas fa-link"></i></a>
+</h3>
+<p>As before, <code><a href="https://rdrr.io/r/base/Random.html">set.seed()</a></code> lets us repeat the same random numbers and compare with <code><a href="https://rdrr.io/r/stats/cor.test.html">cor.test()</a></code>:</p>
+<div class="sourceCode" id="cb235"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">mine</span> <span class="op">&lt;-</span> <span class="fu">my_null_correlation_t</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">r_version</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.test.html">cor.test</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">statistic</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="va">mine</span>, R <span class="op">=</span> <span class="va">r_version</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="va">mine</span>, <span class="va">r_version</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##      mine         R 
+## 0.8759611 0.8759611 
+## [1] TRUE</code></pre>
+</div>
+<div id="the-null-distribution-for-correlation" class="section level3" number="11.13.3">
+<h3>
+<span class="header-section-number">11.13.3</span> The Null Distribution For Correlation<a class="anchor" aria-label="anchor" href="#the-null-distribution-for-correlation"><i class="fas fa-link"></i></a>
+</h3>
+<p>Now repeat it 1000 times and use your tools from this chapter and the last on the result, without changing them:</p>
+<div class="sourceCode" id="cb237"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">null_correlation_ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">replicate</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fu">my_null_correlation_t</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span></span>
+<span>  cutoff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"lower"</span>, <span class="st">"upper"</span><span class="op">)</span>,</span>
+<span>  mine <span class="op">=</span> <span class="fu">my_cutoffs</span><span class="op">(</span><span class="va">null_correlation_ts</span><span class="op">)</span>,</span>
+<span>  quantile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">null_correlation_ts</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  theory <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">qt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span>, df <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="kable-table">
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="left">cutoff</th>
+<th align="right">mine</th>
+<th align="right">quantile</th>
+<th align="right">theory</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">lower</td>
+<td align="right">-2.589077</td>
+<td align="right">-2.589179</td>
+<td align="right">-2.446912</td>
+</tr>
+<tr class="even">
+<td align="left">upper</td>
+<td align="right">2.568422</td>
+<td align="right">2.568610</td>
+<td align="right">2.446912</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p><code><a href="https://rdrr.io/r/stats/quantile.html">quantile()</a></code> is R's own way of finding the value that a given proportion of the data falls below. <code>mine</code> and <code>quantile</code> agree closely without being identical, because <code><a href="https://rdrr.io/r/stats/quantile.html">quantile()</a></code> blends two neighbouring sorted values and <code>my_cutoffs()</code> picks one. Both sit near the <code>theory</code> column, with a little more wobble. Check the gap:</p>
+<div class="sourceCode" id="cb238"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span></span>
+<span>  <span class="fu">my_cutoffs</span><span class="op">(</span><span class="va">null_correlation_ts</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">qt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span>, df <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.6</span></span></code></pre></div>
+<pre><code>## [1] TRUE TRUE</code></pre>
+<p>The cutoffs match a t distribution with <span class="math inline">\(n - 2 = 6\)</span> degrees of freedom, as the formula said they would. We allow a gap of up to 0.6 here. With only 8 pairs, the tails of the distribution are wide, so simulated cutoffs wobble a lot from one simulation to the next.</p>
+<p>Now the p-values. First by simulation, then exactly with <code>my_p_value()</code>:</p>
+<div class="sourceCode" id="cb240"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">our_t</span> <span class="op">&lt;-</span> <span class="fu">my_correlation_t</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>  simulated <span class="op">=</span> <span class="fu">my_sim_p_value</span><span class="op">(</span><span class="va">our_t</span>, <span class="va">null_correlation_ts</span><span class="op">)</span>,</span>
+<span>  exact <span class="op">=</span> <span class="fu">my_p_value</span><span class="op">(</span><span class="va">our_t</span>, df <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  R <span class="op">=</span> <span class="va">correlation_result</span><span class="op">$</span><span class="va">p.value</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span></span>
+<span>  <span class="fu">my_sim_p_value</span><span class="op">(</span><span class="va">our_t</span>, <span class="va">null_correlation_ts</span><span class="op">)</span> <span class="op">-</span> <span class="va">correlation_result</span><span class="op">$</span><span class="va">p.value</span></span>
+<span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.05</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_p_value</span><span class="op">(</span><span class="va">our_t</span>, df <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span>, <span class="va">correlation_result</span><span class="op">$</span><span class="va">p.value</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##   simulated       exact           R 
+## 0.005000000 0.001857673 0.001857673 
+## [1] TRUE
+## [1] TRUE</code></pre>
+<p>Your <code>my_p_value()</code> was written for a one-sample t-test, but it reproduces the p-value from <code><a href="https://rdrr.io/r/stats/cor.test.html">cor.test()</a></code> exactly. That works because we turned r into a t-value first. Any statistic that can be turned into a t-value with the right degrees of freedom can get its p-value from the same tools.</p>
+<p>For our data, a t-value as far from zero as 5.28 would turn up in about 0.19% of samples if there were no relationship. That is unusual enough to pass the cutoff at alpha .05, so we would reject the null hypothesis of no linear relationship in the population.</p>
+<p>A small p-value does not tell us whether practice caused the higher scores. These made-up observations also cannot establish anything about real students.</p>
+</div>
+<div id="on-real-data" class="section level3" number="11.13.4">
+<h3>
+<span class="header-section-number">11.13.4</span> On Real Data<a class="anchor" aria-label="anchor" href="#on-real-data"><i class="fas fa-link"></i></a>
+</h3>
+<p>The extra sleep on the two drugs from Chapter <a href="correlation.html#correlation">6</a>:</p>
+<div class="sourceCode" id="cb242"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">drug_1</span> <span class="op">&lt;-</span> <span class="va">sleep</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">group</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">extra</span><span class="op">)</span></span>
+<span><span class="va">drug_2</span> <span class="op">&lt;-</span> <span class="va">sleep</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">group</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">extra</span><span class="op">)</span></span>
+<span><span class="va">drug_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.test.html">cor.test</a></span><span class="op">(</span><span class="va">drug_1</span>, <span class="va">drug_2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span></span>
+<span>  <span class="fu">my_p_value</span><span class="op">(</span><span class="fu">my_correlation_t</span><span class="op">(</span><span class="va">drug_1</span>, <span class="va">drug_2</span><span class="op">)</span>, df <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">drug_1</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  <span class="va">drug_result</span><span class="op">$</span><span class="va">p.value</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+</div>
+<div id="add-to-your-toolbox-5" class="section level2" number="11.14">
+<h2>
+<span class="header-section-number">11.14</span> Add To Your Toolbox<a class="anchor" aria-label="anchor" href="#add-to-your-toolbox-5"><i class="fas fa-link"></i></a>
+</h2>
+<div class="summary-box">
+<p>Copy your finished <code>my_sim_p_value()</code> and <code>my_p_value()</code> into your <code>my_functions.R</code> file, under the <strong>p-values</strong> heading, and save it. If you did the correlation section, add <code>my_null_correlation_t()</code> too.</p>
+</div>
+<p>The steps are the same as in Chapter <a href="equations.html#equations">2</a>:</p>
+<ol style="list-style-type: decimal">
+<li>Open <code>my_functions.R</code> from the <strong>Files</strong> pane.</li>
+<li>Copy each finished function from your exercise file, from its first line down to its closing <code>}</code>, and paste it under the <strong>p-values</strong> heading.</li>
+<li>Save the file.</li>
+</ol>
+<div class="webex-solution">
+<button>
+Show what this section of my_functions.R should look like
+</button>
+<div class="sourceCode" id="cb244"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># p-values -----------------------------------------------------------------</span></span>
+<span><span class="va">my_sim_p_value</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span>, <span class="va">null_ts</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">as_extreme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">null_ts</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">t</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">as_extreme</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_p_value</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span>, <span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">lower_tail</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">pt</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">t</span><span class="op">)</span>, <span class="va">df</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">lower_tail</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Bonus: correlation</span></span>
+<span><span class="va">my_null_correlation_t</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">null_y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu">my_correlation_t</span><span class="op">(</span><span class="va">x</span>, <span class="va">null_y</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>The rest of your file depends on which chapters you have done so far.</p>
+</div>
+<p>Then check that the saved file works on its own. This is the last chunk of the exercise file:</p>
+<div class="sourceCode" id="cb245"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span>list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html">source</a></span><span class="op">(</span><span class="st">"my_functions.R"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_sim_p_value</span><span class="op">(</span><span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2.5</span><span class="op">)</span><span class="op">)</span>, <span class="fl">0.4</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">44</span>, <span class="fl">47</span>, <span class="fl">48</span>, <span class="fl">49</span>, <span class="fl">50</span>, <span class="fl">50</span>, <span class="fl">51</span>, <span class="fl">52</span>, <span class="fl">53</span>, <span class="fl">56</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span></span>
+<span>  <span class="fu">my_p_value</span><span class="op">(</span><span class="fu">my_t_value</span><span class="op">(</span><span class="va">scores</span>, <span class="fl">46</span><span class="op">)</span>, df <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">scores</span>, mu <span class="op">=</span> <span class="fl">46</span><span class="op">)</span><span class="op">$</span><span class="va">p.value</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>You should see two <code>TRUE</code>s:</p>
+<pre class="text"><code>[1] TRUE
+[1] TRUE</code></pre>
+</div>
+<div id="where-this-goes-next-3" class="section level2" number="11.15">
+<h2>
+<span class="header-section-number">11.15</span> Where This Goes Next<a class="anchor" aria-label="anchor" href="#where-this-goes-next-3"><i class="fas fa-link"></i></a>
+</h2>
+<div class="summary-box">
+<p>null t-values -&gt; cutoffs -&gt; p-value</p>
+</div>
+<p>So far, every group of Steves came from a world where the null hypothesis was true. In the next chapter, we add a second world, where Steves really are taller, and use the same cutoffs to ask how often a study of 10 Steves spots the difference. That proportion is called <strong>power</strong>.</p>
+
+</div>
+</div>
+<script>
+
+/* update total correct if #webex-total_correct exists */
+update_total_correct = function() {
+  console.log("webex: update total_correct");
+
+  if (t = document.getElementById("webex-total_correct")) {
+    var correct = document.getElementsByClassName("webex-correct").length;
+    var solvemes = document.getElementsByClassName("webex-solveme").length;
+    var radiogroups = document.getElementsByClassName("webex-radiogroup").length;
+    var selects = document.getElementsByClassName("webex-select").length;
+    
+    t.innerHTML = correct + " of " + (solvemes + radiogroups + selects) + " correct";
+  }
+}
+
+/* webex-solution button toggling function */
+b_func = function() {
+  console.log("webex: toggle hide");
+  
+  var cl = this.parentElement.classList;
+  if (cl.contains('open')) {
+    cl.remove("open");
+  } else {
+    cl.add("open");
+  }
+}
+
+/* function for checking solveme answers */
+solveme_func = function(e) {
+  console.log("webex: check solveme");
+
+  var real_answers = JSON.parse(this.dataset.answer);
+  var my_answer = this.value;
+  var cl = this.classList;
+  if (cl.contains("ignorecase")) {
+    my_answer = my_answer.toLowerCase();
+  }
+  if (cl.contains("nospaces")) {
+    my_answer = my_answer.replace(/ /g, "")
+  }
+
+  if (my_answer == "") {
+    cl.remove("webex-correct");
+    cl.remove("webex-incorrect");
+  } else if (real_answers.includes(my_answer)) {
+    cl.add("webex-correct");
+    cl.remove("webex-incorrect");
+  } else {
+    cl.add("webex-incorrect");
+    cl.remove("webex-correct");
+  }
+
+  // match numeric answers within a specified tolerance
+  if(this.dataset.tol > 0){
+    var tol = JSON.parse(this.dataset.tol);
+    var matches = real_answers.map(x => Math.abs(x - my_answer) < tol)
+    if (matches.reduce((a, b) => a + b, 0) > 0) {
+      cl.add("webex-correct");
+    } else {
+      cl.remove("webex-correct");
+    }
+  }
+
+  // added regex bit
+  if (cl.contains("regex")){
+    answer_regex = RegExp(real_answers.join("|"))
+    if (answer_regex.test(my_answer)) {
+      cl.add("webex-correct");
+    }
+  }
+
+  update_total_correct();
+}
+
+/* function for checking select answers */
+select_func = function(e) {
+  console.log("webex: check select");
+  
+  var cl = this.classList
+  
+  /* add style */
+  cl.remove("webex-incorrect");
+  cl.remove("webex-correct");
+  if (this.value == "answer") {
+    cl.add("webex-correct");
+  } else if (this.value != "blank") {
+    cl.add("webex-incorrect");
+  }
+  
+  update_total_correct();
+}
+
+/* function for checking radiogroups answers */
+radiogroups_func = function(e) {
+  console.log("webex: check radiogroups");
+
+  var checked_button = document.querySelector('input[name=' + this.id + ']:checked');
+  var cl = checked_button.parentElement.classList;
+  var labels = checked_button.parentElement.parentElement.children;
+  
+  /* get rid of styles */
+  for (i = 0; i < labels.length; i++) {
+    labels[i].classList.remove("webex-incorrect");
+    labels[i].classList.remove("webex-correct");
+  }
+  
+  /* add style */
+  if (checked_button.value == "answer") {
+    cl.add("webex-correct");
+  } else {
+    cl.add("webex-incorrect");
+  }
+  
+  update_total_correct();
+}
+
+window.onload = function() {
+  console.log("onload");
+  /* set up solution buttons */
+  var buttons = document.getElementsByTagName("button");
+
+  for (var i = 0; i < buttons.length; i++) {
+    if (buttons[i].parentElement.classList.contains('webex-solution')) {
+      buttons[i].onclick = b_func;
+    }
+  }
+
+  /* set up webex-solveme inputs */
+  var solveme = document.getElementsByClassName("webex-solveme");
+
+  for (var i = 0; i < solveme.length; i++) {
+    /* make sure input boxes don't auto-anything */
+    solveme[i].setAttribute("autocomplete","off");
+    solveme[i].setAttribute("autocorrect", "off");
+    solveme[i].setAttribute("autocapitalize", "off");
+    solveme[i].setAttribute("spellcheck", "false");
+    solveme[i].value = "";
+
+    /* adjust answer for ignorecase or nospaces */
+    var cl = solveme[i].classList;
+    var real_answer = solveme[i].dataset.answer;
+    if (cl.contains("ignorecase")) {
+      real_answer = real_answer.toLowerCase();
+    }
+    if (cl.contains("nospaces")) {
+      real_answer = real_answer.replace(/ /g, "");
+    }
+    solveme[i].dataset.answer = real_answer;
+
+    /* attach checking function */
+    solveme[i].onkeyup = solveme_func;
+    solveme[i].onchange = solveme_func;
+  }
+  
+  /* set up radiogroups */
+  var radiogroups = document.getElementsByClassName("webex-radiogroup");
+  for (var i = 0; i < radiogroups.length; i++) {
+    radiogroups[i].onchange = radiogroups_func;
+  }
+  
+  /* set up selects */
+  var selects = document.getElementsByClassName("webex-select");
+  for (var i = 0; i < selects.length; i++) {
+    selects[i].onchange = select_func;
+  }
+
+  update_total_correct();
+}
+
+</script><script>
+$( document ).ready(function() {
+  var cite = ' ';
+  var psyteachr = ' <a href="https://psyteachr.github.io/"><img src="images/logos/psyteachr_logo.png" style="height: 31px; color: white;" alt="psyTeachR: Reproducible Research" /></a>';
+  var license = ' <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/" target="blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png"></a>';
+
+  $("footer div.row div:eq(1) p").html(
+    psyteachr + license + cite
+  );
+});
+</script><div class="chapter-nav">
+<div class="prev"><a href="null-distributions.html"><span class="header-section-number">10</span> Null Distributions</a></div>
+<div class="next"><a href="effects-power.html"><span class="header-section-number">12</span> Effects and Power</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#p-values"><span class="header-section-number">11</span> p-values</a></li>
+<li><a class="nav-link" href="#files-for-this-chapter-5"><span class="header-section-number">11.1</span> Files For This Chapter</a></li>
+<li><a class="nav-link" href="#load-your-toolbox-4"><span class="header-section-number">11.2</span> Load Your Toolbox</a></li>
+<li><a class="nav-link" href="#alpha-and-type-i-errors"><span class="header-section-number">11.3</span> Alpha And Type I Errors</a></li>
+<li><a class="nav-link" href="#watch-it-build"><span class="header-section-number">11.4</span> Watch It Build</a></li>
+<li><a class="nav-link" href="#your-turn-write-my_sim_p_value"><span class="header-section-number">11.5</span> Your Turn: Write my_sim_p_value()</a></li>
+<li><a class="nav-link" href="#check-it-close-enough"><span class="header-section-number">11.6</span> Check It: Close Enough</a></li>
+<li><a class="nav-link" href="#from-simulation-to-the-t-distribution"><span class="header-section-number">11.7</span> From Simulation To The t Distribution</a></li>
+<li><a class="nav-link" href="#your-turn-write-my_p_value"><span class="header-section-number">11.8</span> Your Turn: Write my_p_value()</a></li>
+<li><a class="nav-link" href="#check-it-against-t.test-1"><span class="header-section-number">11.9</span> Check It Against t.test()</a></li>
+<li><a class="nav-link" href="#back-to-our-two-comparison-values"><span class="header-section-number">11.10</span> Back To Our Two Comparison Values</a></li>
+<li><a class="nav-link" href="#the-t-value-as-an-anchor"><span class="header-section-number">11.11</span> The t-Value As An Anchor</a></li>
+<li><a class="nav-link" href="#try-it-on-real-data-3"><span class="header-section-number">11.12</span> Try It On Real Data</a></li>
+<li>
+<a class="nav-link" href="#bonus-correlation"><span class="header-section-number">11.13</span> Bonus: Correlation</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#your-turn-write-my_null_correlation_t"><span class="header-section-number">11.13.1</span> Your Turn: Write my_null_correlation_t()</a></li>
+<li><a class="nav-link" href="#check-it-against-r-3"><span class="header-section-number">11.13.2</span> Check It Against R</a></li>
+<li><a class="nav-link" href="#the-null-distribution-for-correlation"><span class="header-section-number">11.13.3</span> The Null Distribution For Correlation</a></li>
+<li><a class="nav-link" href="#on-real-data"><span class="header-section-number">11.13.4</span> On Real Data</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#add-to-your-toolbox-5"><span class="header-section-number">11.14</span> Add To Your Toolbox</a></li>
+<li><a class="nav-link" href="#where-this-goes-next-3"><span class="header-section-number">11.15</span> Where This Goes Next</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+          
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Demystifying Functions For Statistics</strong>" was written by Sean Westwood. It was last built on 2026-10-29.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

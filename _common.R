@@ -5,8 +5,7 @@ suppressPackageStartupMessages({
 })
 
 knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
+  results = "hold",
   message = FALSE,
   warning = FALSE
 )
@@ -59,7 +58,16 @@ demo_scores <- tibble(
 
 score_values <- pull(demo_scores, score)
 
-for (widget in c("mean-variance", "correlation")) {
+dir.create(file.path("docs", "exercises"), recursive = TRUE, showWarnings = FALSE)
+file.copy(
+  list.files("exercises", full.names = TRUE),
+  file.path("docs", "exercises"),
+  overwrite = TRUE
+)
+
+widgets <- c("mean-variance", "sampling", "nhst", "correlation", "regression",
+             "t-steps", "rareness")
+for (widget in widgets) {
   widget_dir <- file.path("apps", widget)
   output_dir <- file.path("docs", widget_dir)
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)

@@ -1,0 +1,5 @@
+# Linearity, Outliers and Influence {#linearity-influence}
+
+*This chapter has not been written yet.*
+
+Linear models assume a straight-line relationship. You check this with residual plots, and look for outliers and influential points with leverage and Cook's distance.

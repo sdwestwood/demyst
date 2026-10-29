@@ -23,12 +23,15 @@ ui <- fluidPage(
         "Show",
         choices = c(
           "Sample dots" = "dots",
-          "Lines to the mean" = "lines",
+          # Lines-to-the-mean toggle hidden to save space; the lines always show.
+          # Uncomment (and add "lines" to selected) to bring it back.
+          # "Lines to the mean" = "lines",
           "Bell curve" = "curve"
         ),
-        selected = c("dots", "lines", "curve")
+        selected = c("dots", "curve")
       ),
-      numericInput("seed", "Seed", value = 123, min = 1, step = 1),
+      # Seed control hidden to save space. Uncomment to bring it back.
+      # numericInput("seed", "Seed", value = 123, min = 1, step = 1),
       actionButton("new_sample", "Draw new sample"),
       tags$hr(),
       tags$p("Standard deviation is the square root of variance."),
@@ -44,12 +47,17 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   sample_values <- reactiveVal(NULL)
 
+  # Falls back to a fixed seed while the seed control is hidden.
+  seed_value <- reactive({
+    if (is.null(input$seed)) 123 else input$seed
+  })
+
   selected_sd <- reactive({
     sqrt(input$variance)
   })
 
   draw_sample <- function() {
-    set.seed(input$seed + input$new_sample)
+    set.seed(seed_value() + input$new_sample)
     sample_values(rnorm(input$n, mean = input$mean, sd = selected_sd()))
   }
 
@@ -57,7 +65,7 @@ server <- function(input, output, session) {
     draw_sample()
   })
 
-  observeEvent(list(input$mean, input$variance, input$n, input$seed), {
+  observeEvent(list(input$mean, input$variance, input$n, seed_value()), {
     draw_sample()
   }, ignoreInit = FALSE)
 
@@ -81,7 +89,7 @@ server <- function(input, output, session) {
 
     sample_data <- NULL
     if (!is.null(values)) {
-      set.seed(input$seed + input$new_sample + 10000)
+      set.seed(seed_value() + input$new_sample + 10000)
       sample_data <- data.frame(
         value = values,
         dot_y = -runif(
@@ -93,7 +101,9 @@ server <- function(input, output, session) {
     }
 
     show_dots <- "dots" %in% input$layers
-    show_lines <- "lines" %in% input$layers
+    # Always TRUE while the lines toggle is hidden. To restore the toggle, use:
+    # show_lines <- "lines" %in% input$layers
+    show_lines <- TRUE
     show_curve <- "curve" %in% input$layers
 
     y_min <- if (show_dots || show_lines) plot_y_limits[1] else 0

@@ -1,0 +1,5 @@
+# Normality of Residuals {#normality}
+
+*This chapter has not been written yet.*
+
+Most of the tests in this book assume that the residuals (what is left over after the model's prediction) come from a normal distribution. You check this with histograms of the residuals, QQ plots, and the Shapiro-Wilk test, and see why a plot is usually more useful than the test.

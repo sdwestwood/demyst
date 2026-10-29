@@ -1,0 +1,189 @@
+---
+title: "Exercises: From Equations to Code"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# error = TRUE lets the file knit even if one of your chunks is not finished yet
+knitr::opts_chunk$set(error = TRUE)
+```
+
+Work through this file alongside the chapter "From Equations to Code" in the book. Run each chunk with the green arrow in its top right corner, or put your cursor inside it and press Ctrl + Shift + Enter (Cmd + Shift + Enter on a Mac).
+
+## The data
+
+Run this chunk first. It loads the tidyverse and creates the values used in the chapter, plus `scores`, a table holding the same values as `x`.
+
+```{r data}
+library(tidyverse)
+
+x <- c(44, 47, 48, 49, 50, 50, 51, 52, 53, 56)
+score_values <- c(48, 51, 49, 54, 52, 50, 53, 51)
+
+scores <- tibble(value = x)
+```
+
+## Building a mean function
+
+### Step 1: add up the values
+
+Add the values of `x` by hand, then with `sum()`. Do you get the same answer?
+
+```{r sum-by-hand}
+44 + 47 + 48 + 49 + 50 + 50 + 51 + 52 + 53 + 56
+
+total <- sum(x)
+total
+```
+
+### Step 2: count the values
+
+```{r count-values}
+n <- length(x)
+n
+```
+
+### Step 3: divide
+
+Your turn: divide the total by the number of values. You should get 50.
+
+```{r divide-total}
+mean_value <-
+mean_value
+```
+
+### Your turn: write `my_mean()`
+
+Fill in the blanks, then run the chunk.
+
+```{r my-mean}
+my_mean <- function(x) {
+  total <-
+  n <-
+  output <-
+  return(output)
+}
+
+my_mean(x)
+```
+
+### Check it against `mean()`
+
+Print both answers, then compare them with `all.equal()`. You are looking for `TRUE`.
+
+```{r my-mean-check}
+c(mine = my_mean(x), R = mean(x))
+all.equal(my_mean(x), mean(x))
+```
+
+Check a second set of values too.
+
+```{r my-mean-check-2}
+c(mine = my_mean(score_values), R = mean(score_values))
+all.equal(my_mean(score_values), mean(score_values))
+```
+
+Work out the mean of `c(2, 4, 9)` in your head, then check it.
+
+```{r my-mean-predict}
+my_mean(c(2, 4, 9))
+```
+
+### The balance point
+
+```{r mean-balance}
+x - my_mean(x)
+sum(x - my_mean(x))
+```
+
+## Squared distances
+
+```{r squared-distances-mean}
+mean_x <- my_mean(x)
+```
+
+### Your turn: distances and squared distances
+
+Add two columns to `scores`: `distance` (each value minus the mean) and `squared` (each distance, squared).
+
+```{r squared-distances}
+mutate(
+  scores,
+  distance = ,
+  squared =
+)
+```
+
+### Your turn: the total squared distance
+
+Now do it with `x` instead of the table: square each distance from the mean and add them up with `sum()`. You should get 100.
+
+```{r total-squared-distance}
+sum()
+```
+
+## Your turn: write `my_var()`
+
+Fill in the blanks. Use your own `my_mean()` for the mean.
+
+```{r my-var}
+my_var <- function(x) {
+  n <-
+  mean_x <-
+  squared_distances <-
+  total_squared_distance <-
+
+  output <-
+  return(output)
+}
+
+my_var(x)
+```
+
+### Check it against `var()`
+
+```{r my-var-check}
+c(mine = my_var(x), R = var(x))
+all.equal(my_var(x), var(x))
+```
+
+```{r my-var-check-2}
+c(mine = my_var(score_values), R = var(score_values))
+all.equal(my_var(score_values), var(score_values))
+```
+
+### Try dividing by `n`
+
+Copy your `my_var()` function into the chunk below, change the last step to divide by `n` instead of `n - 1`, and run the check. What does `all.equal()` tell you?
+
+```{r my-var-n}
+
+```
+
+## Your turn: standard deviation
+
+Standard deviation is the square root of variance. Work it out from your `my_var()`, then check it against `sd()`.
+
+```{r standard-deviation}
+sd_x <-
+c(mine = sd_x, R = sd(x))
+all.equal(sd_x, sd(x))
+```
+
+## Add to your toolbox
+
+1. Open `my_functions.R` in RStudio. It should be in the same folder as this file.
+2. Copy your finished `my_mean()` and `my_var()` functions into it, under the **From Equations to Code** heading. Copy only the functions, not the lines that run them or check them.
+3. Save `my_functions.R`.
+
+Now check that the saved toolbox works. The first line clears everything from your environment, so the functions can only come from your file. Run the chunk and look for two `TRUE`s.
+
+```{r toolbox-check}
+rm(list = ls())
+source("my_functions.R")
+
+all.equal(my_mean(c(2, 4, 9)), mean(c(2, 4, 9)))
+all.equal(my_var(c(2, 4, 9)), var(c(2, 4, 9)))
+```
+
+If you see `could not find function`, the function is not in `my_functions.R` yet, or the file was not saved. If you see `cannot open file`, `my_functions.R` is not in the same folder as this exercise file.

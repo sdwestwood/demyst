@@ -1,0 +1,459 @@
+# Effects and Power Extras {#effects-power-extras}
+
+<!--
+Parked on 29 October 2026 to keep Effects and Power focused on the intuition
+(two worlds, counting, power). Everything below is the text and code that
+followed "Watch It Build" in 2c-effects-power.Rmd, unchanged: APES,
+my_power_at(), a priori power, sensitivity power, the post hoc note,
+one-sided tests, Try It On Real Data, and Bonus: Power For A Correlation.
+It still uses the old effect world (true mean 57.5, SD 10, comparison 50,
+n = 15) and the pwr package. The matching exercise-file sections and the two
+toolbox functions are at the end. To bring it back, rewrite it for the Steve
+world, put the functions back in R/functions.R and exercises/my_functions.R
+under the Effects and Power heading, and run tools/regen_toolbox.py.
+Chunk labels repeat between the chapter part and the exercise part, so this
+file would not knit as it is; it is a store, not a chapter.
+-->
+
+## APES
+
+Power depends on four things, often remembered as **APES**:
+
+- **Alpha:** a larger alpha moves the cutoffs inwards, so more effect samples pass them. Power goes up, but so does the Type I error rate.
+- **Power:** the proportion of samples from the effect world that pass the cutoffs.
+- **Effect size:** a larger effect moves the effect distribution further from zero, so more of it passes the cutoffs.
+- **Sample size:** a larger sample makes each t-value bigger for the same effect ($t = d \times \sqrt{n}$), so more of it passes the cutoffs.
+
+If you know any three, you can work out the fourth. The two most useful versions are a priori power and sensitivity power.
+
+## Your Turn: Write `my_power_at()`
+
+To explore how power changes, we want a function that runs the whole simulation for a given sample size and effect size. Two shortcuts keep it quick:
+
+- with a population SD of 1, the population mean *is* Cohen's d, so we can sample with `pop_mean = d`, `pop_sd = 1`, and `comparison_value = 0`;
+- instead of simulating the null every time, we use the exact cutoffs from `qt()`. You showed in Chapter \@ref(null-distributions) that the simulated cutoffs land on them.
+
+```{r my-power-at-exercise, eval=FALSE}
+my_power_at <- function(n, d, alpha = 0.05, reps = 1000) {
+  effect_ts <- replicate(reps, my_effect_t(n, pop_mean = d, pop_sd = 1, comparison_value = 0))
+  cutoffs <-
+  output <-
+  return(output)
+}
+
+my_power_at(n = 15, d = 0.75)
+```
+
+`r hide("Show a hint")`
+`cutoffs` is `qt(c(alpha / 2, 1 - alpha / 2), df = n - 1)`, and `output` is `my_power(effect_ts, cutoffs)`.
+`r unhide()`
+
+`r hide("Show one solution")`
+```{r my-power-at-solution}
+my_power_at <- function(n, d, alpha = 0.05, reps = 1000) {
+  effect_ts <- replicate(reps, my_effect_t(n, pop_mean = d, pop_sd = 1, comparison_value = 0))
+  cutoffs <- qt(c(alpha / 2, 1 - alpha / 2), df = n - 1)
+  output <- my_power(effect_ts, cutoffs)
+  return(output)
+}
+
+my_power_at(n = 15, d = 0.75)
+```
+`r unhide()`
+
+```{r my-power-at-check}
+abs(my_power_at(n = 15, d = 0.75) - pwr.t.test(n = 15, d = 0.75, type = "one.sample")$power) < 0.05
+```
+
+## A Priori Power: How Many People Do I Need?
+
+Before running a study, you choose the smallest effect you care about, the alpha, and the power you want, then work out the sample size. Say we expect a d of 0.5, and want 80% power at alpha .05.
+
+`sapply()` runs a function once for each value in a vector and collects the answers. Here it runs `my_power_at()` for every sample size from 5 to 60, each time with `d = 0.5`:
+
+```{r power-curve-n}
+sample_sizes <- 5:60
+powers <- sapply(sample_sizes, my_power_at, d = 0.5)
+```
+
+Because `d` is named, each value from `sample_sizes` goes into the first unnamed input of `my_power_at()`, which is `n`.
+
+```{r power-curve-n-plot, fig.cap="Simulated power for d = 0.5 at each sample size. The dashed lines mark 80% and 90% power.", fig.alt="A rising curve of simulated power against sample size, crossing 0.8 a little above 30 and 0.9 a little above 40.", echo=FALSE}
+ggplot(tibble(n = sample_sizes, power = powers), aes(x = n, y = power)) +
+  geom_line(colour = "#467AAC") +
+  geom_point(colour = "#467AAC", size = 1.5) +
+  geom_hline(yintercept = c(0.8, 0.9), linetype = "dashed") +
+  scale_y_continuous(limits = c(0, 1)) +
+  labs(x = "Sample size (n)", y = "Simulated power") +
+  theme_minimal()
+```
+
+```{r power-curve-n-plot-code, ref.label="power-curve-n-plot", eval=FALSE, webex.hide="Show the plot code"}
+```
+
+Read across from 0.8 to the curve, then down to the sample size. In code, that is the first sample size whose power reaches 0.8:
+
+```{r a-priori}
+c(
+  simulated = sample_sizes[powers >= 0.8][1],
+  pwr = pwr.t.test(d = 0.5, power = 0.8, type = "one.sample")$n
+)
+```
+
+`pwr.t.test()` gives a fractional answer, and you always round a sample size *up*, so the exact answer is `r ceiling(pwr.t.test(d = 0.5, power = 0.8, type = "one.sample")$n)`. Your simulated answer should be within a few people of it:
+
+```{r a-priori-check}
+abs(sample_sizes[powers >= 0.8][1] - ceiling(pwr.t.test(d = 0.5, power = 0.8, type = "one.sample")$n)) <= 5
+```
+
+For 90% power, read across from 0.9 instead:
+
+```{r a-priori-90}
+c(
+  simulated = sample_sizes[powers >= 0.9][1],
+  pwr = ceiling(pwr.t.test(d = 0.5, power = 0.9, type = "one.sample")$n)
+)
+```
+
+Going from 80% to 90% power costs about `r ceiling(pwr.t.test(d = 0.5, power = 0.9, type = "one.sample")$n) - ceiling(pwr.t.test(d = 0.5, power = 0.8, type = "one.sample")$n)` more people.
+
+## Sensitivity Power: What Can My Study Detect?
+
+Sometimes the sample size is already fixed: the data are collected, or you can only recruit so many people. Then you ask the question the other way round: what is the smallest effect this study can reliably detect?
+
+Now we keep `n` at 15 and run `my_power_at()` for a range of effect sizes:
+
+```{r power-curve-d}
+effect_sizes <- seq(0.1, 1.5, by = 0.05)
+powers_d <- sapply(effect_sizes, my_power_at, n = 15)
+
+c(
+  simulated = effect_sizes[powers_d >= 0.8][1],
+  pwr = pwr.t.test(n = 15, power = 0.8, type = "one.sample")$d
+)
+abs(effect_sizes[powers_d >= 0.8][1] - pwr.t.test(n = 15, power = 0.8, type = "one.sample")$d) < 0.1
+```
+
+With 15 people, this study has 80% power only for effects of about d = `r round(pwr.t.test(n = 15, power = 0.8, type = "one.sample")$d, 2)` or bigger. For 90% power it needs about d = `r round(pwr.t.test(n = 15, power = 0.9, type = "one.sample")$d, 2)`. Smaller effects might be real, but this study would often miss them.
+
+<div class="note">
+**What about post hoc power?**
+
+You may see "observed power" calculated *after* a study, using the effect size the study found. It does not tell you anything new: it is a rescaled version of the p-value, so a non-significant result always comes with low observed power. Use a priori power before a study and sensitivity power after it, based on effect sizes you care about, not the one you happened to observe.
+</div>
+
+## One-Sided Tests
+
+A two-sided test splits alpha between both tails. A one-sided test puts all of it in one tail, so its single cutoff is closer to zero. For a test that only looks for a mean *above* the comparison value:
+
+```{r one-sided-cutoffs}
+two_sided <- qt(c(0.025, 0.975), df = 14)
+one_sided <- c(-Inf, qt(0.95, df = 14))
+
+tibble(
+  cutoff = c("lower", "upper"),
+  two_sided = two_sided,
+  one_sided = one_sided
+)
+```
+
+`-Inf` means minus infinity: no t-value can be below it, so nothing passes on the lower side. Your `my_power()` works on these cutoffs as it is:
+
+```{r one-sided-power}
+effect_ts_05 <- replicate(1000, my_effect_t(n = 15, pop_mean = 0.5, pop_sd = 1, comparison_value = 0))
+
+c(
+  two_sided = my_power(effect_ts_05, two_sided),
+  one_sided = my_power(effect_ts_05, one_sided)
+)
+```
+
+Check the one-sided power against `pwr.t.test()`, where `alternative = "greater"` asks for a one-sided test:
+
+```{r one-sided-power-check}
+c(
+  simulated = my_power(effect_ts_05, one_sided),
+  pwr = pwr.t.test(n = 15, d = 0.5, type = "one.sample", alternative = "greater")$power
+)
+abs(my_power(effect_ts_05, one_sided) - pwr.t.test(n = 15, d = 0.5, type = "one.sample", alternative = "greater")$power) < 0.05
+```
+
+The one-sided test has more power, *if* the effect goes in the direction you predicted. If it goes the other way, the one-sided test can never detect it. That is why most studies use two-sided tests even when they have a directional hypothesis, and why a one-sided test should be decided and preregistered before seeing the data.
+
+## Try It On Real Data
+
+What is the effect size for the first drug in the `sleep` data, against 0 hours of extra sleep?
+
+```{r real-data-ch6}
+drug_1 <- sleep %>% filter(group == 1) %>% pull(extra)
+
+my_cohens_d(drug_1, comparison_value = 0)
+
+all.equal(
+  my_cohens_d(drug_1, 0) * sqrt(length(drug_1)),
+  my_t_value(drug_1, 0)
+)
+```
+
+A d of about `r round(my_cohens_d(drug_1, 0), 2)` is small to medium. A sensitivity analysis shows why the first drug did not pass the cutoff in Chapter \@ref(p-values): with 10 patients, a one-sample t-test has 80% power only for effects of about d = `r sprintf("%.2f", pwr.t.test(n = 10, power = 0.8, type = "one.sample")$d)` or bigger. An effect the size of this one would usually be missed.
+
+## Bonus: Power For A Correlation
+
+This section needs Chapter \@ref(correlation). The same two-worlds idea works for correlation. In the null world there is no relationship. In the effect world there is a real correlation in the population. How often does a study of a given size detect it?
+
+To simulate pairs with a chosen population correlation, called $\rho$ (the Greek letter rho), we can build y out of two parts: some of x, and some fresh random noise.
+
+$$
+y = \rho x + \sqrt{1 - \rho^2} \times \text{noise}
+$$
+
+The two weights are chosen so that y has an SD of 1 and a correlation of exactly $\rho$ with x in the population. With $\rho = 0$, y is pure noise: a world with no relationship at all.
+
+### Your Turn: Write `my_effect_correlation_t()`
+
+```{r my-effect-correlation-t-exercise, eval=FALSE}
+my_effect_correlation_t <- function(n, rho) {
+  x <- rnorm(n)
+  y <- 
+  output <- 
+  return(output)
+}
+
+my_effect_correlation_t(n = 20, rho = 0.5)
+```
+
+`r hide("Show a hint")`
+`y` is `rho * x + sqrt(1 - rho^2) * rnorm(n)`, and `output` is `my_correlation_t(x, y)`.
+`r unhide()`
+
+`r hide("Show one solution")`
+```{r my-effect-correlation-t-solution}
+my_effect_correlation_t <- function(n, rho) {
+  x <- rnorm(n)
+  y <- rho * x + sqrt(1 - rho^2) * rnorm(n)
+  output <- my_correlation_t(x, y)
+  return(output)
+}
+
+my_effect_correlation_t(n = 20, rho = 0.5)
+```
+`r unhide()`
+
+### Check It Against R
+
+```{r my-effect-correlation-t-check}
+set.seed(1)
+mine <- my_effect_correlation_t(n = 20, rho = 0.5)
+
+set.seed(1)
+check_x <- rnorm(20)
+check_y <- 0.5 * check_x + sqrt(1 - 0.5^2) * rnorm(20)
+r_version <- unname(cor.test(check_x, check_y)$statistic)
+
+c(mine = mine, R = r_version)
+all.equal(mine, r_version)
+```
+
+### Count What Passes
+
+With 20 pairs and a population correlation of 0.5, simulate 1000 studies and count how many pass the cutoffs. The degrees of freedom are $n - 2 = 18$. `my_power()` works here too, because these are also t-values:
+
+```{r correlation-power}
+effect_rts <- replicate(1000, my_effect_correlation_t(n = 20, rho = 0.5))
+
+c(
+  simulated = my_power(effect_rts, qt(c(0.025, 0.975), df = 18)),
+  pwr = pwr.r.test(n = 20, r = 0.5)$power
+)
+abs(my_power(effect_rts, qt(c(0.025, 0.975), df = 18)) - pwr.r.test(n = 20, r = 0.5)$power) < 0.05
+```
+
+A correlation of 0.5 is fairly strong, but with only 20 pairs it is found only about `r round(100 * pwr.r.test(n = 20, r = 0.5)$power)`% of the time.
+
+For an a priori analysis, `pwr.r.test()` works out the number of pairs needed:
+
+```{r correlation-a-priori}
+c(
+  power_80 = ceiling(pwr.r.test(r = 0.5, power = 0.8)$n),
+  power_90 = ceiling(pwr.r.test(r = 0.5, power = 0.9)$n)
+)
+```
+
+Try `my_effect_correlation_t()` with `n = 29` in the exercise file. Your simulated power should come out close to 0.8.
+
+## Parked Exercise-File Sections
+
+These came from `exercises/2c-effects-power-exercises.Rmd`, in the same order.
+
+## Your turn: write `my_power_at()`
+
+```{r my-power-at}
+my_power_at <- function(n, d, alpha = 0.05, reps = 1000) {
+  effect_ts <- replicate(reps, my_effect_t(n, pop_mean = d, pop_sd = 1, comparison_value = 0))
+  cutoffs <-
+  output <-
+  return(output)
+}
+
+my_power_at(n = 15, d = 0.75)
+```
+
+```{r my-power-at-check}
+abs(my_power_at(n = 15, d = 0.75) - pwr.t.test(n = 15, d = 0.75, type = "one.sample")$power) < 0.05
+```
+
+## A priori power
+
+```{r a-priori}
+sample_sizes <- 5:60
+powers <- sapply(sample_sizes, my_power_at, d = 0.5)
+
+plot(sample_sizes, powers, type = "b", ylim = c(0, 1))
+abline(h = c(0.8, 0.9), lty = 2)
+
+sample_sizes[powers >= 0.8][1]
+ceiling(pwr.t.test(d = 0.5, power = 0.8, type = "one.sample")$n)
+abs(sample_sizes[powers >= 0.8][1] - ceiling(pwr.t.test(d = 0.5, power = 0.8, type = "one.sample")$n)) <= 5
+
+sample_sizes[powers >= 0.9][1]
+ceiling(pwr.t.test(d = 0.5, power = 0.9, type = "one.sample")$n)
+```
+
+## Sensitivity power
+
+```{r sensitivity}
+effect_sizes <- seq(0.1, 1.5, by = 0.05)
+powers_d <- sapply(effect_sizes, my_power_at, n = 15)
+
+effect_sizes[powers_d >= 0.8][1]
+pwr.t.test(n = 15, power = 0.8, type = "one.sample")$d
+abs(effect_sizes[powers_d >= 0.8][1] - pwr.t.test(n = 15, power = 0.8, type = "one.sample")$d) < 0.1
+```
+
+Now find the smallest effect with 90% power at n = 15, and check it against `pwr.t.test()`.
+
+```{r sensitivity-90}
+
+```
+
+## One-sided tests
+
+```{r one-sided}
+two_sided <- qt(c(0.025, 0.975), df = 14)
+one_sided <- c(-Inf, qt(0.95, df = 14))
+
+effect_ts_05 <- replicate(1000, my_effect_t(n = 15, pop_mean = 0.5, pop_sd = 1, comparison_value = 0))
+
+my_power(effect_ts_05, two_sided)
+my_power(effect_ts_05, one_sided)
+
+pwr.t.test(n = 15, d = 0.5, type = "one.sample", alternative = "greater")$power
+abs(my_power(effect_ts_05, one_sided) - pwr.t.test(n = 15, d = 0.5, type = "one.sample", alternative = "greater")$power) < 0.05
+```
+
+## Try it on real data
+
+```{r real-data}
+drug_1 <- sleep %>% filter(group == 1) %>% pull(extra)
+
+my_cohens_d(drug_1, comparison_value = 0)
+
+all.equal(
+  my_cohens_d(drug_1, 0) * sqrt(length(drug_1)),
+  my_t_value(drug_1, 0)
+)
+```
+
+With 10 patients, what is the smallest effect a one-sample t-test can detect with 80% power? Use `pwr.t.test()`, and compare it with the drug's d.
+
+```{r real-data-sensitivity}
+
+```
+
+## Bonus: power for a correlation
+
+Only do this section if you have done the "Covariance and Correlation" chapter.
+
+### Your turn: write `my_effect_correlation_t()`
+
+```{r my-effect-correlation-t}
+my_effect_correlation_t <- function(n, rho) {
+  x <- rnorm(n)
+  y <- 
+  output <- 
+  return(output)
+}
+
+my_effect_correlation_t(n = 20, rho = 0.5)
+```
+
+#### Check it against R
+
+```{r my-effect-correlation-t-check}
+set.seed(1)
+mine <- my_effect_correlation_t(n = 20, rho = 0.5)
+
+set.seed(1)
+check_x <- rnorm(20)
+check_y <- 0.5 * check_x + sqrt(1 - 0.5^2) * rnorm(20)
+r_version <- unname(cor.test(check_x, check_y)$statistic)
+
+c(mine = mine, R = r_version)
+all.equal(mine, r_version)
+```
+
+### Power for a correlation
+
+```{r correlation-power}
+effect_rts <- replicate(1000, my_effect_correlation_t(n = 20, rho = 0.5))
+
+my_power(effect_rts, qt(c(0.025, 0.975), df = 18))
+pwr.r.test(n = 20, r = 0.5)$power
+
+abs(my_power(effect_rts, qt(c(0.025, 0.975), df = 18)) - pwr.r.test(n = 20, r = 0.5)$power) < 0.05
+```
+
+`pwr.r.test(r = 0.5, power = 0.8)` says you need 29 pairs for 80% power. Simulate 1000 studies with 29 pairs and check that your power comes out close to 0.8. Remember the degrees of freedom are n - 2.
+
+```{r correlation-a-priori}
+
+```
+
+### Saved toolbox checks for these functions
+
+```{r toolbox-check-extras}
+set.seed(1)
+mine <- my_power_at(n = 10, d = 0.5, reps = 50)
+set.seed(1)
+by_hand <- my_power(replicate(50, my_effect_t(10, pop_mean = 0.5, pop_sd = 1, comparison_value = 0)), qt(c(0.025, 0.975), df = 9))
+all.equal(mine, by_hand)
+```
+
+```{r toolbox-check-correlation}
+set.seed(1)
+mine <- my_effect_correlation_t(n = 20, rho = 0.5)
+set.seed(1)
+check_x <- rnorm(20)
+check_y <- 0.5 * check_x + sqrt(1 - 0.5^2) * rnorm(20)
+all.equal(mine, unname(cor.test(check_x, check_y)$statistic))
+```
+
+## Parked Toolbox Functions
+
+These were in `R/functions.R` (and named in `exercises/my_functions.R`) under the **Effects and Power** heading.
+
+```{r parked-functions, eval=FALSE}
+my_power_at <- function(n, d, alpha = 0.05, reps = 1000) {
+  effect_ts <- replicate(reps, my_effect_t(n, pop_mean = d, pop_sd = 1, comparison_value = 0))
+  cutoffs <- qt(c(alpha / 2, 1 - alpha / 2), df = n - 1)
+  output <- my_power(effect_ts, cutoffs)
+  return(output)
+}
+
+my_effect_correlation_t <- function(n, rho) {
+  x <- rnorm(n)
+  y <- rho * x + sqrt(1 - rho^2) * rnorm(n)
+  output <- my_correlation_t(x, y)
+  return(output)
+}
+```

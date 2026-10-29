@@ -1,0 +1,5 @@
+# Chi-Square as Poisson Regression {#poisson-chi-square}
+
+*This chapter has not been written yet.*
+
+Count data, modelled with Poisson regression. The chi-square test of independence from Chapter \@ref(chi-square) on a table of counts compares two Poisson models of those counts: one with only the row and column effects, and one that adds their interaction. The likelihood-ratio statistic from that comparison is the G-test, and Pearson's chi-square is a close approximation to it.

@@ -1,0 +1,243 @@
+---
+title: "Exercises: p-values"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# error = TRUE lets the file knit even if one of your chunks is not finished yet
+knitr::opts_chunk$set(error = TRUE)
+```
+
+Work through this file alongside the chapter "p-values" in the book. Keep it in the same folder as your `my_functions.R`.
+
+## The data
+
+```{r data}
+scores <- c(44, 47, 48, 49, 50, 50, 51, 52, 53, 56)
+```
+
+## Load your toolbox
+
+```{r load-toolbox}
+library(tidyverse)
+source("my_functions.R")
+
+all.equal(my_t_value(scores, 49), unname(t.test(scores, mu = 49)$statistic))
+
+set.seed(1)
+mine <- my_null_t(n = 10, pop_mean = 175, pop_sd = 7)
+set.seed(1)
+r_version <- unname(
+  t.test(rnorm(n = 10, mean = 175, sd = 7), mu = 175)$statistic
+)
+all.equal(mine, r_version)
+
+all.equal(my_cutoffs(20:1, alpha = 0.1), c(2, 19))
+```
+
+You are looking for three `TRUE`s. If you see `could not find function`, finish the toolbox section at the end of the "Null Distributions" exercise file first.
+
+## Recreate the null distribution
+
+```{r null-ts}
+null_ts <- replicate(1000, my_null_t(n = 10, pop_mean = 175, pop_sd = 7))
+```
+
+## Your turn: write `my_sim_p_value()`
+
+```{r my-sim-p-value}
+my_sim_p_value <- function(t, null_ts) {
+  as_extreme <-
+  output <-
+  return(output)
+}
+
+my_sim_p_value(t = 0.95, null_ts = null_ts)
+```
+
+### Check it: close enough
+
+Back to the ten scores and their two comparison values. Under the null hypothesis, t depends only on the sample size, so the null t-values from the Steve world work for any sample of 10.
+
+```{r sim-p-check}
+t_49 <- my_t_value(scores, comparison_value = 49)
+
+c(
+  simulated = my_sim_p_value(t_49, null_ts),
+  R = t.test(scores, mu = 49)$p.value
+)
+abs(my_sim_p_value(t_49, null_ts) - t.test(scores, mu = 49)$p.value) < 0.05
+```
+
+```{r sim-p-check-46}
+t_46 <- my_t_value(scores, comparison_value = 46)
+
+c(
+  simulated = my_sim_p_value(t_46, null_ts),
+  R = t.test(scores, mu = 46)$p.value
+)
+abs(my_sim_p_value(t_46, null_ts) - t.test(scores, mu = 46)$p.value) < 0.05
+```
+
+## Your turn: write `my_p_value()`
+
+```{r my-p-value}
+my_p_value <- function(t, df) {
+  lower_tail <-
+  output <-
+  return(output)
+}
+
+my_p_value(t = 0.95, df = 9)
+```
+
+### Check it against `t.test()`
+
+```{r my-p-value-check}
+c(mine = my_p_value(t_49, df = 9), R = t.test(scores, mu = 49)$p.value)
+all.equal(my_p_value(t_49, df = 9), t.test(scores, mu = 49)$p.value)
+
+all.equal(my_p_value(t_46, df = 9), t.test(scores, mu = 46)$p.value)
+```
+
+## Try it yourself
+
+Build a new null distribution with groups of 30 Steves instead of 10, and find its cutoffs. Are they closer to zero or further away? Check them against `qt(c(0.025, 0.975), df = 29)`.
+
+```{r try-n-30}
+
+```
+
+## Try it on real data
+
+There are 10 patients in `sleep`, so the `null_ts` you built from groups of 10 works here.
+
+```{r real-data}
+drug_1 <- sleep %>% filter(group == 1) %>% pull(extra)
+drug_t <- my_t_value(drug_1, comparison_value = 0)
+
+c(
+  simulated = my_sim_p_value(drug_t, null_ts),
+  exact = my_p_value(drug_t, df = 9),
+  R = t.test(drug_1, mu = 0)$p.value
+)
+
+abs(my_sim_p_value(drug_t, null_ts) - t.test(drug_1, mu = 0)$p.value) < 0.05
+all.equal(my_p_value(drug_t, df = 9), t.test(drug_1, mu = 0)$p.value)
+```
+
+Is the drug's t-value past the cutoffs? Compare it with `my_cutoffs(null_ts)`.
+
+## Bonus: correlation
+
+Only do this section if you have done the "Covariance and Correlation" chapter.
+
+```{r correlation-data}
+x <- c(1, 2, 3, 4, 5, 6, 7, 8)
+y <- c(48, 55, 51, 62, 58, 70, 65, 71)
+correlation_result <- cor.test(x, y, method = "pearson")
+```
+
+### Your turn: write `my_null_correlation_t()`
+
+```{r my-null-correlation-t}
+my_null_correlation_t <- function(x) {
+  null_y <-
+  output <-
+  return(output)
+}
+
+my_null_correlation_t(x)
+```
+
+#### Check it against R
+
+```{r my-null-correlation-t-check}
+set.seed(1)
+mine <- my_null_correlation_t(x)
+
+set.seed(1)
+r_version <- unname(cor.test(x, rnorm(length(x)))$statistic)
+
+c(mine = mine, R = r_version)
+all.equal(mine, r_version)
+```
+
+### The null distribution for correlation
+
+```{r null-correlation-ts}
+null_correlation_ts <- replicate(1000, my_null_correlation_t(x))
+
+tibble(
+  cutoff = c("lower", "upper"),
+  mine = my_cutoffs(null_correlation_ts),
+  quantile = unname(quantile(null_correlation_ts, c(0.025, 0.975))),
+  theory = qt(c(0.025, 0.975), df = length(x) - 2)
+)
+```
+
+```{r null-correlation-cutoffs-check}
+abs(
+  my_cutoffs(null_correlation_ts) - qt(c(0.025, 0.975), df = length(x) - 2)
+) < 0.6
+```
+
+```{r correlation-p-check}
+our_t <- my_correlation_t(x, y)
+
+my_sim_p_value(our_t, null_correlation_ts)
+my_p_value(our_t, df = length(x) - 2)
+correlation_result$p.value
+
+abs(
+  my_sim_p_value(our_t, null_correlation_ts) - correlation_result$p.value
+) < 0.05
+all.equal(my_p_value(our_t, df = length(x) - 2), correlation_result$p.value)
+```
+
+### On real data
+
+```{r real-data-correlation-p}
+drug_1 <- sleep %>% filter(group == 1) %>% pull(extra)
+drug_2 <- sleep %>% filter(group == 2) %>% pull(extra)
+drug_result <- cor.test(drug_1, drug_2)
+
+all.equal(
+  my_p_value(my_correlation_t(drug_1, drug_2), df = length(drug_1) - 2),
+  drug_result$p.value
+)
+```
+
+## Add to your toolbox
+
+1. Open `my_functions.R`.
+2. Copy your finished `my_sim_p_value()` and `my_p_value()` into it, under the **p-values** heading. If you did the correlation section, copy `my_null_correlation_t()` too. Copy only the functions.
+3. Save `my_functions.R`.
+
+Now check that the saved toolbox works on its own. You are looking for two `TRUE`s.
+
+```{r toolbox-check}
+rm(list = ls())
+source("my_functions.R")
+
+all.equal(my_sim_p_value(2, c(-3, -1, 0, 1, 2.5)), 0.4)
+
+scores <- c(44, 47, 48, 49, 50, 50, 51, 52, 53, 56)
+all.equal(
+  my_p_value(my_t_value(scores, 46), df = 9),
+  t.test(scores, mu = 46)$p.value
+)
+```
+
+If you see `could not find function`, that function is not in `my_functions.R` yet, or the file was not saved.
+
+If you did the correlation section, check that function too:
+
+```{r toolbox-check-correlation}
+x <- c(1, 2, 3, 4, 5, 6, 7, 8)
+set.seed(1)
+mine <- my_null_correlation_t(x)
+set.seed(1)
+r_version <- unname(cor.test(x, rnorm(length(x)))$statistic)
+all.equal(mine, r_version)
+```

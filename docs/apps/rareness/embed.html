@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Which t-Values Are Rare?</title>
+  <style>
+    :root {
+      --blue: #467AAC;
+      --orange: #D55E00;
+      --ink: #243447;
+      --muted: #53677a;
+      --panel: #eef5fb;
+      --line: #d8e4ef;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+    }
+
+    .app {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 160px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .value {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* 50% at the left, 1% at the right: moving right picks out rarer values */
+    input[type="range"] {
+      width: 100%;
+      direction: rtl;
+    }
+
+    .scale {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    button {
+      width: 100%;
+      padding: 8px 6px;
+      background: var(--blue);
+      color: white;
+      border: 0;
+      border-radius: 4px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 320px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    .readout {
+      margin: 8px 4px 0;
+      font-variant-numeric: tabular-nums;
+      min-height: 1.4em;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 8px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      canvas {
+        height: 280px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="controls">
+      <button id="regenerate" type="button">Regenerate</button>
+      <div>
+        <label for="share">Highlight the rarest <span class="value" id="share-value"></span>%</label>
+        <input id="share" type="range" min="1" max="50" step="1" value="10">
+        <div class="scale"><span>50%</span><span>1%</span></div>
+      </div>
+    </div>
+    <canvas id="plot" aria-label="A histogram of 1000 null t-values. The rarest share of them, split between the two tails, is coloured orange; the rest are blue."></canvas>
+    <p class="readout" id="readout" aria-live="polite"></p>
+  </div>
+
+  <script>
+    const blue = "#467AAC";
+    const orange = "#D55E00";
+    const ink = "#243447";
+    const muted = "#53677a";
+    const grid = "#d8e4ef";
+
+    // Settings the book can pass in the address. The defaults are the Steve
+    // world from Null Distributions: 1000 groups of 10, mean 175, SD 7.
+    // share sets the starting percentage.
+    const params = new URLSearchParams(window.location.search);
+    const groupSize = params.has("n") ? Number(params.get("n")) : 10;
+    const popMean = params.has("mean") ? Number(params.get("mean")) : 175;
+    const popSd = params.has("sd") ? Number(params.get("sd")) : 7;
+    const total = 1000;
+    if (params.has("share")) document.getElementById("share").value = params.get("share");
+
+    const tLimits = [-5, 5];
+    const tBin = 0.25;
+
+    const reduceMotion = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const els = {
+      regenerate: document.getElementById("regenerate"),
+      share: document.getElementById("share"),
+      shareValue: document.getElementById("share-value"),
+      canvas: document.getElementById("plot"),
+      readout: document.getElementById("readout")
+    };
+
+    const state = { values: [], shown: 0, anim: null };
+
+    function randomNormal(mean, sd) {
+      const u1 = Math.max(Math.random(), 1e-12);
+      const u2 = Math.random();
+      return mean + sd * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    }
+
+    // One group of Steves from the null world, turned into a t-value against
+    // the population mean (the same steps as my_t_value()).
+    function nullT() {
+      let sum = 0;
+      const xs = [];
+      for (let i = 0; i < groupSize; i++) {
+        const x = randomNormal(popMean, popSd);
+        xs.push(x);
+        sum += x;
+      }
+      const mean = sum / groupSize;
+      const ss = xs.reduce((a, x) => a + (x - mean) ** 2, 0);
+      const se = Math.sqrt(ss / (groupSize - 1)) / Math.sqrt(groupSize);
+      return (mean - popMean) / se;
+    }
+
+    // The book's rule, as in my_cutoffs(): sort the values, put
+    // k = floor(n * share / 2) in each tail, and use positions k + 1 and n - k.
+    function rareLimits(values, share) {
+      const sorted = values.slice().sort((a, b) => a - b);
+      const n = sorted.length;
+      const k = Math.floor(n * share / 2);
+      return { k, n, lower: sorted[k], upper: sorted[n - k - 1] };
+    }
+
+    function share() {
+      return Number(els.share.value) / 100;
+    }
+
+    // ---- Drawing -----------------------------------------------------------
+
+    function draw() {
+      const canvas = els.canvas;
+      const dpr = window.devicePixelRatio || 1;
+      const W = canvas.clientWidth;
+      const H = canvas.clientHeight;
+      if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) {
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+      }
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, W, H);
+
+      const pad = { left: 14, right: 14 };
+      const box = { top: 34, axis: H - 40 };
+      const xScale = t => pad.left + (t - tLimits[0]) / (tLimits[1] - tLimits[0]) * (W - pad.left - pad.right);
+
+      const values = state.values.slice(0, state.shown);
+      ctx.fillStyle = ink;
+      ctx.font = (W < 520 ? "13px" : "15px") + " system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("Null t-values (" + values.length + " of " + total + ")", pad.left, 20);
+
+      // Rare values (once all 1000 are in) are orange; the rest blue.
+      // Each bar stacks its rare values at the bottom.
+      const done = state.shown === total;
+      const lim = done ? rareLimits(state.values, share()) : null;
+      const bins = new Map();
+      let offScale = 0;
+      values.forEach(t => {
+        if (t < tLimits[0] || t >= tLimits[1]) offScale++;
+        const clamped = Math.min(tLimits[1] - 1e-9, Math.max(tLimits[0], t));
+        const b = Math.round(Math.floor(clamped / tBin) * tBin * 100) / 100;
+        const rare = lim !== null && (t < lim.lower || t > lim.upper);
+        const entry = bins.get(b) || { rare: 0, common: 0 };
+        if (rare) entry.rare++; else entry.common++;
+        bins.set(b, entry);
+      });
+
+      // Fixed height, so the histogram visibly fills up as values arrive
+      const yMax = Math.max(total * tBin * 0.5, 10);
+      let tallest = 0;
+      bins.forEach(e => { tallest = Math.max(tallest, e.rare + e.common); });
+      const top = Math.max(yMax, tallest * 1.05);
+      const yScale = c => box.axis - (c / top) * (box.axis - box.top);
+
+      bins.forEach((e, b) => {
+        const x0 = xScale(b) + 0.5;
+        const w = Math.max(1, xScale(b + tBin) - xScale(b) - 1);
+        if (e.rare > 0) {
+          ctx.fillStyle = orange;
+          ctx.fillRect(x0, yScale(e.rare), w, box.axis - yScale(e.rare));
+        }
+        if (e.common > 0) {
+          ctx.fillStyle = blue;
+          ctx.fillRect(x0, yScale(e.rare + e.common), w, yScale(e.rare) - yScale(e.rare + e.common));
+        }
+      });
+
+      // x-axis
+      ctx.strokeStyle = grid;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(xScale(tLimits[0]), box.axis);
+      ctx.lineTo(xScale(tLimits[1]), box.axis);
+      ctx.stroke();
+      ctx.font = "11px system-ui, sans-serif";
+      ctx.fillStyle = muted;
+      ctx.textAlign = "center";
+      for (let v = tLimits[0]; v <= tLimits[1]; v++) {
+        ctx.beginPath();
+        ctx.moveTo(xScale(v), box.axis);
+        ctx.lineTo(xScale(v), box.axis + 4);
+        ctx.stroke();
+        ctx.fillText(String(v), xScale(v), box.axis + 15);
+      }
+      ctx.fillStyle = ink;
+      ctx.font = "12px system-ui, sans-serif";
+      ctx.fillText("t-value", W / 2, box.axis + 31);
+
+      if (offScale > 0) {
+        ctx.fillStyle = muted;
+        ctx.font = "11px system-ui, sans-serif";
+        // On narrow screens the note goes under the title instead of beside it
+        const narrow = W < 520;
+        ctx.textAlign = narrow ? "left" : "right";
+        ctx.fillText(offScale + " beyond the axis, shown at the edge", narrow ? pad.left : W - pad.right, narrow ? 33 : 20);
+      }
+
+      els.shareValue.textContent = els.share.value;
+      if (done) {
+        const pct = els.share.value;
+        els.readout.textContent = "The rarest " + pct + "% of these t-values (" + (2 * lim.k) +
+          " of " + lim.n + ") are below " + lim.lower.toFixed(2) + " or above " + lim.upper.toFixed(2) + ".";
+      } else {
+        els.readout.textContent = "Building 1000 null t-values…";
+      }
+    }
+
+    // ---- Animation ---------------------------------------------------------
+
+    function regenerate() {
+      if (state.anim) cancelAnimationFrame(state.anim);
+      state.values = Array.from({ length: total }, nullT);
+      state.shown = 0;
+      els.regenerate.disabled = true;
+      const duration = reduceMotion ? 0 : 1500;
+      const start = performance.now();
+      const frame = now => {
+        const p = duration === 0 ? 1 : Math.min(1, (now - start) / duration);
+        state.shown = Math.round(total * p);
+        draw();
+        if (p < 1) {
+          state.anim = requestAnimationFrame(frame);
+        } else {
+          state.anim = null;
+          els.regenerate.disabled = false;
+        }
+      };
+      state.anim = requestAnimationFrame(frame);
+    }
+
+    els.regenerate.addEventListener("click", regenerate);
+    els.share.addEventListener("input", draw);
+    window.addEventListener("resize", draw);
+
+    // For checking the counting from outside the page
+    window.rarenessCheck = () => ({ values: state.values.slice(), limits: rareLimits(state.values, share()) });
+
+    // Tell the book page how tall the widget is, so its frame fits without scrolling.
+    function reportHeight() {
+      const h = Math.ceil(document.querySelector(".app").getBoundingClientRect().bottom + 16);
+      if (window.parent !== window) window.parent.postMessage({ demystWidgetHeight: h }, "*");
+    }
+    window.addEventListener("load", reportHeight);
+    window.addEventListener("resize", reportHeight);
+    // Readouts and hints can change length, so report again whenever the content changes size
+    if (window.ResizeObserver) new ResizeObserver(reportHeight).observe(document.querySelector(".app"));
+
+    regenerate();
+  </script>
+</body>
+</html>

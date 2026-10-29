@@ -1,0 +1,200 @@
+---
+title: "Exercises: Spread and Standard Error"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# error = TRUE lets the file knit even if one of your chunks is not finished yet
+knitr::opts_chunk$set(error = TRUE)
+```
+
+Work through this file alongside the chapter "Spread and Standard Error" in the book. Keep it in the same folder as your `my_functions.R`.
+
+## The data
+
+```{r data}
+x <- c(44, 47, 48, 49, 50, 50, 51, 52, 53, 56)
+```
+
+## Load your toolbox
+
+```{r load-toolbox}
+library(tidyverse)
+source("my_functions.R")
+
+all.equal(my_mean(x), mean(x))
+all.equal(my_var(x), var(x))
+```
+
+You are looking for two `TRUE`s. If you see `could not find function`, finish the toolbox section at the end of the "From Equations to Code" exercise file first.
+
+## Your turn: write `my_sd()`
+
+```{r my-sd}
+my_sd <- function(x) {
+  output <-
+  return(output)
+}
+
+my_sd(x)
+```
+
+### Check it against `sd()`
+
+```{r my-sd-check}
+c(mine = my_sd(x), R = sd(x))
+all.equal(my_sd(x), sd(x))
+```
+
+```{r my-sd-check-2}
+c(mine = my_sd(c(2, 4, 9)), R = sd(c(2, 4, 9)))
+all.equal(my_sd(c(2, 4, 9)), sd(c(2, 4, 9)))
+```
+
+## Your turn: write `my_se()`
+
+```{r my-se}
+my_se <- function(x) {
+  n <-
+  sd_x <-
+  output <-
+  return(output)
+}
+
+my_se(x)
+```
+
+### Check it against R
+
+```{r my-se-check}
+c(mine = my_se(x), R = t.test(x)$stderr)
+all.equal(my_se(x), t.test(x)$stderr)
+```
+
+```{r my-se-check-2}
+c(mine = my_se(c(2, 4, 9)), R = t.test(c(2, 4, 9))$stderr)
+all.equal(my_se(c(2, 4, 9)), t.test(c(2, 4, 9))$stderr)
+```
+
+## Seeing standard error
+
+A population of scores, then one sample of 20. Run the second chunk a few times.
+
+```{r population}
+population_scores <- rnorm(n = 10000, mean = 50, sd = 10)
+my_mean(population_scores)
+my_sd(population_scores)
+```
+
+```{r one-sample}
+one_sample <- sample(population_scores, size = 20)
+my_mean(one_sample)
+```
+
+Repeat that 1000 times and compare the spread of the sample means with the formula.
+
+```{r many-samples}
+one_sample_mean <- function(n) {
+  one_sample <- sample(population_scores, size = n)
+  my_mean(one_sample)
+}
+
+sample_means_20 <- replicate(1000, one_sample_mean(n = 20))
+
+c(
+  simulated = my_sd(sample_means_20),
+  formula = my_sd(population_scores) / sqrt(20)
+)
+```
+
+Try changing 20 to 5 and then 50 in both places. What happens to the standard error?
+
+## Your turn: write `my_summary()`
+
+Fill in each column. Use your own functions wherever you can.
+
+```{r my-summary}
+my_summary <- function(x) {
+  output <- tibble(
+    n = ,
+    mean = ,
+    variance = ,
+    sd = ,
+    se =
+  )
+  return(output)
+}
+
+my_summary(x)
+```
+
+### Check it against R
+
+```{r my-summary-check}
+r_summary <- tibble(
+  n = length(x),
+  mean = mean(x),
+  variance = var(x),
+  sd = sd(x),
+  se = t.test(x)$stderr
+)
+
+bind_rows(mine = my_summary(x), R = r_summary, .id = "version")
+all.equal(my_summary(x), r_summary)
+```
+
+## Your turn: write `my_z_score()`
+
+```{r my-z-score}
+my_z_score <- function(x) {
+  mean_x <-
+  sd_x <-
+  output <-
+  return(output)
+}
+
+my_z_score(x)
+```
+
+### Check it against `scale()`
+
+```{r my-z-score-check}
+tibble(value = x, mine = my_z_score(x), R = as.vector(scale(x)))
+all.equal(my_z_score(x), as.vector(scale(x)))
+```
+
+## Try it on real data
+
+`sleep` is a dataset built into R: 10 patients who each tried two sleeping drugs. `extra` is how many more hours they slept on a drug, and `group` says which drug. This picks out the extra sleep for the first drug:
+
+```{r real-data}
+drug_1 <- sleep %>% filter(group == 1) %>% pull(extra)
+drug_1
+
+all.equal(my_sd(drug_1), sd(drug_1))
+all.equal(my_se(drug_1), t.test(drug_1)$stderr)
+all.equal(my_z_score(drug_1), as.vector(scale(drug_1)))
+```
+
+## Add to your toolbox
+
+1. Open `my_functions.R`.
+2. Copy your finished `my_sd()`, `my_se()`, `my_summary()`, and `my_z_score()` into it, under the **Spread and Standard Error** heading. Copy only the functions.
+3. Save `my_functions.R`.
+
+Now check that the saved toolbox works on its own. The first line clears your environment, so the functions can only come from your file. You are looking for six `TRUE`s.
+
+```{r toolbox-check}
+rm(list = ls())
+source("my_functions.R")
+
+values <- c(2, 4, 9)
+all.equal(my_mean(values), mean(values))
+all.equal(my_var(values), var(values))
+all.equal(my_sd(values), sd(values))
+all.equal(my_se(values), t.test(values)$stderr)
+all.equal(my_summary(values)$se, t.test(values)$stderr)
+all.equal(my_z_score(values), as.vector(scale(values)))
+```
+
+If you see `could not find function`, that function is not in `my_functions.R` yet, or the file was not saved.

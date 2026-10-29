@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 6 Covariance and Correlation | Demystifying Functions For Statistics</title>
+<meta name="author" content="Sean Westwood">
+<meta name="description" content="6.1 Two Values Per Person So far, each person has given us one score. What happens when we measure two things about each person? Imagine recording practice time and a test score. These are made-up...">
+<meta name="generator" content="bookdown 0.47 with bs4_book()">
+<meta property="og:title" content="Chapter 6 Covariance and Correlation | Demystifying Functions For Statistics">
+<meta property="og:type" content="book">
+<meta property="og:description" content="6.1 Two Values Per Person So far, each person has given us one score. What happens when we measure two things about each person? Imagine recording practice time and a test score. These are made-up...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 6 Covariance and Correlation | Demystifying Functions For Statistics">
+<meta name="twitter:description" content="6.1 Two Values Per Person So far, each person has given us one score. What happens when we measure two things about each person? Imagine recording practice time and a test score. These are made-up...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.10.0/transition.js"></script><script src="libs/bs3compat-0.10.0/tabs.js"></script><script src="libs/bs3compat-0.10.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-6NP3MF25W3"></script><script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-6NP3MF25W3');
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<link rel="stylesheet" href="include/psyteachr.css">
+<link rel="stylesheet" href="include/webex.css">
+<link rel="stylesheet" href="include/style.css">
+<link rel="stylesheet" href="demyst.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Demystifying Functions For Statistics</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Overview</a></li>
+<li class="book-part">Building Test Statistics</li>
+<li><a class="" href="functions.html"><span class="header-section-number">1</span> What Are Functions?</a></li>
+<li><a class="" href="equations.html"><span class="header-section-number">2</span> From Equations to Code</a></li>
+<li><a class="" href="standard-error.html"><span class="header-section-number">3</span> Spread and Standard Error</a></li>
+<li><a class="" href="t-statistic.html"><span class="header-section-number">4</span> The One-Sample t-Test</a></li>
+<li><a class="" href="two-sample-t.html"><span class="header-section-number">5</span> Two-Sample t-Tests</a></li>
+<li><a class="active" href="correlation.html"><span class="header-section-number">6</span> Covariance and Correlation</a></li>
+<li><a class="" href="one-way-anova.html"><span class="header-section-number">7</span> One-Way ANOVA</a></li>
+<li><a class="" href="factorial-anova.html"><span class="header-section-number">8</span> Factorial ANOVA</a></li>
+<li><a class="" href="chi-square.html"><span class="header-section-number">9</span> Chi-Square</a></li>
+<li class="book-part">Testing by Simulation</li>
+<li><a class="" href="null-distributions.html"><span class="header-section-number">10</span> Null Distributions</a></li>
+<li><a class="" href="p-values.html"><span class="header-section-number">11</span> p-values</a></li>
+<li><a class="" href="effects-power.html"><span class="header-section-number">12</span> Effects and Power</a></li>
+<li class="book-part">The General Linear Model</li>
+<li><a class="" href="lm-mean.html"><span class="header-section-number">13</span> The Mean as a Model</a></li>
+<li><a class="" href="lm-correlation.html"><span class="header-section-number">14</span> Correlation as a Linear Model</a></li>
+<li><a class="" href="lm-t-test.html"><span class="header-section-number">15</span> The Independent t-Test as a Linear Model</a></li>
+<li><a class="" href="lm-one-way-anova.html"><span class="header-section-number">16</span> One-Way ANOVA as a Linear Model</a></li>
+<li class="book-part">Non-Parametric Tests</li>
+<li><a class="" href="wilcoxon-signed-rank.html"><span class="header-section-number">17</span> Wilcoxon Signed-Rank Test</a></li>
+<li><a class="" href="mann-whitney.html"><span class="header-section-number">18</span> Mann-Whitney U Test</a></li>
+<li><a class="" href="spearman.html"><span class="header-section-number">19</span> Spearman's Rho</a></li>
+<li><a class="" href="kruskal-wallis.html"><span class="header-section-number">20</span> Kruskal-Wallis Test</a></li>
+<li><a class="" href="friedman.html"><span class="header-section-number">21</span> Friedman Test</a></li>
+</ul>
+
+        <div class="book-extra">
+          
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="correlation" class="section level1" number="6">
+<h1>
+<span class="header-section-number">6</span> Covariance and Correlation<a class="anchor" aria-label="anchor" href="#correlation"><i class="fas fa-link"></i></a>
+</h1>
+<div id="two-values-per-person" class="section level2" number="6.1">
+<h2>
+<span class="header-section-number">6.1</span> Two Values Per Person<a class="anchor" aria-label="anchor" href="#two-values-per-person"><i class="fas fa-link"></i></a>
+</h2>
+<p>So far, each person has given us one score. What happens when we measure two things about each person?</p>
+<p>Imagine recording practice time and a test score. These are made-up data for eight people. Each row belongs to one person, so the two values in that row go together.</p>
+<div class="sourceCode" id="cb135"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">practice</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span></span>
+<span>  hours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">8</span><span class="op">)</span>,</span>
+<span>  score <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">48</span>, <span class="fl">55</span>, <span class="fl">51</span>, <span class="fl">62</span>, <span class="fl">58</span>, <span class="fl">70</span>, <span class="fl">65</span>, <span class="fl">71</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">practice</span></span></code></pre></div>
+<div class="kable-table">
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="right">hours</th>
+<th align="right">score</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">48</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">55</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">51</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">62</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">58</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">70</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">65</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="right">71</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="figure">
+<span style="display:block;" id="fig:paired-scatter"></span>
+<img src="1f-correlation_files/figure-html/paired-scatter-1.png" alt="Scatterplot of eight paired observations showing a positive, imperfect relationship between practice hours and test scores." width="672"><p class="caption">
+Figure 6.1: Each point represents one person. People with more practice hours tend to have higher scores.
+</p>
+</div>
+<div class="webex-solution">
+<button>
+Show the plot code
+</button>
+<div class="sourceCode" id="cb136"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">practice</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">hours</span>, y <span class="op">=</span> <span class="va">score</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">3</span>, colour <span class="op">=</span> <span class="st">"#467AAC"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Practice time (hours)"</span>, y <span class="op">=</span> <span class="st">"Test score"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>There is an upward pattern, but the points do not lie on a straight line. We want a number that describes the direction and strength of this linear relationship.</p>
+</div>
+<div id="files-for-this-chapter-3" class="section level2" number="6.2">
+<h2>
+<span class="header-section-number">6.2</span> Files For This Chapter<a class="anchor" aria-label="anchor" href="#files-for-this-chapter-3"><i class="fas fa-link"></i></a>
+</h2>
+<p>Download the exercise file for this chapter and save it in the same folder as your <code>my_functions.R</code>:</p>
+<ul>
+<li><a href="exercises/1f-correlation-exercises.Rmd" download>1f-correlation-exercises.Rmd</a></li>
+</ul>
+</div>
+<div id="load-your-toolbox-2" class="section level2" number="6.3">
+<h2>
+<span class="header-section-number">6.3</span> Load Your Toolbox<a class="anchor" aria-label="anchor" href="#load-your-toolbox-2"><i class="fas fa-link"></i></a>
+</h2>
+<p>We will call the two columns <code>x</code> and <code>y</code>, then load your functions:</p>
+<div class="sourceCode" id="cb137"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">practice</span>, <span class="va">hours</span><span class="op">)</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">practice</span>, <span class="va">score</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb138"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html">source</a></span><span class="op">(</span><span class="st">"my_functions.R"</span><span class="op">)</span></span></code></pre></div>
+<p>This chapter uses <code>my_mean()</code>, <code>my_var()</code>, and <code>my_sd()</code>. Check them first:</p>
+<div class="sourceCode" id="cb139"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_mean</span><span class="op">(</span><span class="va">y</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_var</span><span class="op">(</span><span class="va">y</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">var</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_sd</span><span class="op">(</span><span class="va">y</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] TRUE
+## [1] TRUE
+## [1] TRUE</code></pre>
+</div>
+<div id="two-distances-from-the-mean" class="section level2" number="6.4">
+<h2>
+<span class="header-section-number">6.4</span> Two Distances From The Mean<a class="anchor" aria-label="anchor" href="#two-distances-from-the-mean"><i class="fas fa-link"></i></a>
+</h2>
+<p>For variance, we subtracted a mean from each value. We can do that for both variables, then multiply the two distances for each person. Use <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> to add three columns to <code>practice</code>:</p>
+<ul>
+<li>
+<code>dx</code>: each person's practice time minus the mean practice time;</li>
+<li>
+<code>dy</code>: each person's score minus the mean score;</li>
+<li>
+<code>product</code>: <code>dx</code> multiplied by <code>dy</code>.</li>
+</ul>
+<div class="sourceCode" id="cb141"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mean_x</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">mean_y</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">deviations</span> <span class="op">&lt;-</span> <span class="va">practice</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
+<span>    dx <span class="op">=</span> ,</span>
+<span>    dy <span class="op">=</span> ,</span>
+<span>    product <span class="op">=</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">deviations</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p>This is the same <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> pattern as the squared distances in Chapter <a href="equations.html#equations">2</a>. The practice times are in the <code>hours</code> column and the scores are in <code>score</code>. <code>product</code> can build on <code>dx</code> and <code>dy</code>, because <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> can use a column it has only just made.</p>
+</div>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb142"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mean_x</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">mean_y</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">deviations</span> <span class="op">&lt;-</span> <span class="va">practice</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
+<span>    dx <span class="op">=</span> <span class="va">hours</span> <span class="op">-</span> <span class="va">mean_x</span>,</span>
+<span>    dy <span class="op">=</span> <span class="va">score</span> <span class="op">-</span> <span class="va">mean_y</span>,</span>
+<span>    product <span class="op">=</span> <span class="va">dx</span> <span class="op">*</span> <span class="va">dy</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">deviations</span></span></code></pre></div>
+<div class="kable-table">
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="right">hours</th>
+<th align="right">score</th>
+<th align="right">dx</th>
+<th align="right">dy</th>
+<th align="right">product</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">48</td>
+<td align="right">-3.5</td>
+<td align="right">-12</td>
+<td align="right">42.0</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">55</td>
+<td align="right">-2.5</td>
+<td align="right">-5</td>
+<td align="right">12.5</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">51</td>
+<td align="right">-1.5</td>
+<td align="right">-9</td>
+<td align="right">13.5</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">62</td>
+<td align="right">-0.5</td>
+<td align="right">2</td>
+<td align="right">-1.0</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">58</td>
+<td align="right">0.5</td>
+<td align="right">-2</td>
+<td align="right">-1.0</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">70</td>
+<td align="right">1.5</td>
+<td align="right">10</td>
+<td align="right">15.0</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">65</td>
+<td align="right">2.5</td>
+<td align="right">5</td>
+<td align="right">12.5</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="right">71</td>
+<td align="right">3.5</td>
+<td align="right">11</td>
+<td align="right">38.5</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<p><code>dx</code> tells us how far someone's practice time is above or below the mean practice time. <code>dy</code> does the same for their score.</p>
+<div class="figure">
+<span style="display:block;" id="fig:paired-deviations"></span>
+<img src="1f-correlation_files/figure-html/paired-deviations-1.png" alt="Scatterplot of centred hours and scores with zero reference lines. Points mostly fall in the lower-left and upper-right quadrants." width="672"><p class="caption">
+Figure 6.2: Zero on each axis means the corresponding variable's mean. Matching signs give positive products; opposite signs give negative products.
+</p>
+</div>
+<div class="webex-solution">
+<button>
+Show the plot code
+</button>
+<div class="sourceCode" id="cb143"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">deviations</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dx</span>, y <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span>, colour <span class="op">=</span> <span class="st">"grey60"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">0</span>, colour <span class="op">=</span> <span class="st">"grey60"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">3</span>, colour <span class="op">=</span> <span class="st">"#467AAC"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Hours minus mean hours"</span>, y <span class="op">=</span> <span class="st">"Score minus mean score"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>Look at the <code>product</code> column. When we multiply the two distances for each person:</p>
+<ul>
+<li>Above both means: positive times positive gives a positive product.</li>
+<li>Below both means: negative times negative also gives a positive product.</li>
+<li>Above one mean and below the other: the product is negative.</li>
+</ul>
+<p>If one person's <code>dx</code> is -2 and their <code>dy</code> is -3, their product is <input class="webex-solveme nospaces" size="1" data-answer='["6"]'>.</p>
+</div>
+<div id="covariance" class="section level2" number="6.5">
+<h2>
+<span class="header-section-number">6.5</span> Covariance<a class="anchor" aria-label="anchor" href="#covariance"><i class="fas fa-link"></i></a>
+</h2>
+<p>Add those products and divide by the number of pairs minus one. That gives us the sample covariance:</p>
+<p><span class="math display">\[
+s_{xy} = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{n-1}
+\]</span></p>
+<p>The subscript <span class="math inline">\(i\)</span> keeps each person's two values together. <span class="math inline">\(n\)</span> is the number of pairs. The summation sign tells us to add the products.</p>
+<p>Now turn the equation into code. As with the squared distances in Chapter <a href="equations.html#equations">2</a>, a function will only have the vectors <code>x</code> and <code>y</code>, so do this step with them. The distances are filled in for you; multiply them, then add up the products and divide by the number of pairs minus one:</p>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="correlation.html#cb144-1" tabindex="-1"></a>dx <span class="ot">&lt;-</span> x <span class="sc">-</span> <span class="fu">my_mean</span>(x)</span>
+<span id="cb144-2"><a href="correlation.html#cb144-2" tabindex="-1"></a>dy <span class="ot">&lt;-</span> y <span class="sc">-</span> <span class="fu">my_mean</span>(y)</span>
+<span id="cb144-3"><a href="correlation.html#cb144-3" tabindex="-1"></a>products <span class="ot">&lt;-</span></span>
+<span id="cb144-4"><a href="correlation.html#cb144-4" tabindex="-1"></a><span class="fu">sum</span>() <span class="sc">/</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p><code>products</code> is <code>dx * dy</code>. The top of the fraction is <code>sum(products)</code>, and <span class="math inline">\(n\)</span> is <code>length(x)</code>. Put brackets around <code>length(x) - 1</code>.</p>
+</div>
+<p>To two decimal places, the covariance is <input class="webex-solveme nospaces" size="5" data-answer='["18.86"]'>.</p>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb145"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dx</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op">-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">dy</span> <span class="op">&lt;-</span> <span class="va">y</span> <span class="op">-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
+<span><span class="va">products</span> <span class="op">&lt;-</span> <span class="va">dx</span> <span class="op">*</span> <span class="va">dy</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">products</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] 18.85714</code></pre>
+</div>
+</div>
+<div id="your-turn-write-my_covariance" class="section level2" number="6.6">
+<h2>
+<span class="header-section-number">6.6</span> Your Turn: Write <code>my_covariance()</code><a class="anchor" aria-label="anchor" href="#your-turn-write-my_covariance"><i class="fas fa-link"></i></a>
+</h2>
+<p>Put those steps into a function with two inputs, <code>x</code> and <code>y</code>:</p>
+<div class="sourceCode" id="cb147"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_covariance</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">dx</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">dy</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">products</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_covariance</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p><code>dx</code> and <code>dy</code> use <code>my_mean()</code>, exactly as in the chunk above. <code>products</code> multiplies them, and <code>output</code> divides the sum of the products by <code>length(x) - 1</code>.</p>
+</div>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb148"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_covariance</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">dx</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op">-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">dy</span> <span class="op">&lt;-</span> <span class="va">y</span> <span class="op">-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
+<span>  <span class="va">products</span> <span class="op">&lt;-</span> <span class="va">dx</span> <span class="op">*</span> <span class="va">dy</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">products</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_covariance</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] 18.85714</code></pre>
+</div>
+</div>
+<div id="check-it-against-cov" class="section level2" number="6.7">
+<h2>
+<span class="header-section-number">6.7</span> Check It Against <code>cov()</code><a class="anchor" aria-label="anchor" href="#check-it-against-cov"><i class="fas fa-link"></i></a>
+</h2>
+<p><code><a href="https://rdrr.io/r/stats/cor.html">cov()</a></code> is R's sample covariance function.</p>
+<div class="sourceCode" id="cb150"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="fu">my_covariance</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_covariance</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##     mine        R 
+## 18.85714 18.85714 
+## [1] TRUE</code></pre>
+<p>And on a second, smaller pair of variables:</p>
+<div class="sourceCode" id="cb152"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">9</span><span class="op">)</span></span>
+<span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">8</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="fu">my_covariance</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_covariance</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## mine    R 
+##   11   11 
+## [1] TRUE</code></pre>
+<p>Our version expects two numeric vectors of the same length, with at least two complete pairs and no missing values. Keep the rows paired: sorting one variable on its own would change who goes with whom.</p>
+<p>Our covariance is positive. On balance, people above the mean on practice time are also above the mean on test score, and people below one mean are below the other.</p>
+<p>What happens if we put the same variable into both inputs?</p>
+<div class="sourceCode" id="cb154"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>covariance <span class="op">=</span> <span class="fu">my_covariance</span><span class="op">(</span><span class="va">x</span>, <span class="va">x</span><span class="op">)</span>, variance <span class="op">=</span> <span class="fu">my_var</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_covariance</span><span class="op">(</span><span class="va">x</span>, <span class="va">x</span><span class="op">)</span>, <span class="fu">my_var</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## covariance   variance 
+##          6          6 
+## [1] TRUE</code></pre>
+<p>We multiply each deviation by itself, so the products become squared deviations. Covariance of a variable with itself is its variance.</p>
+</div>
+<div id="why-standardise" class="section level2" number="6.8">
+<h2>
+<span class="header-section-number">6.8</span> Why Standardise?<a class="anchor" aria-label="anchor" href="#why-standardise"><i class="fas fa-link"></i></a>
+</h2>
+<p>Covariance depends on the units. Change hours to minutes and we multiply every practice-time deviation by 60.</p>
+<div class="sourceCode" id="cb156"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>hours <span class="op">=</span> <span class="fu">my_covariance</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, minutes <span class="op">=</span> <span class="fu">my_covariance</span><span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="fl">60</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##      hours    minutes 
+##   18.85714 1131.42857</code></pre>
+<p>The people and their scores have not changed, but the covariance is now 60 times larger. To describe strength without depending on these units, divide by the product of the two standard deviations:</p>
+<p><span class="math display">\[
+r = \frac{s_{xy}}{s_x s_y}
+\]</span></p>
+<p>This is Pearson's correlation coefficient, <span class="math inline">\(r\)</span>.</p>
+</div>
+<div id="your-turn-write-my_correlation" class="section level2" number="6.9">
+<h2>
+<span class="header-section-number">6.9</span> Your Turn: Write <code>my_correlation()</code><a class="anchor" aria-label="anchor" href="#your-turn-write-my_correlation"><i class="fas fa-link"></i></a>
+</h2>
+<p>The recipe is:</p>
+<ol style="list-style-type: decimal">
+<li>calculate the covariance with <code>my_covariance()</code>;</li>
+<li>calculate the SD of each variable with <code>my_sd()</code>;</li>
+<li>divide the covariance by the product of the two SDs.</li>
+</ol>
+<div class="sourceCode" id="cb158"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_correlation</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">covariance</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">sd_x</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">sd_y</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_correlation</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p>For the last blank, put brackets around the bottom of the fraction: <code>covariance / (sd_x * sd_y)</code>.</p>
+</div>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb159"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_correlation</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">covariance</span> <span class="op">&lt;-</span> <span class="fu">my_covariance</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
+<span>  <span class="va">sd_x</span> <span class="op">&lt;-</span> <span class="fu">my_sd</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">sd_y</span> <span class="op">&lt;-</span> <span class="fu">my_sd</span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="va">covariance</span> <span class="op">/</span> <span class="op">(</span><span class="va">sd_x</span> <span class="op">*</span> <span class="va">sd_y</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_correlation</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] 0.9072647</code></pre>
+</div>
+</div>
+<div id="check-it-against-cor" class="section level2" number="6.10">
+<h2>
+<span class="header-section-number">6.10</span> Check It Against <code>cor()</code><a class="anchor" aria-label="anchor" href="#check-it-against-cor"><i class="fas fa-link"></i></a>
+</h2>
+<div class="sourceCode" id="cb161"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="fu">my_correlation</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cor</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_correlation</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cor</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##      mine         R 
+## 0.9072647 0.9072647 
+## [1] TRUE</code></pre>
+<div class="sourceCode" id="cb163"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="fu">my_correlation</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cor</a></span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_correlation</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cor</a></span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##      mine         R 
+## 0.8461538 0.8461538 
+## [1] TRUE</code></pre>
+<p>Now change hours to minutes:</p>
+<div class="sourceCode" id="cb165"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">my_correlation</span><span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="fl">60</span>, <span class="va">y</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] 0.9072647</code></pre>
+<p>Our correlation is 0.91. It describes a strong positive linear association in these eight observations. Multiplying hours by 60 also multiplies its SD by 60, so the change cancels when we divide.</p>
+<p>Correlation ranges from -1 to 1. Both ends describe a perfect straight-line relationship; the sign gives its direction. A value near zero describes little linear association. There can still be a curved relationship, so always look at the scatterplot too. If either variable has zero SD, correlation is undefined because we would divide by zero.</p>
+<p>Changing hours to minutes makes Pearson's correlation <select class="webex-select"><option value="blank"></option>
+<option value="answer">stay the same</option>
+<option value="">60 times larger</option>
+<option value="">negative</option></select>.</p>
+</div>
+<div id="try-it-interactively-1" class="section level2" number="6.11">
+<h2>
+<span class="header-section-number">6.11</span> Try It Interactively<a class="anchor" aria-label="anchor" href="#try-it-interactively-1"><i class="fas fa-link"></i></a>
+</h2>
+<p>Change the relationship slider and watch the paired deviations. Blue points have positive products and orange points have negative products. The table gives the numbers for each point.</p>
+<iframe src="apps/correlation/embed.html" width="100%" height="900" title="Explore covariance and correlation" style="border: 0;">
+</iframe>
+<ol style="list-style-type: decimal">
+<li>Set the relationship to zero. Do the positive and negative products cancel?</li>
+<li>Set a positive relationship, then double the scale of y. Predict which of covariance and correlation will change.</li>
+<li>Choose a negative relationship. Explain why most products are now negative.</li>
+</ol>
+<div class="webex-solution">
+<button>
+Show explanations
+</button>
+<p>At zero, the products sum to zero in this constructed example. Doubling the scale of y doubles covariance and its SD, so correlation stays the same. A negative relationship mostly pairs above-mean values of one variable with below-mean values of the other.</p>
+<p>The slider constructs data with a chosen sample correlation. It does not draw a new random sample each time. A random sample from a population with zero correlation will usually have a sample correlation a little above or below zero.</p>
+</div>
+</div>
+<div id="your-turn-two-predictions" class="section level2" number="6.12">
+<h2>
+<span class="header-section-number">6.12</span> Your Turn: Two Predictions<a class="anchor" aria-label="anchor" href="#your-turn-two-predictions"><i class="fas fa-link"></i></a>
+</h2>
+<p>Use the practice data to check two predictions:</p>
+<ol style="list-style-type: decimal">
+<li>Adding 10 to every score leaves the correlation unchanged.</li>
+<li>Reversing the sign of every score reverses the correlation's sign.</li>
+</ol>
+<div class="sourceCode" id="cb167"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">my_correlation</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span> <span class="op">+</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="fu">my_correlation</span><span class="op">(</span><span class="va">x</span>, <span class="op">-</span><span class="va">y</span><span class="op">)</span></span></code></pre></div>
+<p>Explain each result using deviations from the mean.</p>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb168"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>plus_10 <span class="op">=</span> <span class="fu">my_correlation</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span> <span class="op">+</span> <span class="fl">10</span><span class="op">)</span>, reversed <span class="op">=</span> <span class="fu">my_correlation</span><span class="op">(</span><span class="va">x</span>, <span class="op">-</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##    plus_10   reversed 
+##  0.9072647 -0.9072647</code></pre>
+<p>Adding 10 increases every score and the mean by 10, leaving deviations unchanged. Multiplying by -1 reverses every score deviation. That reverses the products and covariance, while SD stays positive.</p>
+</div>
+</div>
+<div id="a-t-value-again" class="section level2" number="6.13">
+<h2>
+<span class="header-section-number">6.13</span> A t-Value Again<a class="anchor" aria-label="anchor" href="#a-t-value-again"><i class="fas fa-link"></i></a>
+</h2>
+<p>Our sample correlation describes the data we have. We can also test a null hypothesis that the population Pearson correlation is zero.</p>
+<p>For independent pairs drawn from a bivariate normal population, the following statistic follows a t-distribution under that null hypothesis:</p>
+<p><span class="math display">\[
+t = r\sqrt{\frac{n-2}{1-r^2}}, \qquad df = n-2
+\]</span></p>
+<p>Here <span class="math inline">\(n\)</span> is the number of pairs. Unlike our one-sample t-test, the degrees of freedom are <span class="math inline">\(n-2\)</span>. This is also the residual degrees of freedom in a simple regression with an intercept and one slope.</p>
+</div>
+<div id="your-turn-write-my_correlation_t" class="section level2" number="6.14">
+<h2>
+<span class="header-section-number">6.14</span> Your Turn: Write <code>my_correlation_t()</code><a class="anchor" aria-label="anchor" href="#your-turn-write-my_correlation_t"><i class="fas fa-link"></i></a>
+</h2>
+<p>The recipe is:</p>
+<ol style="list-style-type: decimal">
+<li>calculate the correlation with <code>my_correlation()</code>;</li>
+<li>count the pairs;</li>
+<li>multiply r by the square root of <span class="math inline">\((n - 2) / (1 - r^2)\)</span>.</li>
+</ol>
+<div class="sourceCode" id="cb170"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_correlation_t</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">r</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_correlation_t</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p><code>n</code> is <code>length(x)</code>. In R, <span class="math inline">\(r^2\)</span> is written <code>r^2</code>, so the last line is <code>output &lt;- r * sqrt((n - 2) / (1 - r^2))</code>.</p>
+</div>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb171"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_correlation_t</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">my_correlation</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="va">r</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">r</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_correlation_t</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] 5.284229</code></pre>
+</div>
+<p>This calculation needs at least three complete pairs and a correlation strictly between -1 and 1. Our small teaching functions do not check these conditions for us.</p>
+</div>
+<div id="check-it-against-cor.test" class="section level2" number="6.15">
+<h2>
+<span class="header-section-number">6.15</span> Check It Against <code>cor.test()</code><a class="anchor" aria-label="anchor" href="#check-it-against-cor.test"><i class="fas fa-link"></i></a>
+</h2>
+<div class="sourceCode" id="cb173"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">correlation_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.test.html">cor.test</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, method <span class="op">=</span> <span class="st">"pearson"</span><span class="op">)</span></span>
+<span><span class="va">correlation_result</span></span></code></pre></div>
+<pre><code>## 
+##  Pearson's product-moment correlation
+## 
+## data:  x and y
+## t = 5.2842, df = 6, p-value = 0.001858
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  0.5617016 0.9832936
+## sample estimates:
+##       cor 
+## 0.9072647</code></pre>
+<p>The <code>t</code> in this output should match your function. As with <code><a href="https://rdrr.io/r/stats/t.test.html">t.test()</a></code> in Chapter <a href="t-statistic.html#t-statistic">4</a>, <code>$statistic</code> pulls it out and <code><a href="https://rdrr.io/r/base/unname.html">unname()</a></code> drops its label:</p>
+<div class="sourceCode" id="cb175"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="fu">my_correlation_t</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">correlation_result</span><span class="op">$</span><span class="va">statistic</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_correlation_t</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">correlation_result</span><span class="op">$</span><span class="va">statistic</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##     mine        R 
+## 5.284229 5.284229 
+## [1] TRUE</code></pre>
+<p>The t-values match. For our data, t is 5.28 with 6 degrees of freedom.</p>
+</div>
+<div id="is-it-significant" class="section level2" number="6.16">
+<h2>
+<span class="header-section-number">6.16</span> Is It Significant?<a class="anchor" aria-label="anchor" href="#is-it-significant"><i class="fas fa-link"></i></a>
+</h2>
+<p><code><a href="https://rdrr.io/r/stats/cor.test.html">cor.test()</a></code> also reports a p-value. Because a correlation can be turned into a t-value, the same tools that give a p-value for the one-sample t-test work for correlation too. If you want to test a correlation, see the bonus correlation section in Chapter <a href="p-values.html#p-values">11</a>.</p>
+<p>Whatever the p-value says, a correlation does not tell us whether practice caused the higher scores. These made-up observations also cannot establish anything about real students.</p>
+</div>
+<div id="try-it-on-real-data-2" class="section level2" number="6.17">
+<h2>
+<span class="header-section-number">6.17</span> Try It On Real Data<a class="anchor" aria-label="anchor" href="#try-it-on-real-data-2"><i class="fas fa-link"></i></a>
+</h2>
+<p>Every patient in the <code>sleep</code> data from Chapter <a href="standard-error.html#standard-error">3</a> tried both drugs, so each patient gives us two values: their extra sleep on the first drug and on the second. The rows for the second drug are in the same patient order as the first, so position 1 in each vector is patient 1, position 2 is patient 2, and so on.</p>
+<p>Do patients who gain more sleep on one drug also gain more on the other?</p>
+<div class="sourceCode" id="cb177"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">drug_1</span> <span class="op">&lt;-</span> <span class="va">sleep</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">group</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">extra</span><span class="op">)</span></span>
+<span><span class="va">drug_2</span> <span class="op">&lt;-</span> <span class="va">sleep</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">group</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">extra</span><span class="op">)</span></span>
+<span><span class="va">drug_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.test.html">cor.test</a></span><span class="op">(</span><span class="va">drug_1</span>, <span class="va">drug_2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="fu">my_correlation</span><span class="op">(</span><span class="va">drug_1</span>, <span class="va">drug_2</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cor</a></span><span class="op">(</span><span class="va">drug_1</span>, <span class="va">drug_2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_correlation</span><span class="op">(</span><span class="va">drug_1</span>, <span class="va">drug_2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cor</a></span><span class="op">(</span><span class="va">drug_1</span>, <span class="va">drug_2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_correlation_t</span><span class="op">(</span><span class="va">drug_1</span>, <span class="va">drug_2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">drug_result</span><span class="op">$</span><span class="va">statistic</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##      mine         R 
+## 0.7951702 0.7951702 
+## [1] TRUE
+## [1] TRUE</code></pre>
+<p>The correlation is strongly positive: patients who slept a lot more on one drug tended to sleep a lot more on the other too, so some patients respond more strongly to both drugs than others do. This comes back in Chapter <a href="two-sample-t.html#two-sample-t">5</a>, where it changes how we compare the two drugs.</p>
+</div>
+<div id="add-to-your-toolbox-3" class="section level2" number="6.18">
+<h2>
+<span class="header-section-number">6.18</span> Add To Your Toolbox<a class="anchor" aria-label="anchor" href="#add-to-your-toolbox-3"><i class="fas fa-link"></i></a>
+</h2>
+<div class="summary-box">
+<p>Copy your finished <code>my_covariance()</code>, <code>my_correlation()</code>, and <code>my_correlation_t()</code> into your <code>my_functions.R</code> file, under the <strong>Covariance and Correlation</strong> heading, and save it.</p>
+</div>
+<p>The steps are the same as in Chapter <a href="equations.html#equations">2</a>:</p>
+<ol style="list-style-type: decimal">
+<li>Open <code>my_functions.R</code> from the <strong>Files</strong> pane.</li>
+<li>Copy each finished function from your exercise file, from its first line down to its closing <code>}</code>, and paste it under the <strong>Covariance and Correlation</strong> heading.</li>
+<li>Save the file.</li>
+</ol>
+<div class="webex-solution">
+<button>
+Show what my_functions.R should look like now
+</button>
+<div class="sourceCode" id="cb179"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># My statistics functions</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># Add each function you build to this file, under the heading of the</span></span>
+<span><span class="co"># chapter you built it in. Later chapters load it with</span></span>
+<span><span class="co"># source("my_functions.R"), so every function here can be reused.</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># Keep only the functions in this file. Run and check them in your</span></span>
+<span><span class="co"># exercise files, not here.</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># Some functions return a tibble, so load the tidyverse before using them.</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># PART I: BUILDING TEST STATISTICS =========================================</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># From Equations to Code ---------------------------------------------------</span></span>
+<span><span class="va">my_mean</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">total</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="va">total</span> <span class="op">/</span> <span class="va">n</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_var</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">mean_x</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">squared_distances</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">mean_x</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span>
+<span>  <span class="va">total_squared_distance</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">squared_distances</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="va">total_squared_distance</span> <span class="op">/</span> <span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Spread and Standard Error ------------------------------------------------</span></span>
+<span><span class="va">my_sd</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="fu">my_var</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_se</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">sd_x</span> <span class="op">&lt;-</span> <span class="fu">my_sd</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="va">sd_x</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_summary</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span></span>
+<span>    n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>    mean <span class="op">=</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>    variance <span class="op">=</span> <span class="fu">my_var</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>    sd <span class="op">=</span> <span class="fu">my_sd</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>    se <span class="op">=</span> <span class="fu">my_se</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_z_score</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">mean_x</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">sd_x</span> <span class="op">&lt;-</span> <span class="fu">my_sd</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">mean_x</span><span class="op">)</span> <span class="op">/</span> <span class="va">sd_x</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># The One-Sample t-Test ----------------------------------------------------</span></span>
+<span><span class="va">my_t_value</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">comparison_value</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">mean_x</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">se_x</span> <span class="op">&lt;-</span> <span class="fu">my_se</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">mean_x</span> <span class="op">-</span> <span class="va">comparison_value</span><span class="op">)</span> <span class="op">/</span> <span class="va">se_x</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_t_test</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">comparison_value</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">t</span> <span class="op">&lt;-</span> <span class="fu">my_t_value</span><span class="op">(</span><span class="va">x</span>, <span class="va">comparison_value</span><span class="op">)</span></span>
+<span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>t <span class="op">=</span> <span class="va">t</span>, df <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Covariance and Correlation -----------------------------------------------</span></span>
+<span><span class="va">my_covariance</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">dx</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op">-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">dy</span> <span class="op">&lt;-</span> <span class="va">y</span> <span class="op">-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
+<span>  <span class="va">products</span> <span class="op">&lt;-</span> <span class="va">dx</span> <span class="op">*</span> <span class="va">dy</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">products</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_correlation</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">covariance</span> <span class="op">&lt;-</span> <span class="fu">my_covariance</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
+<span>  <span class="va">sd_x</span> <span class="op">&lt;-</span> <span class="fu">my_sd</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">sd_y</span> <span class="op">&lt;-</span> <span class="fu">my_sd</span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="va">covariance</span> <span class="op">/</span> <span class="op">(</span><span class="va">sd_x</span> <span class="op">*</span> <span class="va">sd_y</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_correlation_t</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">my_correlation</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="va">r</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">r</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># PART II: TESTING BY SIMULATION ===========================================</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Null Distributions -------------------------------------------------------</span></span>
+<span><span class="co"># my_null_t() and my_cutoffs() go here</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># p-values -----------------------------------------------------------------</span></span>
+<span><span class="co"># my_sim_p_value() and my_p_value() go here</span></span>
+<span><span class="co"># (and my_null_correlation_t() if you did the correlation section)</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Effects and Power --------------------------------------------------------</span></span>
+<span><span class="co"># my_effect_t(), my_power() and my_cohens_d() go here</span></span></code></pre></div>
+</div>
+<p>Then check that the saved file works on its own. This is the last chunk of the exercise file:</p>
+<div class="sourceCode" id="cb180"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span>list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html">source</a></span><span class="op">(</span><span class="st">"my_functions.R"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">8</span><span class="op">)</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">48</span>, <span class="fl">55</span>, <span class="fl">51</span>, <span class="fl">62</span>, <span class="fl">58</span>, <span class="fl">70</span>, <span class="fl">65</span>, <span class="fl">71</span><span class="op">)</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.test.html">cor.test</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_covariance</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_correlation</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cor</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_correlation_t</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">statistic</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>You should see three <code>TRUE</code>s:</p>
+<pre class="text"><code>[1] TRUE
+[1] TRUE
+[1] TRUE</code></pre>
+</div>
+<div id="link-back-and-next-step" class="section level2" number="6.19">
+<h2>
+<span class="header-section-number">6.19</span> Link Back And Next Step<a class="anchor" aria-label="anchor" href="#link-back-and-next-step"><i class="fas fa-link"></i></a>
+</h2>
+<p>Variance used squared deviations from one mean. Covariance used paired deviations from two means. Dividing covariance by two SDs gave us correlation. Turning that correlation into a t-value brought us back to t, which means the p-value and power tools in Part II work for correlation as well.</p>
+
+</div>
+</div>
+<script>
+
+/* update total correct if #webex-total_correct exists */
+update_total_correct = function() {
+  console.log("webex: update total_correct");
+
+  if (t = document.getElementById("webex-total_correct")) {
+    var correct = document.getElementsByClassName("webex-correct").length;
+    var solvemes = document.getElementsByClassName("webex-solveme").length;
+    var radiogroups = document.getElementsByClassName("webex-radiogroup").length;
+    var selects = document.getElementsByClassName("webex-select").length;
+    
+    t.innerHTML = correct + " of " + (solvemes + radiogroups + selects) + " correct";
+  }
+}
+
+/* webex-solution button toggling function */
+b_func = function() {
+  console.log("webex: toggle hide");
+  
+  var cl = this.parentElement.classList;
+  if (cl.contains('open')) {
+    cl.remove("open");
+  } else {
+    cl.add("open");
+  }
+}
+
+/* function for checking solveme answers */
+solveme_func = function(e) {
+  console.log("webex: check solveme");
+
+  var real_answers = JSON.parse(this.dataset.answer);
+  var my_answer = this.value;
+  var cl = this.classList;
+  if (cl.contains("ignorecase")) {
+    my_answer = my_answer.toLowerCase();
+  }
+  if (cl.contains("nospaces")) {
+    my_answer = my_answer.replace(/ /g, "")
+  }
+
+  if (my_answer == "") {
+    cl.remove("webex-correct");
+    cl.remove("webex-incorrect");
+  } else if (real_answers.includes(my_answer)) {
+    cl.add("webex-correct");
+    cl.remove("webex-incorrect");
+  } else {
+    cl.add("webex-incorrect");
+    cl.remove("webex-correct");
+  }
+
+  // match numeric answers within a specified tolerance
+  if(this.dataset.tol > 0){
+    var tol = JSON.parse(this.dataset.tol);
+    var matches = real_answers.map(x => Math.abs(x - my_answer) < tol)
+    if (matches.reduce((a, b) => a + b, 0) > 0) {
+      cl.add("webex-correct");
+    } else {
+      cl.remove("webex-correct");
+    }
+  }
+
+  // added regex bit
+  if (cl.contains("regex")){
+    answer_regex = RegExp(real_answers.join("|"))
+    if (answer_regex.test(my_answer)) {
+      cl.add("webex-correct");
+    }
+  }
+
+  update_total_correct();
+}
+
+/* function for checking select answers */
+select_func = function(e) {
+  console.log("webex: check select");
+  
+  var cl = this.classList
+  
+  /* add style */
+  cl.remove("webex-incorrect");
+  cl.remove("webex-correct");
+  if (this.value == "answer") {
+    cl.add("webex-correct");
+  } else if (this.value != "blank") {
+    cl.add("webex-incorrect");
+  }
+  
+  update_total_correct();
+}
+
+/* function for checking radiogroups answers */
+radiogroups_func = function(e) {
+  console.log("webex: check radiogroups");
+
+  var checked_button = document.querySelector('input[name=' + this.id + ']:checked');
+  var cl = checked_button.parentElement.classList;
+  var labels = checked_button.parentElement.parentElement.children;
+  
+  /* get rid of styles */
+  for (i = 0; i < labels.length; i++) {
+    labels[i].classList.remove("webex-incorrect");
+    labels[i].classList.remove("webex-correct");
+  }
+  
+  /* add style */
+  if (checked_button.value == "answer") {
+    cl.add("webex-correct");
+  } else {
+    cl.add("webex-incorrect");
+  }
+  
+  update_total_correct();
+}
+
+window.onload = function() {
+  console.log("onload");
+  /* set up solution buttons */
+  var buttons = document.getElementsByTagName("button");
+
+  for (var i = 0; i < buttons.length; i++) {
+    if (buttons[i].parentElement.classList.contains('webex-solution')) {
+      buttons[i].onclick = b_func;
+    }
+  }
+
+  /* set up webex-solveme inputs */
+  var solveme = document.getElementsByClassName("webex-solveme");
+
+  for (var i = 0; i < solveme.length; i++) {
+    /* make sure input boxes don't auto-anything */
+    solveme[i].setAttribute("autocomplete","off");
+    solveme[i].setAttribute("autocorrect", "off");
+    solveme[i].setAttribute("autocapitalize", "off");
+    solveme[i].setAttribute("spellcheck", "false");
+    solveme[i].value = "";
+
+    /* adjust answer for ignorecase or nospaces */
+    var cl = solveme[i].classList;
+    var real_answer = solveme[i].dataset.answer;
+    if (cl.contains("ignorecase")) {
+      real_answer = real_answer.toLowerCase();
+    }
+    if (cl.contains("nospaces")) {
+      real_answer = real_answer.replace(/ /g, "");
+    }
+    solveme[i].dataset.answer = real_answer;
+
+    /* attach checking function */
+    solveme[i].onkeyup = solveme_func;
+    solveme[i].onchange = solveme_func;
+  }
+  
+  /* set up radiogroups */
+  var radiogroups = document.getElementsByClassName("webex-radiogroup");
+  for (var i = 0; i < radiogroups.length; i++) {
+    radiogroups[i].onchange = radiogroups_func;
+  }
+  
+  /* set up selects */
+  var selects = document.getElementsByClassName("webex-select");
+  for (var i = 0; i < selects.length; i++) {
+    selects[i].onchange = select_func;
+  }
+
+  update_total_correct();
+}
+
+</script><script>
+$( document ).ready(function() {
+  var cite = ' ';
+  var psyteachr = ' <a href="https://psyteachr.github.io/"><img src="images/logos/psyteachr_logo.png" style="height: 31px; color: white;" alt="psyTeachR: Reproducible Research" /></a>';
+  var license = ' <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/" target="blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png"></a>';
+
+  $("footer div.row div:eq(1) p").html(
+    psyteachr + license + cite
+  );
+});
+</script><div class="chapter-nav">
+<div class="prev"><a href="two-sample-t.html"><span class="header-section-number">5</span> Two-Sample t-Tests</a></div>
+<div class="next"><a href="one-way-anova.html"><span class="header-section-number">7</span> One-Way ANOVA</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#correlation"><span class="header-section-number">6</span> Covariance and Correlation</a></li>
+<li><a class="nav-link" href="#two-values-per-person"><span class="header-section-number">6.1</span> Two Values Per Person</a></li>
+<li><a class="nav-link" href="#files-for-this-chapter-3"><span class="header-section-number">6.2</span> Files For This Chapter</a></li>
+<li><a class="nav-link" href="#load-your-toolbox-2"><span class="header-section-number">6.3</span> Load Your Toolbox</a></li>
+<li><a class="nav-link" href="#two-distances-from-the-mean"><span class="header-section-number">6.4</span> Two Distances From The Mean</a></li>
+<li><a class="nav-link" href="#covariance"><span class="header-section-number">6.5</span> Covariance</a></li>
+<li><a class="nav-link" href="#your-turn-write-my_covariance"><span class="header-section-number">6.6</span> Your Turn: Write my_covariance()</a></li>
+<li><a class="nav-link" href="#check-it-against-cov"><span class="header-section-number">6.7</span> Check It Against cov()</a></li>
+<li><a class="nav-link" href="#why-standardise"><span class="header-section-number">6.8</span> Why Standardise?</a></li>
+<li><a class="nav-link" href="#your-turn-write-my_correlation"><span class="header-section-number">6.9</span> Your Turn: Write my_correlation()</a></li>
+<li><a class="nav-link" href="#check-it-against-cor"><span class="header-section-number">6.10</span> Check It Against cor()</a></li>
+<li><a class="nav-link" href="#try-it-interactively-1"><span class="header-section-number">6.11</span> Try It Interactively</a></li>
+<li><a class="nav-link" href="#your-turn-two-predictions"><span class="header-section-number">6.12</span> Your Turn: Two Predictions</a></li>
+<li><a class="nav-link" href="#a-t-value-again"><span class="header-section-number">6.13</span> A t-Value Again</a></li>
+<li><a class="nav-link" href="#your-turn-write-my_correlation_t"><span class="header-section-number">6.14</span> Your Turn: Write my_correlation_t()</a></li>
+<li><a class="nav-link" href="#check-it-against-cor.test"><span class="header-section-number">6.15</span> Check It Against cor.test()</a></li>
+<li><a class="nav-link" href="#is-it-significant"><span class="header-section-number">6.16</span> Is It Significant?</a></li>
+<li><a class="nav-link" href="#try-it-on-real-data-2"><span class="header-section-number">6.17</span> Try It On Real Data</a></li>
+<li><a class="nav-link" href="#add-to-your-toolbox-3"><span class="header-section-number">6.18</span> Add To Your Toolbox</a></li>
+<li><a class="nav-link" href="#link-back-and-next-step"><span class="header-section-number">6.19</span> Link Back And Next Step</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+          
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Demystifying Functions For Statistics</strong>" was written by Sean Westwood. It was last built on 2026-10-29.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

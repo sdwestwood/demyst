@@ -1,0 +1,5 @@
+# Logistic Regression {#logistic-regression}
+
+*This chapter has not been written yet.*
+
+Linear models assume the outcome can take any value. Generalised linear models extend them to outcomes that cannot, using a link function. Logistic regression handles yes/no outcomes by modelling the log-odds, and its coefficients turn into odds ratios.

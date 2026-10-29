@@ -1,7 +1,7 @@
 --- 
 title: "Demystifying Functions For Statistics"
 author: "Sean Westwood"
-date: "2026-09-18"
+date: "2026-10-29"
 site: bookdown::bookdown_site
 documentclass: book
 bibliography: [book.bib, packages.bib]
@@ -15,10 +15,14 @@ csl: include/apa.csl
 
 # Overview {-}
 
+**Author:** Sean Westwood
+
 This mini-book is designed for students who have already used functions in R, but still feel that functions and statistical equations are two different languages. The goal is to show that they are the same idea written in different forms.
 
 <div class="summary-box">
-In this resource, a statistical formula is treated as a recipe: inputs go in, a process happens, and an output comes back.
+In this resource, a statistical formula is treated as a blueprint: a set of instructions for turning inputs into an output.
+
+A function is what you build from that blueprint. You give it the inputs, it carries out the instructions, and it gives you back the output.
 </div>
 
 By the end, students should be able to:
@@ -26,16 +30,22 @@ By the end, students should be able to:
 - describe a function as **input -> process -> output**;
 - recognise arguments, defaults, and returned values;
 - translate simple mathematical notation into R code;
-- explain summation as repeated addition with `sum()`;
-- connect raw values to distributions;
-- build a variance function by hand;
-- explain standard error as the spread of sample means;
-- build small reusable statistics functions from familiar pieces;
-- use paired deviations to calculate covariance and correlation;
-- connect a correlation test to the t-distribution.
+- build functions from scratch for various summary and test statistics from their equations
+- understand how different tests and models relate to each other mathematically
+- build a null distribution by simulation, and use it to turn test statistics into p-values;
+- simulate true and null effects to illustrate power
 
 ## How To Use This Book
 
-Work through the chapters in order. Type the code yourself when possible, then change the numbers and predict what will happen before running it again.
+The book has two core parts:
 
-Use the questions to check your predictions. Open the hints or solutions after you have tried an exercise yourself.
+- **Part I: Building Test Statistics.** You build every piece of each test statistic as your own R function, from the mean upwards, and check each one against the version that comes with R.
+- **Part II: Testing by Simulation.** You take those test statistics and simulate thousands of samples, to see where p-values and power come from.
+
+Two later parts, still being written, take the same approach further: the general linear model, which rebuilds the tests from Part I as one kind of model, and non-parametric tests, which work on ranks.
+
+The recommended route is to work through Part I first, then Part II. If you want to build intuitions about null hypothesis testing sooner, you can dip into Part II as soon as you have finished the one-sample t-test chapter, starting with Null Distributions and then p-values. Each chapter in Part II says what it needs at the start, and its sections on other tests are bonus sections.
+
+Type the code yourself when possible, then change the numbers and see if you can predict what will happen before running it again.
+
+Use the questions to check your predictions. Try to have a go yourself before using the hints or solutions!

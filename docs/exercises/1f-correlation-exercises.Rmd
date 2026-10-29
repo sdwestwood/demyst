@@ -1,0 +1,185 @@
+---
+title: "Exercises: Covariance and Correlation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# error = TRUE lets the file knit even if one of your chunks is not finished yet
+knitr::opts_chunk$set(error = TRUE)
+```
+
+Work through this file alongside the chapter "Covariance and Correlation" in the book. Keep it in the same folder as your `my_functions.R`.
+
+## The data
+
+Practice hours and test scores for eight people. Each position in `x` goes with the same position in `y`.
+
+```{r data}
+x <- c(1, 2, 3, 4, 5, 6, 7, 8)
+y <- c(48, 55, 51, 62, 58, 70, 65, 71)
+```
+
+## Load your toolbox
+
+```{r load-toolbox}
+library(tidyverse)
+source("my_functions.R")
+
+all.equal(my_mean(y), mean(y))
+all.equal(my_var(y), var(y))
+all.equal(my_sd(y), sd(y))
+```
+
+You are looking for three `TRUE`s. If you see `could not find function`, finish the toolbox sections in the earlier exercise files first.
+
+## Two distances from the mean
+
+```{r deviations}
+dx <- x - my_mean(x)
+dy <- y - my_mean(y)
+
+dx
+dy
+```
+
+### Your turn: the covariance equation
+
+Multiply the two distances for each person, then add up the products and divide by the number of pairs minus one. You should get about 18.86.
+
+```{r covariance-steps}
+products <-
+sum() /
+```
+
+## Your turn: write `my_covariance()`
+
+```{r my-covariance}
+my_covariance <- function(x, y) {
+  dx <-
+  dy <-
+  products <-
+  output <-
+  return(output)
+}
+
+my_covariance(x, y)
+```
+
+### Check it against `cov()`
+
+```{r my-covariance-check}
+c(mine = my_covariance(x, y), R = cov(x, y))
+all.equal(my_covariance(x, y), cov(x, y))
+```
+
+```{r my-covariance-check-2}
+a <- c(2, 4, 9)
+b <- c(3, 1, 8)
+
+c(mine = my_covariance(a, b), R = cov(a, b))
+all.equal(my_covariance(a, b), cov(a, b))
+```
+
+What happens if you put the same variable into both inputs?
+
+```{r covariance-is-variance}
+c(covariance = my_covariance(x, x), variance = my_var(x))
+all.equal(my_covariance(x, x), my_var(x))
+```
+
+## Your turn: write `my_correlation()`
+
+```{r my-correlation}
+my_correlation <- function(x, y) {
+  covariance <-
+  sd_x <-
+  sd_y <-
+  output <-
+  return(output)
+}
+
+my_correlation(x, y)
+```
+
+### Check it against `cor()`
+
+```{r my-correlation-check}
+c(mine = my_correlation(x, y), R = cor(x, y))
+all.equal(my_correlation(x, y), cor(x, y))
+```
+
+```{r my-correlation-check-2}
+c(mine = my_correlation(a, b), R = cor(a, b))
+all.equal(my_correlation(a, b), cor(a, b))
+```
+
+## Two predictions
+
+Predict each result before you run it, then explain it using deviations from the mean.
+
+```{r predictions}
+my_covariance(x * 60, y)
+my_correlation(x * 60, y)
+my_correlation(x, y + 10)
+my_correlation(x, -y)
+```
+
+## Your turn: write `my_correlation_t()`
+
+```{r my-correlation-t}
+my_correlation_t <- function(x, y) {
+  r <-
+  n <-
+  output <-
+  return(output)
+}
+
+my_correlation_t(x, y)
+```
+
+### Check it against `cor.test()`
+
+```{r my-correlation-t-check}
+correlation_result <- cor.test(x, y, method = "pearson")
+correlation_result
+
+c(mine = my_correlation_t(x, y), R = unname(correlation_result$statistic))
+all.equal(my_correlation_t(x, y), unname(correlation_result$statistic))
+```
+
+## Try it on real data
+
+Each patient in `sleep` tried both drugs. The rows for the two drugs are in the same patient order, so the two vectors below are paired.
+
+```{r real-data}
+drug_1 <- sleep %>% filter(group == 1) %>% pull(extra)
+drug_2 <- sleep %>% filter(group == 2) %>% pull(extra)
+drug_result <- cor.test(drug_1, drug_2)
+
+c(mine = my_correlation(drug_1, drug_2), R = cor(drug_1, drug_2))
+all.equal(my_correlation(drug_1, drug_2), cor(drug_1, drug_2))
+all.equal(my_correlation_t(drug_1, drug_2), unname(drug_result$statistic))
+```
+
+## Add to your toolbox
+
+1. Open `my_functions.R`.
+2. Copy your finished `my_covariance()`, `my_correlation()`, and `my_correlation_t()` into it, under the **Covariance and Correlation** heading. Copy only the functions.
+3. Save `my_functions.R`.
+
+Now check that the saved toolbox works on its own. You are looking for three `TRUE`s.
+
+```{r toolbox-check}
+rm(list = ls())
+source("my_functions.R")
+
+x <- c(1, 2, 3, 4, 5, 6, 7, 8)
+y <- c(48, 55, 51, 62, 58, 70, 65, 71)
+result <- cor.test(x, y)
+
+all.equal(my_covariance(x, y), cov(x, y))
+all.equal(my_correlation(x, y), cor(x, y))
+all.equal(my_correlation_t(x, y), unname(result$statistic))
+```
+
+If you see `could not find function`, that function is not in `my_functions.R` yet, or the file was not saved.

@@ -122,12 +122,37 @@
     }
 
     @media (max-width: 760px) {
+      body {
+        padding: 8px;
+      }
+
       .app {
         grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 16px;
+        row-gap: 4px;
+        padding: 10px 12px;
+      }
+
+      .control {
+        margin-bottom: 4px;
+      }
+
+      .checks label {
+        margin: 2px 0;
+      }
+
+      button {
+        align-self: center;
       }
 
       canvas {
-        height: 360px;
+        height: 340px;
       }
     }
   </style>
@@ -153,14 +178,18 @@
         <div class="value" id="sample-size-value"></div>
       </div>
 
+      <!-- Seed control hidden to save space. Uncomment to bring it back.
       <div class="control">
         <label for="seed">Seed</label>
         <input id="seed" type="number" min="1" step="1" value="123">
       </div>
+      -->
 
       <div class="control checks">
         <label><input id="show-dots" type="checkbox" checked> Sample dots</label>
+        <!-- Lines-to-the-mean toggle hidden to save space; the lines always show. Uncomment to bring it back.
         <label><input id="show-lines" type="checkbox" checked> Lines to the mean</label>
+        -->
         <label><input id="show-curve" type="checkbox" checked> Bell curve</label>
       </div>
 
@@ -234,9 +263,9 @@
         variance,
         sd: Math.sqrt(variance),
         n: Number(els.sampleSize.value),
-        seed: Number(els.seed.value),
+        seed: els.seed ? Number(els.seed.value) : 123,
         showDots: els.showDots.checked,
-        showLines: els.showLines.checked,
+        showLines: els.showLines ? els.showLines.checked : true,
         showCurve: els.showCurve.checked
       };
     }
@@ -383,11 +412,13 @@
     }
 
     ["mean", "variance", "sample-size", "seed"].forEach(id => {
-      document.getElementById(id).addEventListener("input", redrawWithNewSample);
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("input", redrawWithNewSample);
     });
 
     ["show-dots", "show-lines", "show-curve"].forEach(id => {
-      document.getElementById(id).addEventListener("change", draw);
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("change", draw);
     });
 
     els.newSample.addEventListener("click", () => {

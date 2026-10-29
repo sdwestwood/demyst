@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 4 The One-Sample t-Test | Demystifying Functions For Statistics</title>
+<meta name="author" content="Sean Westwood">
+<meta name="description" content="4.1 One More Function So far, we have built small functions for the mean, variance, standard deviation, and standard error. Those pieces can also be used to build a t-statistic. We will build it...">
+<meta name="generator" content="bookdown 0.47 with bs4_book()">
+<meta property="og:title" content="Chapter 4 The One-Sample t-Test | Demystifying Functions For Statistics">
+<meta property="og:type" content="book">
+<meta property="og:description" content="4.1 One More Function So far, we have built small functions for the mean, variance, standard deviation, and standard error. Those pieces can also be used to build a t-statistic. We will build it...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 4 The One-Sample t-Test | Demystifying Functions For Statistics">
+<meta name="twitter:description" content="4.1 One More Function So far, we have built small functions for the mean, variance, standard deviation, and standard error. Those pieces can also be used to build a t-statistic. We will build it...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.10.0/transition.js"></script><script src="libs/bs3compat-0.10.0/tabs.js"></script><script src="libs/bs3compat-0.10.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-6NP3MF25W3"></script><script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-6NP3MF25W3');
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<link rel="stylesheet" href="include/psyteachr.css">
+<link rel="stylesheet" href="include/webex.css">
+<link rel="stylesheet" href="include/style.css">
+<link rel="stylesheet" href="demyst.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Demystifying Functions For Statistics</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Overview</a></li>
+<li class="book-part">Building Test Statistics</li>
+<li><a class="" href="functions.html"><span class="header-section-number">1</span> What Are Functions?</a></li>
+<li><a class="" href="equations.html"><span class="header-section-number">2</span> From Equations to Code</a></li>
+<li><a class="" href="standard-error.html"><span class="header-section-number">3</span> Spread and Standard Error</a></li>
+<li><a class="active" href="t-statistic.html"><span class="header-section-number">4</span> The One-Sample t-Test</a></li>
+<li><a class="" href="two-sample-t.html"><span class="header-section-number">5</span> Two-Sample t-Tests</a></li>
+<li><a class="" href="correlation.html"><span class="header-section-number">6</span> Covariance and Correlation</a></li>
+<li><a class="" href="one-way-anova.html"><span class="header-section-number">7</span> One-Way ANOVA</a></li>
+<li><a class="" href="factorial-anova.html"><span class="header-section-number">8</span> Factorial ANOVA</a></li>
+<li><a class="" href="chi-square.html"><span class="header-section-number">9</span> Chi-Square</a></li>
+<li class="book-part">Testing by Simulation</li>
+<li><a class="" href="null-distributions.html"><span class="header-section-number">10</span> Null Distributions</a></li>
+<li><a class="" href="p-values.html"><span class="header-section-number">11</span> p-values</a></li>
+<li><a class="" href="effects-power.html"><span class="header-section-number">12</span> Effects and Power</a></li>
+<li class="book-part">The General Linear Model</li>
+<li><a class="" href="lm-mean.html"><span class="header-section-number">13</span> The Mean as a Model</a></li>
+<li><a class="" href="lm-correlation.html"><span class="header-section-number">14</span> Correlation as a Linear Model</a></li>
+<li><a class="" href="lm-t-test.html"><span class="header-section-number">15</span> The Independent t-Test as a Linear Model</a></li>
+<li><a class="" href="lm-one-way-anova.html"><span class="header-section-number">16</span> One-Way ANOVA as a Linear Model</a></li>
+<li class="book-part">Non-Parametric Tests</li>
+<li><a class="" href="wilcoxon-signed-rank.html"><span class="header-section-number">17</span> Wilcoxon Signed-Rank Test</a></li>
+<li><a class="" href="mann-whitney.html"><span class="header-section-number">18</span> Mann-Whitney U Test</a></li>
+<li><a class="" href="spearman.html"><span class="header-section-number">19</span> Spearman's Rho</a></li>
+<li><a class="" href="kruskal-wallis.html"><span class="header-section-number">20</span> Kruskal-Wallis Test</a></li>
+<li><a class="" href="friedman.html"><span class="header-section-number">21</span> Friedman Test</a></li>
+</ul>
+
+        <div class="book-extra">
+          
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="t-statistic" class="section level1" number="4">
+<h1>
+<span class="header-section-number">4</span> The One-Sample t-Test<a class="anchor" aria-label="anchor" href="#t-statistic"><i class="fas fa-link"></i></a>
+</h1>
+<div id="one-more-function" class="section level2" number="4.1">
+<h2>
+<span class="header-section-number">4.1</span> One More Function<a class="anchor" aria-label="anchor" href="#one-more-function"><i class="fas fa-link"></i></a>
+</h2>
+<p>So far, we have built small functions for the mean, variance, standard deviation, and standard error.</p>
+<p>Those pieces can also be used to build a t-statistic. We will build it piece by piece, then check it against R's own t-test.</p>
+<p>The basic question is:</p>
+<div class="summary-box">
+<p>How far is my sample mean from a comparison value, relative to the noise in the sample?</p>
+</div>
+</div>
+<div id="a-score-example" class="section level2" number="4.2">
+<h2>
+<span class="header-section-number">4.2</span> A Score Example<a class="anchor" aria-label="anchor" href="#a-score-example"><i class="fas fa-link"></i></a>
+</h2>
+<p>We will keep using the same ten values from the last two chapters. Their mean is 50.</p>
+<div class="sourceCode" id="cb106"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">44</span>, <span class="fl">47</span>, <span class="fl">48</span>, <span class="fl">49</span>, <span class="fl">50</span>, <span class="fl">50</span>, <span class="fl">51</span>, <span class="fl">52</span>, <span class="fl">53</span>, <span class="fl">56</span><span class="op">)</span></span>
+<span><span class="va">comparison_value</span> <span class="op">&lt;-</span> <span class="fl">49</span></span></code></pre></div>
+<p>The comparison value is just the value we want to compare the sample against. It could be a scale midpoint, a known benchmark, or a value from a previous study.</p>
+<p>We will test the same sample against two different comparison values. First 49, which is close to our sample mean, and later 46, which is further away. Keep an eye on what changes between the two and what stays the same.</p>
+</div>
+<div id="files-for-this-chapter-2" class="section level2" number="4.3">
+<h2>
+<span class="header-section-number">4.3</span> Files For This Chapter<a class="anchor" aria-label="anchor" href="#files-for-this-chapter-2"><i class="fas fa-link"></i></a>
+</h2>
+<p>Download the exercise file for this chapter and save it in the same folder as your <code>my_functions.R</code>:</p>
+<ul>
+<li><a href="exercises/1d-t-statistic-exercises.Rmd" download>1d-t-statistic-exercises.Rmd</a></li>
+</ul>
+</div>
+<div id="load-your-toolbox-1" class="section level2" number="4.4">
+<h2>
+<span class="header-section-number">4.4</span> Load Your Toolbox<a class="anchor" aria-label="anchor" href="#load-your-toolbox-1"><i class="fas fa-link"></i></a>
+</h2>
+<p>Load the functions you have built so far:</p>
+<div class="sourceCode" id="cb107"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html">source</a></span><span class="op">(</span><span class="st">"my_functions.R"</span><span class="op">)</span></span></code></pre></div>
+<p>Check that they still match R before building on them:</p>
+<div class="sourceCode" id="cb108"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_mean</span><span class="op">(</span><span class="va">scores</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">scores</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_var</span><span class="op">(</span><span class="va">scores</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">var</a></span><span class="op">(</span><span class="va">scores</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_sd</span><span class="op">(</span><span class="va">scores</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">scores</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_se</span><span class="op">(</span><span class="va">scores</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">scores</span><span class="op">)</span><span class="op">$</span><span class="va">stderr</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] TRUE
+## [1] TRUE
+## [1] TRUE
+## [1] TRUE</code></pre>
+<p>Four <code>TRUE</code>s and you are ready.</p>
+</div>
+<div id="the-equation" class="section level2" number="4.5">
+<h2>
+<span class="header-section-number">4.5</span> The Equation<a class="anchor" aria-label="anchor" href="#the-equation"><i class="fas fa-link"></i></a>
+</h2>
+<p>The t-statistic can be written as:</p>
+<p><span class="math display">\[
+t = \frac{\bar{x} - \mu_0}{s / \sqrt{n}}
+\]</span></p>
+<p>Look at the bottom of the fraction. It is the standard error equation from Chapter <a href="standard-error.html#standard-error">3</a>:</p>
+<p><span class="math display">\[
+SE = \frac{s}{\sqrt{n}}
+\]</span></p>
+<p>So the t-statistic is the difference on top, divided by the standard error underneath:</p>
+<p><span class="math display">\[
+t = \frac{\overbrace{\bar{x} - \mu_0}^{\text{difference}}}{\underbrace{s / \sqrt{n}}_{\text{standard error}}} = \frac{\bar{x} - \mu_0}{SE}
+\]</span></p>
+<p>The two halves of the fraction push t in opposite directions:</p>
+<ul>
+<li>
+<strong>the numerator:</strong> the bigger the difference between the sample mean and the comparison value, the bigger t is;</li>
+<li>
+<strong>the denominator:</strong> the bigger the standard error (the amount of spread in sample means), the smaller t is.</li>
+</ul>
+<p>So t tells us how big the difference we are interested in is, <em>after</em> taking into account how much uncertainty there is from sampling.</p>
+<p>With our scores and a comparison value of 49, that is:</p>
+<p><span class="math display">\[
+t = \frac{50 - 49}{1.05} = 0.95
+\]</span></p>
+<p>You already have a function for the bottom of the fraction, <code>my_se()</code>, so the t-value needs only one new step: the division.</p>
+<p>Read this as:</p>
+<ol style="list-style-type: decimal">
+<li>calculate the sample mean;</li>
+<li>subtract the comparison value;</li>
+<li>calculate the standard error;</li>
+<li>divide the difference by the standard error.</li>
+</ol>
+</div>
+<div id="build-the-pieces" class="section level2" number="4.6">
+<h2>
+<span class="header-section-number">4.6</span> Build The Pieces<a class="anchor" aria-label="anchor" href="#build-the-pieces"><i class="fas fa-link"></i></a>
+</h2>
+<p>Every piece of the equation is something you have already built:</p>
+<div class="sourceCode" id="cb110"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mean_score</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">scores</span><span class="op">)</span></span>
+<span><span class="va">se_score</span> <span class="op">&lt;-</span> <span class="fu">my_se</span><span class="op">(</span><span class="va">scores</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mean <span class="op">=</span> <span class="va">mean_score</span>, se <span class="op">=</span> <span class="va">se_score</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##      mean        se 
+## 50.000000  1.054093</code></pre>
+<p>Now put those pieces into the equation yourself. Write one line that subtracts the comparison value from the mean, then divides by the standard error:</p>
+<div class="sourceCode" id="cb112"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">t_value</span> <span class="op">&lt;-</span></span>
+<span><span class="va">t_value</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p>Use <code>mean_score</code>, <code>comparison_value</code>, and <code>se_score</code>. Put brackets around the top of the fraction, so the subtraction happens before the division.</p>
+</div>
+<p>To two decimal places, t is <input class="webex-solveme nospaces" size="4" data-answer='["0.95",".95"]'>.</p>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb113"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">t_value</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">mean_score</span> <span class="op">-</span> <span class="va">comparison_value</span><span class="op">)</span> <span class="op">/</span> <span class="va">se_score</span></span>
+<span><span class="va">t_value</span></span></code></pre></div>
+<pre><code>## [1] 0.9486833</code></pre>
+</div>
+<p>The sign of t tells us which side of the comparison value the mean falls on: positive above it, negative below it.</p>
+</div>
+<div id="your-turn-write-my_t_value" class="section level2" number="4.7">
+<h2>
+<span class="header-section-number">4.7</span> Your Turn: Write <code>my_t_value()</code><a class="anchor" aria-label="anchor" href="#your-turn-write-my_t_value"><i class="fas fa-link"></i></a>
+</h2>
+<p>This function has two inputs: the values, <code>x</code>, and the comparison value. The recipe is:</p>
+<ol style="list-style-type: decimal">
+<li>calculate the sample mean, using <code>my_mean()</code>;</li>
+<li>calculate the standard error, using <code>my_se()</code>;</li>
+<li>subtract the comparison value from the mean, then divide by the standard error.</li>
+</ol>
+<div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_t_value</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">comparison_value</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">mean_x</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">se_x</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_t_value</span><span class="op">(</span><span class="va">scores</span>, comparison_value <span class="op">=</span> <span class="fl">49</span><span class="op">)</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p>The last blank is the same calculation you just wrote by hand, with <code>mean_x</code> and <code>se_x</code> in place of <code>mean_score</code> and <code>se_score</code>.</p>
+</div>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb116"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_t_value</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">comparison_value</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">mean_x</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">se_x</span> <span class="op">&lt;-</span> <span class="fu">my_se</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">mean_x</span> <span class="op">-</span> <span class="va">comparison_value</span><span class="op">)</span> <span class="op">/</span> <span class="va">se_x</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_t_value</span><span class="op">(</span><span class="va">scores</span>, comparison_value <span class="op">=</span> <span class="fl">49</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] 0.9486833</code></pre>
+</div>
+<p>This function returns one number, the t-statistic. A full t-test also reports degrees of freedom and a p-value, which we will come to.</p>
+<p>The denominator of the t-statistic is the <input class="webex-solveme nospaces" size="14" data-answer='["standard error"]'>.</p>
+</div>
+<div id="check-it-against-t.test" class="section level2" number="4.8">
+<h2>
+<span class="header-section-number">4.8</span> Check It Against <code>t.test()</code><a class="anchor" aria-label="anchor" href="#check-it-against-t.test"><i class="fas fa-link"></i></a>
+</h2>
+<p>R's version is <code><a href="https://rdrr.io/r/stats/t.test.html">t.test()</a></code>, from the <code>stats</code> package. As with every function so far, we check ours against it. First, look at the full output:</p>
+<div class="sourceCode" id="cb118"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">scores</span>, mu <span class="op">=</span> <span class="va">comparison_value</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  scores
+## t = 0.94868, df = 9, p-value = 0.3676
+## alternative hypothesis: true mean is not equal to 49
+## 95 percent confidence interval:
+##  47.61548 52.38452
+## sample estimates:
+## mean of x 
+##        50</code></pre>
+<p>The <code>t</code> in this output should match our function. To check it with <code><a href="https://rdrr.io/r/base/all.equal.html">all.equal()</a></code>, we need to pull the t-value out of the result. <code><a href="https://rdrr.io/r/stats/t.test.html">t.test()</a></code> returns a list of results, and <code>$statistic</code> picks out the t-value. That value comes with a label attached (<code>t</code>), so <code><a href="https://rdrr.io/r/base/unname.html">unname()</a></code> removes the label and leaves just the number. Otherwise <code><a href="https://rdrr.io/r/base/all.equal.html">all.equal()</a></code> would report that the names differ, even though the numbers match.</p>
+<div class="sourceCode" id="cb120"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">t_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">scores</span>, mu <span class="op">=</span> <span class="va">comparison_value</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="fu">my_t_value</span><span class="op">(</span><span class="va">scores</span>, <span class="va">comparison_value</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">t_result</span><span class="op">$</span><span class="va">statistic</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">my_t_value</span><span class="op">(</span><span class="va">scores</span>, <span class="va">comparison_value</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">t_result</span><span class="op">$</span><span class="va">statistic</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##      mine         R 
+## 0.9486833 0.9486833 
+## [1] TRUE</code></pre>
+<p><code>TRUE</code> means your function reproduces the t-value from <code><a href="https://rdrr.io/r/stats/t.test.html">t.test()</a></code>.</p>
+<p>The output also reports degrees of freedom (<code>df</code>), a p-value, and a confidence interval. For this one-sample test, <code>df</code> is the sample size minus one, the same <span class="math inline">\(n - 1\)</span> as in the variance.</p>
+<div class="note">
+<p><strong>What about the p-value?</strong></p>
+<p>You will notice that <code><a href="https://rdrr.io/r/stats/t.test.html">t.test()</a></code> also reports a p-value. It answers a question we have not asked yet: if there were no real difference, how unusual would a t-value this far from zero be? We will build that ourselves in Chapters <a href="null-distributions.html#null-distributions">10</a> and <a href="p-values.html#p-values">11</a>, in the second part of the book. For now, focus on what the t-value itself tells you.</p>
+</div>
+</div>
+<div id="your-turn-write-my_t_test" class="section level2" number="4.9">
+<h2>
+<span class="header-section-number">4.9</span> Your Turn: Write <code>my_t_test()</code><a class="anchor" aria-label="anchor" href="#your-turn-write-my_t_test"><i class="fas fa-link"></i></a>
+</h2>
+<p>Put the pieces together in one function that returns a small table with the t-value and its degrees of freedom:</p>
+<ol style="list-style-type: decimal">
+<li>calculate t with <code>my_t_value()</code>;</li>
+<li>calculate the degrees of freedom: the number of values minus one;</li>
+<li>put both into a table with <code><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble()</a></code>.</li>
+</ol>
+<div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_t_test</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">comparison_value</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">t</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">df</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>t <span class="op">=</span> <span class="va">t</span>, df <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_t_test</span><span class="op">(</span><span class="va">scores</span>, comparison_value <span class="op">=</span> <span class="fl">49</span><span class="op">)</span></span></code></pre></div>
+<div class="webex-solution">
+<button>
+Show a hint
+</button>
+<p><code>t</code> uses <code>my_t_value(x, comparison_value)</code>, and <code>df</code> uses <code>length(x) - 1</code>.</p>
+</div>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb123"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_t_test</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">comparison_value</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">t</span> <span class="op">&lt;-</span> <span class="fu">my_t_value</span><span class="op">(</span><span class="va">x</span>, <span class="va">comparison_value</span><span class="op">)</span></span>
+<span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>t <span class="op">=</span> <span class="va">t</span>, df <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">my_t_test</span><span class="op">(</span><span class="va">scores</span>, comparison_value <span class="op">=</span> <span class="fl">49</span><span class="op">)</span></span></code></pre></div>
+<div class="kable-table">
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="right">t</th>
+<th align="right">df</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="right">0.9486833</td>
+<td align="right">9</td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+</div>
+<div id="check-it-against-t.test-again" class="section level2" number="4.10">
+<h2>
+<span class="header-section-number">4.10</span> Check It Against <code>t.test()</code> Again<a class="anchor" aria-label="anchor" href="#check-it-against-t.test-again"><i class="fas fa-link"></i></a>
+</h2>
+<p><code><a href="https://rdrr.io/r/stats/t.test.html">t.test()</a></code> keeps the degrees of freedom under the name <code>parameter</code>. To check both numbers at once, put R's t and df into a one-row tibble shaped like the one <code>my_t_test()</code> returns. As in Chapter <a href="standard-error.html#standard-error">3</a>, <code><a href="https://dplyr.tidyverse.org/reference/bind_rows.html">bind_rows()</a></code> stacks the two rows so you can read them side by side, and <code><a href="https://rdrr.io/r/base/all.equal.html">all.equal()</a></code> compares the whole table:</p>
+<div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_result</span> <span class="op">&lt;-</span> <span class="fu">my_t_test</span><span class="op">(</span><span class="va">scores</span>, <span class="va">comparison_value</span><span class="op">)</span></span>
+<span><span class="va">r_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span></span>
+<span>  t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">t_result</span><span class="op">$</span><span class="va">statistic</span><span class="op">)</span>,</span>
+<span>  df <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">t_result</span><span class="op">$</span><span class="va">parameter</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html">bind_rows</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="va">my_result</span>, R <span class="op">=</span> <span class="va">r_result</span>, .id <span class="op">=</span> <span class="st">"version"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="va">my_result</span>, <span class="va">r_result</span><span class="op">)</span></span></code></pre></div>
+<div class="kable-table">
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="left">version</th>
+<th align="right">t</th>
+<th align="right">df</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">mine</td>
+<td align="right">0.9486833</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">R</td>
+<td align="right">0.9486833</td>
+<td align="right">9</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<pre><code>## [1] TRUE</code></pre>
+<p><code>TRUE</code> means your own functions reproduce the t-value and degrees of freedom from <code><a href="https://rdrr.io/r/stats/t.test.html">t.test()</a></code>.</p>
+<p>Our sample mean is 50 and the comparison value is 49. The mean sits 0.95 standard errors above the comparison value.</p>
+</div>
+<div id="a-second-comparison-value" class="section level2" number="4.11">
+<h2>
+<span class="header-section-number">4.11</span> A Second Comparison Value<a class="anchor" aria-label="anchor" href="#a-second-comparison-value"><i class="fas fa-link"></i></a>
+</h2>
+<p>Now test the same sample against 46.</p>
+<div class="sourceCode" id="cb126"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">comparison_value_2</span> <span class="op">&lt;-</span> <span class="fl">46</span></span>
+<span></span>
+<span><span class="va">my_result_2</span> <span class="op">&lt;-</span> <span class="fu">my_t_test</span><span class="op">(</span><span class="va">scores</span>, <span class="va">comparison_value_2</span><span class="op">)</span></span>
+<span><span class="va">t_result_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">scores</span>, mu <span class="op">=</span> <span class="va">comparison_value_2</span><span class="op">)</span></span>
+<span><span class="va">r_result_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span></span>
+<span>  t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">t_result_2</span><span class="op">$</span><span class="va">statistic</span><span class="op">)</span>,</span>
+<span>  df <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">t_result_2</span><span class="op">$</span><span class="va">parameter</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html">bind_rows</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="va">my_result_2</span>, R <span class="op">=</span> <span class="va">r_result_2</span>, .id <span class="op">=</span> <span class="st">"version"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="va">my_result_2</span>, <span class="va">r_result_2</span><span class="op">)</span></span></code></pre></div>
+<div class="kable-table">
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="left">version</th>
+<th align="right">t</th>
+<th align="right">df</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">mine</td>
+<td align="right">3.794733</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">R</td>
+<td align="right">3.794733</td>
+<td align="right">9</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<pre><code>## [1] TRUE</code></pre>
+<p>The sample mean is still 50 and the standard error is still 1.05. The only thing that changed is the comparison value. The difference is now 4 instead of 1, so t is 3.79 instead of 0.95.</p>
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th>Comparison value</th>
+<th>Difference</th>
+<th>Standard error</th>
+<th>t</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>49</td>
+<td>1</td>
+<td>1.05</td>
+<td>0.95</td>
+</tr>
+<tr class="even">
+<td>46</td>
+<td>4</td>
+<td>1.05</td>
+<td>3.79</td>
+</tr>
+</tbody>
+</table></div>
+<p>A t-value is the distance between the sample mean and the comparison value, measured in standard errors. A mean that sits nearly four standard errors from the comparison value is much harder to put down to noise than one that sits about one standard error away.</p>
+<p>Deciding how far is far enough is the job of p-values. Chapter <a href="null-distributions.html#null-distributions">10</a> builds the null distribution they need from scratch, and Chapter <a href="p-values.html#p-values">11</a> turns it into p-values.</p>
+<p>Which part of the t-statistic changed between the two tests? <select class="webex-select"><option value="blank"></option>
+<option value="">the standard error</option>
+<option value="answer">the difference between the sample mean and the comparison value</option>
+<option value="">the sample size</option></select></p>
+<p>Try a third comparison value: 55. Before running the function, predict the sign of t.</p>
+<div class="webex-solution">
+<button>
+Show one solution
+</button>
+<div class="sourceCode" id="cb128"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">my_t_test</span><span class="op">(</span><span class="va">scores</span>, comparison_value <span class="op">=</span> <span class="fl">55</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">scores</span>, mu <span class="op">=</span> <span class="fl">55</span><span class="op">)</span></span></code></pre></div>
+<div class="kable-table">
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="right">t</th>
+<th align="right">df</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="right">-4.743417</td>
+<td align="right">9</td>
+</tr></tbody>
+</table></div>
+</div>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  scores
+## t = -4.7434, df = 9, p-value = 0.001054
+## alternative hypothesis: true mean is not equal to 55
+## 95 percent confidence interval:
+##  47.61548 52.38452
+## sample estimates:
+## mean of x 
+##        50</code></pre>
+<p>The t-value is negative because our sample mean is below 55.</p>
+</div>
+</div>
+<div id="try-it-on-real-data-1" class="section level2" number="4.12">
+<h2>
+<span class="header-section-number">4.12</span> Try It On Real Data<a class="anchor" aria-label="anchor" href="#try-it-on-real-data-1"><i class="fas fa-link"></i></a>
+</h2>
+<p>Back to the <code>sleep</code> data from Chapter <a href="standard-error.html#standard-error">3</a>. Did the first drug add any sleep, on average? If it did nothing, the population mean of <code>extra</code> would be 0, so 0 is our comparison value. Run your t-test and R's:</p>
+<div class="sourceCode" id="cb130"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">drug_1</span> <span class="op">&lt;-</span> <span class="va">sleep</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">group</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">extra</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">my_result</span> <span class="op">&lt;-</span> <span class="fu">my_t_test</span><span class="op">(</span><span class="va">drug_1</span>, comparison_value <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">drug_t_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">drug_1</span>, mu <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">drug_r_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span></span>
+<span>  t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">drug_t_result</span><span class="op">$</span><span class="va">statistic</span><span class="op">)</span>,</span>
+<span>  df <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="va">drug_t_result</span><span class="op">$</span><span class="va">parameter</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html">bind_rows</a></span><span class="op">(</span>mine <span class="op">=</span> <span class="va">my_result</span>, R <span class="op">=</span> <span class="va">drug_r_result</span>, .id <span class="op">=</span> <span class="st">"version"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="va">my_result</span>, <span class="va">drug_r_result</span><span class="op">)</span></span></code></pre></div>
+<div class="kable-table">
+<div class="inline-table"><table class="table table-sm">
+<thead><tr class="header">
+<th align="left">version</th>
+<th align="right">t</th>
+<th align="right">df</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">mine</td>
+<td align="right">1.32571</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">R</td>
+<td align="right">1.32571</td>
+<td align="right">9</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<pre><code>## [1] TRUE</code></pre>
+<p>On average, patients slept 0.75 hours more on the first drug, which puts the mean about 1.3 standard errors above 0. Chapter <a href="p-values.html#p-values">11</a> works out whether that is far enough to rule out noise.</p>
+</div>
+<div id="add-to-your-toolbox-2" class="section level2" number="4.13">
+<h2>
+<span class="header-section-number">4.13</span> Add To Your Toolbox<a class="anchor" aria-label="anchor" href="#add-to-your-toolbox-2"><i class="fas fa-link"></i></a>
+</h2>
+<div class="summary-box">
+<p>Copy your finished <code>my_t_value()</code> and <code>my_t_test()</code> into your <code>my_functions.R</code> file, under <strong>The One-Sample t-Test</strong> heading, and save it.</p>
+</div>
+<p>The steps are the same as in Chapter <a href="equations.html#equations">2</a>:</p>
+<ol style="list-style-type: decimal">
+<li>Open <code>my_functions.R</code> from the <strong>Files</strong> pane.</li>
+<li>Copy each finished function from your exercise file, from its first line down to its closing <code>}</code>, and paste it under <strong>The One-Sample t-Test</strong> heading.</li>
+<li>Save the file.</li>
+</ol>
+<div class="webex-solution">
+<button>
+Show what my_functions.R should look like now
+</button>
+<div class="sourceCode" id="cb132"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># My statistics functions</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># Add each function you build to this file, under the heading of the</span></span>
+<span><span class="co"># chapter you built it in. Later chapters load it with</span></span>
+<span><span class="co"># source("my_functions.R"), so every function here can be reused.</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># Keep only the functions in this file. Run and check them in your</span></span>
+<span><span class="co"># exercise files, not here.</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># Some functions return a tibble, so load the tidyverse before using them.</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># PART I: BUILDING TEST STATISTICS =========================================</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># From Equations to Code ---------------------------------------------------</span></span>
+<span><span class="va">my_mean</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">total</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="va">total</span> <span class="op">/</span> <span class="va">n</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_var</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">mean_x</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">squared_distances</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">mean_x</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span>
+<span>  <span class="va">total_squared_distance</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">squared_distances</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="va">total_squared_distance</span> <span class="op">/</span> <span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Spread and Standard Error ------------------------------------------------</span></span>
+<span><span class="va">my_sd</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="fu">my_var</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_se</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">sd_x</span> <span class="op">&lt;-</span> <span class="fu">my_sd</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="va">sd_x</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_summary</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span></span>
+<span>    n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>    mean <span class="op">=</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>    variance <span class="op">=</span> <span class="fu">my_var</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>    sd <span class="op">=</span> <span class="fu">my_sd</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>    se <span class="op">=</span> <span class="fu">my_se</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_z_score</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">mean_x</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">sd_x</span> <span class="op">&lt;-</span> <span class="fu">my_sd</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">mean_x</span><span class="op">)</span> <span class="op">/</span> <span class="va">sd_x</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># The One-Sample t-Test ----------------------------------------------------</span></span>
+<span><span class="va">my_t_value</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">comparison_value</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">mean_x</span> <span class="op">&lt;-</span> <span class="fu">my_mean</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">se_x</span> <span class="op">&lt;-</span> <span class="fu">my_se</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">mean_x</span> <span class="op">-</span> <span class="va">comparison_value</span><span class="op">)</span> <span class="op">/</span> <span class="va">se_x</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">my_t_test</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">comparison_value</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">t</span> <span class="op">&lt;-</span> <span class="fu">my_t_value</span><span class="op">(</span><span class="va">x</span>, <span class="va">comparison_value</span><span class="op">)</span></span>
+<span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>t <span class="op">=</span> <span class="va">t</span>, df <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Covariance and Correlation -----------------------------------------------</span></span>
+<span><span class="co"># my_covariance(), my_correlation() and my_correlation_t() go here</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># PART II: TESTING BY SIMULATION ===========================================</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Null Distributions -------------------------------------------------------</span></span>
+<span><span class="co"># my_null_t() and my_cutoffs() go here</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># p-values -----------------------------------------------------------------</span></span>
+<span><span class="co"># my_sim_p_value() and my_p_value() go here</span></span>
+<span><span class="co"># (and my_null_correlation_t() if you did the correlation section)</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Effects and Power --------------------------------------------------------</span></span>
+<span><span class="co"># my_effect_t(), my_power() and my_cohens_d() go here</span></span></code></pre></div>
+</div>
+<p>Then check that the saved file works on its own. This is the last chunk of the exercise file:</p>
+<div class="sourceCode" id="cb133"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html">rm</a></span><span class="op">(</span>list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ls.html">ls</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html">source</a></span><span class="op">(</span><span class="st">"my_functions.R"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">44</span>, <span class="fl">47</span>, <span class="fl">48</span>, <span class="fl">49</span>, <span class="fl">50</span>, <span class="fl">50</span>, <span class="fl">51</span>, <span class="fl">52</span>, <span class="fl">53</span>, <span class="fl">56</span><span class="op">)</span></span>
+<span><span class="va">mine</span> <span class="op">&lt;-</span> <span class="fu">my_t_test</span><span class="op">(</span><span class="va">values</span>, comparison_value <span class="op">=</span> <span class="fl">46</span><span class="op">)</span></span>
+<span><span class="va">theirs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">values</span>, mu <span class="op">=</span> <span class="fl">46</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">mine</span><span class="op">$</span><span class="va">t</span>, <span class="va">mine</span><span class="op">$</span><span class="va">df</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unname.html">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">theirs</span><span class="op">$</span><span class="va">statistic</span>, <span class="va">theirs</span><span class="op">$</span><span class="va">parameter</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>You should see one <code>TRUE</code>:</p>
+<pre class="text"><code>[1] TRUE</code></pre>
+</div>
+<div id="where-this-goes-next-1" class="section level2" number="4.14">
+<h2>
+<span class="header-section-number">4.14</span> Where This Goes Next<a class="anchor" aria-label="anchor" href="#where-this-goes-next-1"><i class="fas fa-link"></i></a>
+</h2>
+<p>You have built a one-sample t-statistic entirely from your own functions:</p>
+<div class="summary-box">
+<p>values -&gt; mean -&gt; variance -&gt; standard deviation -&gt; standard error -&gt; t</p>
+</div>
+<p>One t-value tells us about one sample. From here, there are two ways to carry on:</p>
+<ul>
+<li>
+<strong>Keep building.</strong> The next chapter builds another test statistic from the same pieces. Part I of the book keeps going like this, one statistic at a time.</li>
+<li>
+<strong>Dip into Part II.</strong> Chapter <a href="null-distributions.html#null-distributions">10</a> takes the t-value you just built and simulates thousands of samples to find out what "far enough" means, and Chapter <a href="p-values.html#p-values">11</a> turns that into p-values. They only need the chapters you have already done, and you can come back to Part I afterwards.</li>
+</ul>
+<p>Either order works. If you are not sure, keep building, and come back to Part II once you have a few test statistics under your belt.</p>
+
+</div>
+</div>
+<script>
+
+/* update total correct if #webex-total_correct exists */
+update_total_correct = function() {
+  console.log("webex: update total_correct");
+
+  if (t = document.getElementById("webex-total_correct")) {
+    var correct = document.getElementsByClassName("webex-correct").length;
+    var solvemes = document.getElementsByClassName("webex-solveme").length;
+    var radiogroups = document.getElementsByClassName("webex-radiogroup").length;
+    var selects = document.getElementsByClassName("webex-select").length;
+    
+    t.innerHTML = correct + " of " + (solvemes + radiogroups + selects) + " correct";
+  }
+}
+
+/* webex-solution button toggling function */
+b_func = function() {
+  console.log("webex: toggle hide");
+  
+  var cl = this.parentElement.classList;
+  if (cl.contains('open')) {
+    cl.remove("open");
+  } else {
+    cl.add("open");
+  }
+}
+
+/* function for checking solveme answers */
+solveme_func = function(e) {
+  console.log("webex: check solveme");
+
+  var real_answers = JSON.parse(this.dataset.answer);
+  var my_answer = this.value;
+  var cl = this.classList;
+  if (cl.contains("ignorecase")) {
+    my_answer = my_answer.toLowerCase();
+  }
+  if (cl.contains("nospaces")) {
+    my_answer = my_answer.replace(/ /g, "")
+  }
+
+  if (my_answer == "") {
+    cl.remove("webex-correct");
+    cl.remove("webex-incorrect");
+  } else if (real_answers.includes(my_answer)) {
+    cl.add("webex-correct");
+    cl.remove("webex-incorrect");
+  } else {
+    cl.add("webex-incorrect");
+    cl.remove("webex-correct");
+  }
+
+  // match numeric answers within a specified tolerance
+  if(this.dataset.tol > 0){
+    var tol = JSON.parse(this.dataset.tol);
+    var matches = real_answers.map(x => Math.abs(x - my_answer) < tol)
+    if (matches.reduce((a, b) => a + b, 0) > 0) {
+      cl.add("webex-correct");
+    } else {
+      cl.remove("webex-correct");
+    }
+  }
+
+  // added regex bit
+  if (cl.contains("regex")){
+    answer_regex = RegExp(real_answers.join("|"))
+    if (answer_regex.test(my_answer)) {
+      cl.add("webex-correct");
+    }
+  }
+
+  update_total_correct();
+}
+
+/* function for checking select answers */
+select_func = function(e) {
+  console.log("webex: check select");
+  
+  var cl = this.classList
+  
+  /* add style */
+  cl.remove("webex-incorrect");
+  cl.remove("webex-correct");
+  if (this.value == "answer") {
+    cl.add("webex-correct");
+  } else if (this.value != "blank") {
+    cl.add("webex-incorrect");
+  }
+  
+  update_total_correct();
+}
+
+/* function for checking radiogroups answers */
+radiogroups_func = function(e) {
+  console.log("webex: check radiogroups");
+
+  var checked_button = document.querySelector('input[name=' + this.id + ']:checked');
+  var cl = checked_button.parentElement.classList;
+  var labels = checked_button.parentElement.parentElement.children;
+  
+  /* get rid of styles */
+  for (i = 0; i < labels.length; i++) {
+    labels[i].classList.remove("webex-incorrect");
+    labels[i].classList.remove("webex-correct");
+  }
+  
+  /* add style */
+  if (checked_button.value == "answer") {
+    cl.add("webex-correct");
+  } else {
+    cl.add("webex-incorrect");
+  }
+  
+  update_total_correct();
+}
+
+window.onload = function() {
+  console.log("onload");
+  /* set up solution buttons */
+  var buttons = document.getElementsByTagName("button");
+
+  for (var i = 0; i < buttons.length; i++) {
+    if (buttons[i].parentElement.classList.contains('webex-solution')) {
+      buttons[i].onclick = b_func;
+    }
+  }
+
+  /* set up webex-solveme inputs */
+  var solveme = document.getElementsByClassName("webex-solveme");
+
+  for (var i = 0; i < solveme.length; i++) {
+    /* make sure input boxes don't auto-anything */
+    solveme[i].setAttribute("autocomplete","off");
+    solveme[i].setAttribute("autocorrect", "off");
+    solveme[i].setAttribute("autocapitalize", "off");
+    solveme[i].setAttribute("spellcheck", "false");
+    solveme[i].value = "";
+
+    /* adjust answer for ignorecase or nospaces */
+    var cl = solveme[i].classList;
+    var real_answer = solveme[i].dataset.answer;
+    if (cl.contains("ignorecase")) {
+      real_answer = real_answer.toLowerCase();
+    }
+    if (cl.contains("nospaces")) {
+      real_answer = real_answer.replace(/ /g, "");
+    }
+    solveme[i].dataset.answer = real_answer;
+
+    /* attach checking function */
+    solveme[i].onkeyup = solveme_func;
+    solveme[i].onchange = solveme_func;
+  }
+  
+  /* set up radiogroups */
+  var radiogroups = document.getElementsByClassName("webex-radiogroup");
+  for (var i = 0; i < radiogroups.length; i++) {
+    radiogroups[i].onchange = radiogroups_func;
+  }
+  
+  /* set up selects */
+  var selects = document.getElementsByClassName("webex-select");
+  for (var i = 0; i < selects.length; i++) {
+    selects[i].onchange = select_func;
+  }
+
+  update_total_correct();
+}
+
+</script><script>
+$( document ).ready(function() {
+  var cite = ' ';
+  var psyteachr = ' <a href="https://psyteachr.github.io/"><img src="images/logos/psyteachr_logo.png" style="height: 31px; color: white;" alt="psyTeachR: Reproducible Research" /></a>';
+  var license = ' <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/" target="blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png"></a>';
+
+  $("footer div.row div:eq(1) p").html(
+    psyteachr + license + cite
+  );
+});
+</script><div class="chapter-nav">
+<div class="prev"><a href="standard-error.html"><span class="header-section-number">3</span> Spread and Standard Error</a></div>
+<div class="next"><a href="two-sample-t.html"><span class="header-section-number">5</span> Two-Sample t-Tests</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#t-statistic"><span class="header-section-number">4</span> The One-Sample t-Test</a></li>
+<li><a class="nav-link" href="#one-more-function"><span class="header-section-number">4.1</span> One More Function</a></li>
+<li><a class="nav-link" href="#a-score-example"><span class="header-section-number">4.2</span> A Score Example</a></li>
+<li><a class="nav-link" href="#files-for-this-chapter-2"><span class="header-section-number">4.3</span> Files For This Chapter</a></li>
+<li><a class="nav-link" href="#load-your-toolbox-1"><span class="header-section-number">4.4</span> Load Your Toolbox</a></li>
+<li><a class="nav-link" href="#the-equation"><span class="header-section-number">4.5</span> The Equation</a></li>
+<li><a class="nav-link" href="#build-the-pieces"><span class="header-section-number">4.6</span> Build The Pieces</a></li>
+<li><a class="nav-link" href="#your-turn-write-my_t_value"><span class="header-section-number">4.7</span> Your Turn: Write my_t_value()</a></li>
+<li><a class="nav-link" href="#check-it-against-t.test"><span class="header-section-number">4.8</span> Check It Against t.test()</a></li>
+<li><a class="nav-link" href="#your-turn-write-my_t_test"><span class="header-section-number">4.9</span> Your Turn: Write my_t_test()</a></li>
+<li><a class="nav-link" href="#check-it-against-t.test-again"><span class="header-section-number">4.10</span> Check It Against t.test() Again</a></li>
+<li><a class="nav-link" href="#a-second-comparison-value"><span class="header-section-number">4.11</span> A Second Comparison Value</a></li>
+<li><a class="nav-link" href="#try-it-on-real-data-1"><span class="header-section-number">4.12</span> Try It On Real Data</a></li>
+<li><a class="nav-link" href="#add-to-your-toolbox-2"><span class="header-section-number">4.13</span> Add To Your Toolbox</a></li>
+<li><a class="nav-link" href="#where-this-goes-next-1"><span class="header-section-number">4.14</span> Where This Goes Next</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+          
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Demystifying Functions For Statistics</strong>" was written by Sean Westwood. It was last built on 2026-10-29.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

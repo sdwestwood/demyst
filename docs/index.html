@@ -53,11 +53,31 @@
       <nav aria-label="Table of contents"><h2>Table of contents</h2>
         <ul class="book-toc list-unstyled">
 <li><a class="active" href="index.html">Overview</a></li>
-<li><a class="" href="functions-as-machines.html"><span class="header-section-number">1</span> Functions As Machines</a></li>
-<li><a class="" href="turning-equations-into-r.html"><span class="header-section-number">2</span> Turning Equations Into R</a></li>
-<li><a class="" href="from-spread-to-standard-error.html"><span class="header-section-number">3</span> From Spread To Standard Error</a></li>
-<li><a class="" href="from-summary-functions-to-a-t-statistic.html"><span class="header-section-number">4</span> From Summary Functions To A t-Statistic</a></li>
-<li><a class="" href="covariance-and-correlation.html"><span class="header-section-number">5</span> Covariance And Correlation</a></li>
+<li class="book-part">Building Test Statistics</li>
+<li><a class="" href="functions.html"><span class="header-section-number">1</span> What Are Functions?</a></li>
+<li><a class="" href="equations.html"><span class="header-section-number">2</span> From Equations to Code</a></li>
+<li><a class="" href="standard-error.html"><span class="header-section-number">3</span> Spread and Standard Error</a></li>
+<li><a class="" href="t-statistic.html"><span class="header-section-number">4</span> The One-Sample t-Test</a></li>
+<li><a class="" href="two-sample-t.html"><span class="header-section-number">5</span> Two-Sample t-Tests</a></li>
+<li><a class="" href="correlation.html"><span class="header-section-number">6</span> Covariance and Correlation</a></li>
+<li><a class="" href="one-way-anova.html"><span class="header-section-number">7</span> One-Way ANOVA</a></li>
+<li><a class="" href="factorial-anova.html"><span class="header-section-number">8</span> Factorial ANOVA</a></li>
+<li><a class="" href="chi-square.html"><span class="header-section-number">9</span> Chi-Square</a></li>
+<li class="book-part">Testing by Simulation</li>
+<li><a class="" href="null-distributions.html"><span class="header-section-number">10</span> Null Distributions</a></li>
+<li><a class="" href="p-values.html"><span class="header-section-number">11</span> p-values</a></li>
+<li><a class="" href="effects-power.html"><span class="header-section-number">12</span> Effects and Power</a></li>
+<li class="book-part">The General Linear Model</li>
+<li><a class="" href="lm-mean.html"><span class="header-section-number">13</span> The Mean as a Model</a></li>
+<li><a class="" href="lm-correlation.html"><span class="header-section-number">14</span> Correlation as a Linear Model</a></li>
+<li><a class="" href="lm-t-test.html"><span class="header-section-number">15</span> The Independent t-Test as a Linear Model</a></li>
+<li><a class="" href="lm-one-way-anova.html"><span class="header-section-number">16</span> One-Way ANOVA as a Linear Model</a></li>
+<li class="book-part">Non-Parametric Tests</li>
+<li><a class="" href="wilcoxon-signed-rank.html"><span class="header-section-number">17</span> Wilcoxon Signed-Rank Test</a></li>
+<li><a class="" href="mann-whitney.html"><span class="header-section-number">18</span> Mann-Whitney U Test</a></li>
+<li><a class="" href="spearman.html"><span class="header-section-number">19</span> Spearman's Rho</a></li>
+<li><a class="" href="kruskal-wallis.html"><span class="header-section-number">20</span> Kruskal-Wallis Test</a></li>
+<li><a class="" href="friedman.html"><span class="header-section-number">21</span> Friedman Test</a></li>
 </ul>
 
         <div class="book-extra">
@@ -68,32 +88,43 @@
   </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><!--bookdown:title:end--><!--bookdown:title:start--><div id="overview" class="section level1 unnumbered">
 <h1>Overview<a class="anchor" aria-label="anchor" href="#overview"><i class="fas fa-link"></i></a>
 </h1>
+<p><strong>Author:</strong> Sean Westwood</p>
 <p>This mini-book is designed for students who have already used functions in R, but still feel that functions and statistical equations are two different languages. The goal is to show that they are the same idea written in different forms.</p>
 <div class="summary-box">
-<p>In this resource, a statistical formula is treated as a recipe: inputs go in, a process happens, and an output comes back.</p>
+<p>In this resource, a statistical formula is treated as a blueprint: a set of instructions for turning inputs into an output.</p>
+<p>A function is what you build from that blueprint. You give it the inputs, it carries out the instructions, and it gives you back the output.</p>
 </div>
 <p>By the end, students should be able to:</p>
 <ul>
 <li>describe a function as <strong>input -&gt; process -&gt; output</strong>;</li>
 <li>recognise arguments, defaults, and returned values;</li>
 <li>translate simple mathematical notation into R code;</li>
-<li>explain summation as repeated addition with <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code>;</li>
-<li>connect raw values to distributions;</li>
-<li>build a variance function by hand;</li>
-<li>explain standard error as the spread of sample means;</li>
-<li>build small reusable statistics functions from familiar pieces;</li>
-<li>use paired deviations to calculate covariance and correlation;</li>
-<li>connect a correlation test to the t-distribution.</li>
+<li>build functions from scratch for various summary and test statistics from their equations</li>
+<li>understand how different tests and models relate to each other mathematically</li>
+<li>build a null distribution by simulation, and use it to turn test statistics into p-values;</li>
+<li>simulate true and null effects to illustrate power</li>
 </ul>
 <div id="how-to-use-this-book" class="section level2" number="0.1">
 <h2>
 <span class="header-section-number">0.1</span> How To Use This Book<a class="anchor" aria-label="anchor" href="#how-to-use-this-book"><i class="fas fa-link"></i></a>
 </h2>
-<p>Work through the chapters in order. Type the code yourself when possible, then change the numbers and predict what will happen before running it again.</p>
-<p>Use the questions to check your predictions. Open the hints or solutions after you have tried an exercise yourself.</p>
+<p>The book has two core parts:</p>
+<ul>
+<li>
+<strong>Part I: Building Test Statistics.</strong> You build every piece of each test statistic as your own R function, from the mean upwards, and check each one against the version that comes with R.</li>
+<li>
+<strong>Part II: Testing by Simulation.</strong> You take those test statistics and simulate thousands of samples, to see where p-values and power come from.</li>
+</ul>
+<p>Two later parts, still being written, take the same approach further: the general linear model, which rebuilds the tests from Part I as one kind of model, and non-parametric tests, which work on ranks.</p>
+<p>The recommended route is to work through Part I first, then Part II. If you want to build intuitions about null hypothesis testing sooner, you can dip into Part II as soon as you have finished the one-sample t-test chapter, starting with Null Distributions and then p-values. Each chapter in Part II says what it needs at the start, and its sections on other tests are bonus sections.</p>
+<p>Type the code yourself when possible, then change the numbers and see if you can predict what will happen before running it again.</p>
+<p>Use the questions to check your predictions. Try to have a go yourself before using the hints or solutions!</p>
 
 </div>
 </div>
+
+
+
 <script>
 
 /* update total correct if #webex-total_correct exists */
@@ -276,7 +307,7 @@ $( document ).ready(function() {
 });
 </script><div class="chapter-nav">
 <div class="empty"></div>
-<div class="next"><a href="functions-as-machines.html"><span class="header-section-number">1</span> Functions As Machines</a></div>
+<div class="next"><a href="functions.html"><span class="header-section-number">1</span> What Are Functions?</a></div>
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
       <ul class="nav navbar-nav">
@@ -298,7 +329,7 @@ $( document ).ready(function() {
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Demystifying Functions For Statistics</strong>" was written by Sean Westwood. It was last built on 2026-09-18.</p>
+    <p>"<strong>Demystifying Functions For Statistics</strong>" was written by Sean Westwood. It was last built on 2026-10-29.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

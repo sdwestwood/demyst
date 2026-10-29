@@ -1,0 +1,188 @@
+---
+title: "Exercises: Null Distributions"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# error = TRUE lets the file knit even if one of your chunks is not finished yet
+knitr::opts_chunk$set(error = TRUE)
+```
+
+Work through this file alongside the chapter "Null Distributions" in the book. Keep it in the same folder as your `my_functions.R`.
+
+## Load your toolbox
+
+```{r load-toolbox}
+library(tidyverse)
+source("my_functions.R")
+
+scores <- c(44, 47, 48, 49, 50, 50, 51, 52, 53, 56)
+
+all.equal(my_mean(scores), mean(scores))
+all.equal(my_t_value(scores, 49), unname(t.test(scores, mu = 49)$statistic))
+```
+
+You are looking for two `TRUE`s. If you see `could not find function`, finish the toolbox section at the end of the "The One-Sample t-Test" exercise file first.
+
+## A world where the null is true
+
+Steves are exactly average here: their heights have a mean of 175 cm and an SD of 7 cm, the same as everyone else's. Run this chunk a few times. The heights change, and so does the t-value against 175.
+
+```{r one-null-sample}
+null_sample <- rnorm(n = 10, mean = 175, sd = 7)
+null_sample
+
+my_t_value(null_sample, comparison_value = 175)
+```
+
+## Many groups of Steves
+
+1000 groups of 10 Steves, keeping each group's mean height. Compare the SD of the means with the standard error.
+
+```{r null-means}
+null_means <- replicate(1000, mean(rnorm(n = 10, mean = 175, sd = 7)))
+
+c(sd_of_means = my_sd(null_means), formula_se = 7 / sqrt(10))
+
+hist(null_means, breaks = 40)
+```
+
+## Your turn: write `my_null_t()`
+
+```{r my-null-t}
+my_null_t <- function(n, pop_mean, pop_sd) {
+  sample_values <-
+  output <-
+  return(output)
+}
+
+my_null_t(n = 10, pop_mean = 175, pop_sd = 7)
+```
+
+### Check it against R
+
+```{r my-null-t-check}
+set.seed(1)
+mine <- my_null_t(n = 10, pop_mean = 175, pop_sd = 7)
+
+set.seed(1)
+r_version <- unname(
+  t.test(rnorm(n = 10, mean = 175, sd = 7), mu = 175)$statistic
+)
+
+c(mine = mine, R = r_version)
+all.equal(mine, r_version)
+```
+
+## Many t-values
+
+```{r null-ts}
+null_ts <- replicate(1000, my_null_t(n = 10, pop_mean = 175, pop_sd = 7))
+
+hist(null_ts, breaks = 40)
+```
+
+## Where do the rare values start?
+
+```{r sorted-ts}
+sorted_ts <- sort(null_ts)
+
+head(sorted_ts)
+tail(sorted_ts)
+```
+
+### Your turn: pick them out by position
+
+To mark the rarest 5% of 1000 t-values, 25 go in each tail. The lower cutoff is the 26th smallest value and the upper cutoff is the 975th.
+
+```{r cutoffs-by-position}
+lower <-
+upper <-
+
+c(lower = lower, upper = upper)
+```
+
+### Your turn: write `my_cutoffs()`
+
+```{r my-cutoffs}
+my_cutoffs <- function(null_ts, alpha = 0.05) {
+  sorted <-
+  n <-
+  k <-
+  lower <-
+  upper <-
+  output <- c(lower, upper)
+  return(output)
+}
+
+my_cutoffs(null_ts)
+```
+
+### See the rare values
+
+Set `alpha_choice` to 0.5, 0.1, 0.05 and 0.01, and run the chunk each time.
+
+```{r rare-plot}
+alpha_choice <- 0.05
+rare_cutoffs <- my_cutoffs(null_ts, alpha = alpha_choice)
+
+null_t_data <- tibble(t = null_ts) %>%
+  mutate(rare = t < rare_cutoffs[1] | t > rare_cutoffs[2])
+
+ggplot(null_t_data, aes(x = t, fill = rare)) +
+  geom_histogram(binwidth = 0.25, colour = "white") +
+  geom_vline(xintercept = rare_cutoffs, linetype = "dashed") +
+  scale_fill_manual(values = c("FALSE" = "#467AAC", "TRUE" = "#D55E00"),
+                    guide = "none") +
+  coord_cartesian(xlim = c(-6, 6)) +
+  labs(x = "t-value", y = "Count") +
+  theme_minimal()
+
+null_t_data %>%
+  summarise(beyond = sum(rare), share = mean(rare))
+```
+
+### Compare with R
+
+```{r cutoffs-compare}
+tibble(
+  cutoff = c("lower", "upper"),
+  simulated = my_cutoffs(null_ts),
+  qt = qt(c(0.025, 0.975), df = 9)
+)
+```
+
+## Rare, but not impossible
+
+How many of your 1000 groups of Steves averaged more than 180 cm, or less than 170 cm?
+
+```{r rare-groups}
+sum(null_means > 180)
+sum(null_means < 170)
+```
+
+## Add to your toolbox
+
+1. Open `my_functions.R`.
+2. Copy your finished `my_null_t()` and `my_cutoffs()` into it, under the **Null Distributions** heading. Copy only the functions.
+3. Save `my_functions.R`.
+
+Now check that the saved toolbox works on its own. You are looking for two `TRUE`s.
+
+```{r toolbox-check}
+rm(list = ls())
+source("my_functions.R")
+
+set.seed(1)
+mine <- my_null_t(n = 10, pop_mean = 175, pop_sd = 7)
+set.seed(1)
+r_version <- unname(
+  t.test(rnorm(n = 10, mean = 175, sd = 7), mu = 175)$statistic
+)
+all.equal(mine, r_version)
+
+# 20:1 counts down from 20 to 1; with alpha = 0.1, one value is in each tail
+all.equal(my_cutoffs(20:1, alpha = 0.1), c(2, 19))
+```
+
+If you see `could not find function`, that function is not in `my_functions.R` yet, or the file was not saved.
